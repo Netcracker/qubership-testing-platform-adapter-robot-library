@@ -5,14 +5,14 @@ metadata:
   namespace: ca-ta
 
 parameters:
-- name: SERVICE_NAME
-  description: Deployment Config/Service name.
-  value: 'dealer'
-  required: true
-- name: DOCKER_TAG
-  description: Which docker image should be used to deploy
-  required: true
-  value: artifactorycn-someurl:17014/atp/dealer:v3
+  - name: SERVICE_NAME
+    description: Deployment Config/Service name.
+    value: "dealer"
+    required: true
+  - name: DOCKER_TAG
+    description: Which docker image should be used to deploy
+    required: true
+    value: artifactorycn-someurl:17014/atp/dealer:v3
 
 objects:
   - kind: DeploymentConfig
@@ -49,11 +49,11 @@ objects:
                   mountPath: /dealer/cred
               resources:
                 requests:
-                  memory: '1Gi'
-                  cpu: '750m'
+                  memory: "1Gi"
+                  cpu: "750m"
                 limits:
-                  memory: '1Gi'
-                  cpu: '750m'
+                  memory: "1Gi"
+                  cpu: "750m"
               ports:
                 - containerPort: 8080
                   name: web
@@ -81,7 +81,7 @@ objects:
     metadata:
       name: "${SERVICE_NAME}"
       annotations:
-          haproxy.router.openshift.io/timeout: 10h
+        haproxy.router.openshift.io/timeout: 10h
     spec:
       host: ${SERVICE_NAME}.somehost.com
       to:
