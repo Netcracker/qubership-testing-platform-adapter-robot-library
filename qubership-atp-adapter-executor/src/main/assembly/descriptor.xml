@@ -1,0 +1,45 @@
+<assembly xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xmlns="http://maven.apache.org/ASSEMBLY/2.0.0"
+          xsi:schemaLocation="http://maven.apache.org/ASSEMBLY/2.0.0 http://maven.apache.org/xsd/assembly-2.0.0.xsd">
+    <id>dist</id>
+    <includeBaseDirectory>true</includeBaseDirectory>
+    <baseDirectory>atp-adapter-robot</baseDirectory>
+
+    <formats>
+        <format>zip</format>
+    </formats>
+
+    <fileSets>
+        <fileSet>
+            <directory>target</directory>
+            <includes>
+                <include>version.txt</include>
+            </includes>
+            <outputDirectory/>
+
+        </fileSet>
+
+        <fileSet>
+            <directory>src/main/resources</directory>
+
+            <includes>
+                <include>run.bat</include>
+            </includes>
+            <outputDirectory/>
+        </fileSet>
+
+        <fileSet>
+            <directory>target</directory>
+            <outputDirectory/>
+            <includes>
+                <include>*.sh</include>
+            </includes>
+            <lineEnding>unix</lineEnding>
+        </fileSet>
+    </fileSets>
+    <dependencySets>
+        <dependencySet>
+            <outputDirectory>/lib</outputDirectory>
+        </dependencySet>
+    </dependencySets>
+</assembly>

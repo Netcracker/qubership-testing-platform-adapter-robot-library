@@ -1,0 +1,63 @@
+syntax = "proto3";
+
+option java_outer_classname = "KafkaEnvironmentsInfo";
+option java_package = "org.qubership.atp.adapter.common.protos";
+
+message ToolsInfo {
+    string uuid = 1;
+    string sessionId = 2;
+    string sessionLogsUrl = 3;
+    string dealer = 4;
+    string dealerLogsUrl = 5;
+    string selenoid = 6;
+    string selenoidLogsUrl = 7;
+    string tool = 8;
+    string toolLogsUrl = 9;
+    repeated WdShells wdShells = 10;
+}
+
+message WdShells {
+    string name = 1;
+    string version = 2;
+}
+
+message System {
+
+    string name = 1;
+    string status = 2;
+    string version = 3;
+    repeated string urls = 4;
+    string monitoringSystem = 5;
+}
+
+message SsmMetricReports {
+    string problemContextReportId = 1;
+    string microservicesReportId = 2;
+}
+
+message EnvironmentsInfo {
+    string uuid = 1;
+    oneof executionRequestId_oneof {
+        string executionRequestId = 2;
+    }
+    oneof startDate_oneof {
+        int64 startDate = 3;
+    }
+    int64 endDate = 4;
+    oneof dur_oneof {
+        int64 duration = 5;
+    }
+    oneof name_oneof {
+        string name = 6;
+    }
+    oneof toolsInfo_oneof {
+        string toolsInfo = 7;
+    }
+    repeated System qaSystemInfoList = 8;
+    repeated System taSystemInfoList = 9;
+    string environmentId = 10;
+    string taToolsGroupId = 11;
+    string mandatoryChecksReportId = 12;
+
+    SsmMetricReports ssmMetricReports = 13;
+}

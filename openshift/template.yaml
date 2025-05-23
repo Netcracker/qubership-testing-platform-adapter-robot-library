@@ -1,0 +1,89 @@
+apiVersion: v1
+kind: Template
+metadata:
+  name: ${SERVICE_NAME}
+  namespace: ca-ta
+
+parameters:
+- name: SERVICE_NAME
+  description: Deployment Config/Service name.
+  value: 'dealer'
+  required: true
+- name: DOCKER_TAG
+  description: Which docker image should be used to deploy
+  required: true
+  value: artifactorycn-someurl:17014/atp/dealer:v3
+
+objects:
+  - kind: DeploymentConfig
+    apiVersion: v1
+    metadata:
+      name: ${SERVICE_NAME}
+      labels:
+        app: ${SERVICE_NAME}
+        name: ${SERVICE_NAME}
+    spec:
+      strategy:
+        type: Rolling
+        reacreateParams:
+          timeoutSeconds: 600
+      triggers:
+        - type: ConfigChange
+      replicas: 2
+      selector:
+        app: ${SERVICE_NAME}
+        deploymentconfig: ${SERVICE_NAME}
+      template:
+        metadata:
+          labels:
+            name: ${SERVICE_NAME}
+            app: ${SERVICE_NAME}
+            deploymentconfig: ${SERVICE_NAME}
+        spec:
+          containers:
+            - name: ${SERVICE_NAME}
+              image: ${DOCKER_TAG}
+              imagePullPolicy: Always
+              volumeMounts:
+                - name: cred
+                  mountPath: /dealer/cred
+              resources:
+                requests:
+                  memory: '1Gi'
+                  cpu: '750m'
+                limits:
+                  memory: '1Gi'
+                  cpu: '750m'
+              ports:
+                - containerPort: 8080
+                  name: web
+                  protocol: TCP
+          volumes:
+            - name: cred
+              secret:
+                secretName: kube2vcs
+  - kind: Service
+    apiVersion: v1
+    metadata:
+      name: ${SERVICE_NAME}
+      namespace: namespace
+    spec:
+      ports:
+        - name: web
+          port: 8080
+          protocol: TCP
+      selector:
+        name: "${SERVICE_NAME}"
+      type: NodePort
+
+  - apiVersion: v1
+    kind: Route
+    metadata:
+      name: "${SERVICE_NAME}"
+      annotations:
+          haproxy.router.openshift.io/timeout: 10h
+    spec:
+      host: ${SERVICE_NAME}.somehost.com
+      to:
+        kind: Service
+        name: "${SERVICE_NAME}"

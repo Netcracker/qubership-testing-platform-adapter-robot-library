@@ -1,0 +1,78 @@
+{
+  "testCaseId": "257794f0-8c6e-4e01-a95d-bbebf6218a31",
+  "metaInfo": {
+    "scenarioHashSum": "ac458c1b88d799676536b4e673f83360"
+  },
+  "trees": [
+    {
+      "logRecordId": null,
+      "parentRecordId": null,
+      "name": "section 1",
+      "message": null,
+      "testingStatus": "Unknown",
+      "metaInfo": {
+        "scenarioId": "654de161-3ca5-44c3-bbd7-33263665fe8a",
+        "scenarioHashSum": "a6d1f65664a59a753c8524f7d8f04d2a",
+        "line": 1
+      },
+      "configInfo": null,
+      "child": [
+        {
+          "logRecordId": null,
+          "parentRecordId": null,
+          "name": "message 1",
+          "message": "there is a body for message 1",
+          "testingStatus": "Unknown",
+          "metaInfo": null,
+          "configInfo": null,
+          "child": []
+        },
+        {
+          "logRecordId": null,
+          "parentRecordId": null,
+          "name": "message 2",
+          "message": "there is a body for message 2",
+          "testingStatus": "Unknown",
+          "metaInfo": null,
+          "configInfo": null,
+          "child": []
+        },
+        {
+          "logRecordId": null,
+          "parentRecordId": null,
+          "name": "section 2",
+          "message": null,
+          "testingStatus": "Unknown",
+          "metaInfo": {
+            "scenarioId": "b4a9af89-3dc2-4daa-95b5-65e60f079458",
+            "scenarioHashSum": "scenarioIdHashSum_section2metainfo",
+            "line": 2
+          },
+          "configInfo": null,
+          "child": [
+            {
+              "logRecordId": null,
+              "parentRecordId": null,
+              "name": "message 1 from section 2",
+              "message": "there is a body for message 1 from section 2",
+              "testingStatus": "Unknown",
+              "metaInfo": null,
+              "configInfo": null,
+              "child": []
+            },
+            {
+              "logRecordId": null,
+              "parentRecordId": null,
+              "name": "message 2 from section 2",
+              "message": "there is a body for message 2 from section 2",
+              "testingStatus": "Unknown",
+              "metaInfo": null,
+              "configInfo": null,
+              "child": []
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

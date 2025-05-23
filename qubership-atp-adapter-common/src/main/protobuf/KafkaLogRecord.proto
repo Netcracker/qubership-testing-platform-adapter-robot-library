@@ -1,0 +1,180 @@
+syntax = "proto3";
+
+option java_outer_classname = "KafkaLogRecord";
+option java_package = "org.qubership.atp.adapter.common.protos";
+
+message ATPSource{
+    string atpObjectId = 1;
+}
+
+message StepLinkMetaInfo {
+    string engineType = 1;
+    string value = 2;
+}
+
+message CustomLink {
+    string name = 1;
+    string url = 2;
+    string openMode = 3;
+}
+
+message MetaInfo {
+    string scenarioId = 1;
+    int32 line = 2;
+    string scenarioHashSum = 3;
+    bool hidden = 4;
+    string definitionId = 5;
+    StepLinkMetaInfo editorMetaInfo = 6;
+}
+
+message SqlResult {
+    string key = 1;
+    repeated string value = 2;
+}
+
+message Map {
+    string key = 1;
+    string value = 2;
+}
+
+message RequestHeader {
+    string name = 1;
+    string value = 2;
+    string description = 3;
+}
+
+message ValidationTableLine {
+    string name = 1;
+    string expectedResult = 2;
+    string actualResult = 3;
+    string status = 4;
+    string bvStatus = 5;
+    repeated string validationLabels = 6;
+}
+
+message ValidationTable {
+    repeated ValidationTableLine steps = 1;
+}
+
+message Request {
+    string endpoint = 1;
+    string method = 2;
+    repeated Map headers = 3;
+    int64 timestamp = 4;
+    string body = 5;
+    repeated RequestHeader headersList = 6;
+    bool htmlBody = 7;
+}
+
+message Response {
+    string endpoint = 1;
+    string code = 2;
+    repeated Map headers = 3;
+    int64 timestamp = 4;
+    string body = 5;
+    repeated RequestHeader headersList = 6;
+}
+
+message ContextVariable {
+    string name = 1;
+    string beforeValue = 2;
+    string afterValue = 3;
+}
+
+message FileMetadata {
+    string fileName = 1;
+    string fileType = 2;
+}
+
+message MessageParameter {
+    string name = 1;
+    string value = 2;
+}
+
+message Cell {
+    string value = 1;
+}
+
+message Row {
+    repeated Cell cells = 1;
+}
+
+message Table {
+    repeated Row rows = 1;
+}
+
+message BrowserConsoleLogsTable {
+    string message = 1;
+    int64 timestamp = 2;
+    string level = 3;
+    string fileName = 4;
+}
+
+message SsmMetricReports {
+
+    string problemContextReportId = 1;
+    string microservicesReportId = 2;
+}
+
+
+message LogRecord {
+    string uuid = 1;
+    string parentRecordId = 2;
+    bool isSection = 3;
+    string testingStatus = 4;
+    int64 startDate = 5;
+    int64 endDate = 6;
+    string testRunId = 7;
+    bool isCompaund = 8;
+    int64 duration = 9;
+    string name = 10;
+    string message = 11;
+    ATPSource atpSource = 12;
+    repeated string configInfoId = 13;
+    string type = 14;
+    ValidationTable validationTable = 15;
+    Request request = 16;
+    Response response = 17;
+    string command = 18;
+    string output = 19;
+    string stage = 20;
+    string linkToTool = 21;
+    repeated SqlResult result = 22;
+    repeated Map connectionInfo = 23;
+    string className = 24;
+    string screenId = 25;
+    string preview = 26;
+    string server = 27;
+    MetaInfo metaInfo = 28;
+    oneof executionStatus_oneof {
+        string executionStatus = 29;
+    }
+    oneof lastUpdated_oneof {
+        int64 lastUpdated = 30;
+    }
+    int64 createdDate = 31;
+    int64 createdDateStamp = 32;
+    repeated ContextVariable contextVariables = 33;
+    repeated string validationLabels = 34;
+    repeated MessageParameter messageParameters = 35;
+    repeated ContextVariable stepContextVariables = 36;
+    repeated FileMetadata fileMetadata = 37;
+    oneof isGroup_oneof {
+        bool isGroup = 38;
+    }
+    Table table = 39;
+    repeated BrowserConsoleLogsTable browserConsoleLogTable = 40;
+    string browserName = 41;
+    string protocolType = 42;
+    string linkToSvp = 43;
+
+    SsmMetricReports ssmMetricReports = 44;
+
+    oneof isPreScriptPresent_oneof {
+            bool isPreScriptPresent = 45;
+        }
+    oneof isPostScriptPresent_oneof {
+            bool isPostScriptPresent = 46;
+        }
+    repeated CustomLink customLinks = 47;
+}
