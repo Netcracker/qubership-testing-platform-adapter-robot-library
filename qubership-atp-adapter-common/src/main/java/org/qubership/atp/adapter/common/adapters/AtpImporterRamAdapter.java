@@ -161,9 +161,8 @@ public class AtpImporterRamAdapter extends AbstractAdapter {
 
     /**
      * Sends request to start TR.
-     *
-     * @throws FailedToCreateRamEntity in case of TR creation failure in RAM.
-     *                                 This is unrecoverable for reporting error. Client should handle it.
+     * In case TR creation failure in RAM, throws FailedToCreateRamEntity exception
+     * (unrecoverable; client should handle it).
      */
     @SneakyThrows
     @Override
@@ -233,9 +232,6 @@ public class AtpImporterRamAdapter extends AbstractAdapter {
 
     /**
      * Updates ER status.
-     *
-     * @throws FailedToCreateRamEntity in case of ER details reporting to RAM fails.
-     *                                 This is unrecoverable for reporting error. Client should handle it.
      */
     @SneakyThrows
     @Override
