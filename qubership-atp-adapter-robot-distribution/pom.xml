@@ -23,7 +23,7 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>qubership-atp-adapter-robot</artifactId>
-            <version>${project.version}</version>
+            <version>4.5.71-SNAPSHOT</version>
             <type>zip</type>
             <classifier>dist</classifier>
         </dependency>

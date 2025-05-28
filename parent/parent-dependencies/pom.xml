@@ -150,26 +150,8 @@
             <dependency>
                 <groupId>org.qubership.atp.adapter.robot</groupId>
                 <artifactId>qubership-atp-adapter-robot</artifactId>
-                <version>${project.parent.version}</version>
+                <version>4.5.71-SNAPSHOT</version>
             </dependency>
-
         </dependencies>
     </dependencyManagement>
-
-    <distributionManagement>
-        <repository>
-            <id>central</id>
-            <name>Maven Central</name>
-            <url>https://repo1.maven.org/maven2/</url>
-        </repository>
-    </distributionManagement>
-
-    <repositories>
-        <repository>
-            <id>central</id>
-            <name>Maven Central</name>
-            <url>https://repo1.maven.org/maven2/</url>
-        </repository>
-    </repositories>
-
 </project>
