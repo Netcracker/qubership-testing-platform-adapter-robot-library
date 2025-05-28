@@ -22,7 +22,6 @@ message WdShells {
 }
 
 message System {
-
     string name = 1;
     string status = 2;
     string version = 3;
@@ -58,6 +57,5 @@ message EnvironmentsInfo {
     string environmentId = 10;
     string taToolsGroupId = 11;
     string mandatoryChecksReportId = 12;
-
     SsmMetricReports ssmMetricReports = 13;
 }
