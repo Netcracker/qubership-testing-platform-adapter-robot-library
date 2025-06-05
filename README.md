@@ -55,8 +55,8 @@ kafka.topic.name=messages
 ```
 ### Special builds
 There should be special built virtual machine(s) for building of docker images with robot-framework^
- - repository-path/atp/robot-framework/vm-for-atp-robot-centos:v1   - this is centos official VM from internal artifactory repository
- - repository-path/atp/robot-framework/vm-for-atp-robot:v1     - this is ppodgorsek/robot-framework image from docker hub
+- repository-path/atp/robot-framework/vm-for-atp-robot-centos:v1   - this is centos official VM from internal artifactory repository
+- repository-path/atp/robot-framework/vm-for-atp-robot:v1     - this is ppodgorsek/robot-framework image from docker hub
 
 Versions numbering
 - Even version (1.0.0, 1.0.2, etc.) use for ethalon publication
