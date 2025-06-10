@@ -23,7 +23,7 @@
     </properties>
 
     <name>${project.groupId}:${project.artifactId}</name>
-    <description>Adapter Robot library</description>
+    <description>Qubership Testing Platform Adapter Robot library</description>
     <url>https://github.com/Netcracker/qubership-testing-platform-adapter-robot-library</url>
     <licenses>
         <license>
@@ -41,7 +41,7 @@
     </developers>
     <scm>
         <connection>scm:git:https//github.com/Netcracker/qubership-testing-platform-adapter-robot-library.git</connection>
-        <developerConnection>scm:git:https://github.com:Netcracker/qubership-testing-platform-adapter-robot-library.git</developerConnection>
+        <developerConnection>scm:git:https://github.com/Netcracker/qubership-testing-platform-adapter-robot-library.git</developerConnection>
         <url>scm:git:https://github.com/Netcracker/qubership-testing-platform-adapter-robot-library/tree/main</url>
     </scm>
 
