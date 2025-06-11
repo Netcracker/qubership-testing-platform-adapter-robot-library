@@ -31,7 +31,7 @@
         <lombok.version>1.18.30</lombok.version>
         <mapstruct.version>1.5.5.Final</mapstruct.version>
         <crypt.version>0.0.20</crypt.version>
-        <ram.model.version>2.2.204-SNAPSHOT</ram.model.version>
+        <ram.model.version>2.2.204</ram.model.version>
     </properties>
 
     <repositories>
@@ -272,7 +272,7 @@
             <dependency>
                 <groupId>org.qubership.atp.adapter.robot</groupId>
                 <artifactId>qubership-atp-adapter-robot</artifactId>
-                <version>4.5.71-SNAPSHOT</version>
+                <version>${project.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
