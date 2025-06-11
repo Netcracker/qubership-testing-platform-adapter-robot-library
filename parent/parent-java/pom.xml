@@ -20,34 +20,6 @@
         <svn.revision>local_build</svn.revision>
     </properties>
 
-    <profiles>
-        <profile>
-            <id>with-analyzers</id>
-            <activation>
-                <property>
-                    <name>stage</name>
-                    <value>test</value>
-                </property>
-            </activation>
-            <build>
-                <plugins>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <id>skipTests</id>
-            <activation>
-                <property>
-                    <name>stage</name>
-                    <value>release</value>
-                </property>
-            </activation>
-            <properties>
-                <maven.test.skip>true</maven.test.skip>
-            </properties>
-        </profile>
-    </profiles>
-
     <build>
         <pluginManagement>
             <plugins>
@@ -161,6 +133,5 @@
             </plugin>
         </plugins>
     </build>
-
 
 </project>
