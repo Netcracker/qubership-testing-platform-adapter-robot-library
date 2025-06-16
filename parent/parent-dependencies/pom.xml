@@ -4,7 +4,7 @@
 
     <groupId>org.qubership.atp.adapter.robot</groupId>
     <artifactId>qubership-atp-adapter-robot-parent-dependencies</artifactId>
-    <version>4.5.72-SNAPSHOT</version>
+    <version>4.5.71-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>parent-dependencies</name>
 
@@ -32,6 +32,29 @@
         <crypt.version>0.0.20</crypt.version>
         <ram.model.version>2.2.204</ram.model.version>
     </properties>
+
+    <description>Qubership Testing Platform Adapter Robot library</description>
+    <url>https://github.com/Netcracker/qubership-testing-platform-adapter-robot-library</url>
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0</url>
+        </license>
+    </licenses>
+    <developers>
+        <developer>
+            <name>Netcracker</name>
+            <email>opensourcegroup@netcracker.com</email>
+            <organization>Netcracker Technology</organization>
+            <organizationUrl>https://www.netcracker.com</organizationUrl>
+        </developer>
+    </developers>
+    <scm>
+        <connection>scm:git:https//github.com/Netcracker/qubership-testing-platform-adapter-robot-library.git</connection>
+        <developerConnection>scm:git:https://github.com/Netcracker/qubership-testing-platform-adapter-robot-library.git</developerConnection>
+        <url>scm:git:https://github.com/Netcracker/qubership-testing-platform-adapter-robot-library/tree/main</url>
+        <tag>HEAD</tag>
+    </scm>
 
     <repositories>
         <!-- Maven Central repository for release versions -->

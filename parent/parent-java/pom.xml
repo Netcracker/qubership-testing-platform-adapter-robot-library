@@ -3,7 +3,7 @@
     <parent>
         <groupId>org.qubership.atp.adapter.robot</groupId>
         <artifactId>qubership-atp-adapter-robot-parent-dependencies</artifactId>
-        <version>4.5.72-SNAPSHOT</version>
+        <version>4.5.71-SNAPSHOT</version>
         <relativePath>../parent-dependencies/pom.xml</relativePath>
     </parent>
 
