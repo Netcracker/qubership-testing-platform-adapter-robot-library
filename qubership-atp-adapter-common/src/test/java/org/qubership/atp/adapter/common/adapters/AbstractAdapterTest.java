@@ -16,8 +16,6 @@
 
 package org.qubership.atp.adapter.common.adapters;
 
-import static org.qubership.atp.adapter.common.RamConstants.OBJECT_MAPPER;
-import static org.qubership.atp.adapter.common.utils.ExecutionRequestHelper.getCurrentTimestamp;
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -29,6 +27,8 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.qubership.atp.adapter.common.RamConstants.OBJECT_MAPPER;
+import static org.qubership.atp.adapter.common.utils.ExecutionRequestHelper.getCurrentTimestamp;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -52,9 +52,6 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
-import org.springframework.core.io.ClassPathResource;
-
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.qubership.atp.adapter.common.RamConstants;
 import org.qubership.atp.adapter.common.adapters.error.FailedToCreateRamEntity;
 import org.qubership.atp.adapter.common.context.AtpCompaund;
@@ -78,13 +75,15 @@ import org.qubership.atp.ram.models.logrecords.BvLogRecord;
 import org.qubership.atp.ram.models.logrecords.CompoundLogRecord;
 import org.qubership.atp.ram.models.logrecords.ItfLogRecord;
 import org.qubership.atp.ram.models.logrecords.MiaLogRecord;
-import org.qubership.atp.ram.models.logrecords.RbmLogRecord;
 import org.qubership.atp.ram.models.logrecords.RestLogRecord;
 import org.qubership.atp.ram.models.logrecords.SqlLogRecord;
 import org.qubership.atp.ram.models.logrecords.SshLogRecord;
 import org.qubership.atp.ram.models.logrecords.TechnicalLogRecord;
 import org.qubership.atp.ram.models.logrecords.UiLogRecord;
 import org.qubership.atp.ram.models.logrecords.parts.ContextVariable;
+import org.springframework.core.io.ClassPathResource;
+
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class AbstractAdapterTest {
 
@@ -130,13 +129,11 @@ public class AbstractAdapterTest {
                         argThat(er -> {
                             if (er instanceof ExecutionRequest) {
                                 ExecutionRequest erToCreate = (ExecutionRequest) er;
-                                if (erToCreate.getName().equals(createdRequest.getName()) &&
+                                return erToCreate.getName().equals(createdRequest.getName()) &&
                                         erToCreate.getTestPlanId().equals(createdRequest.getTestPlanId()) &&
                                         erToCreate.getProjectId().equals(createdRequest.getProjectId()) &&
                                         erToCreate.getExecutionStatus().equals(createdRequest.getExecutionStatus()) &&
-                                        erToCreate.getStartDate() != null) {
-                                    return true;
-                                }
+                                        erToCreate.getStartDate() != null;
                             }
                             return false;
                         }),
@@ -270,12 +267,10 @@ public class AbstractAdapterTest {
                         argThat(details -> {
                             if (details instanceof ExecutionRequestDetails) {
                                 ExecutionRequestDetails requestDetails = (ExecutionRequestDetails) details;
-                                if (requestDetails.getMessage().equals(DETAILS_MESSAGE) &&
+                                return requestDetails.getMessage().equals(DETAILS_MESSAGE) &&
                                         requestDetails.getStatus().equals(TestingStatuses.FAILED) &&
                                         requestDetails.getExecutionRequestId().equals(erId) &&
-                                        requestDetails.getProjectId().equals(projectId)) {
-                                    return true;
-                                }
+                                        requestDetails.getProjectId().equals(projectId);
                             }
                             return false;
                         }),
@@ -501,7 +496,7 @@ public class AbstractAdapterTest {
         LogRecord logRecord = abstractAdapter.createLogRecord(message, true, false);
         assertEquals("Log record title should be masked",
                 MASKED_MESSAGE, logRecord.getName());
-        assertEquals("Log record message shouldn be masked", MASKED_MESSAGE, logRecord.getMessage());
+        assertEquals("Log record message should be masked", MASKED_MESSAGE, logRecord.getMessage());
     }
 
     @Test
