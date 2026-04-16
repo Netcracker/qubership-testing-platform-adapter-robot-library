@@ -99,7 +99,6 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.common.base.Strings;
 import lombok.SneakyThrows;
 import net.sf.json.JSONObject;
 
@@ -602,7 +601,7 @@ public abstract class AbstractAdapter implements AtpRamAdapter {
     @Override
     public TestRunContext openItfSection(Message messageBean, JSONObject validationTable) {
         try {
-            if (Strings.isNullOrEmpty(messageBean.getType())) {
+            if (StringUtils.isEmpty(messageBean.getType())) {
                 messageBean.setType(TypeAction.ITF.toString());
             }
             ItfLogRecord itfLogRecord =
@@ -631,7 +630,7 @@ public abstract class AbstractAdapter implements AtpRamAdapter {
     @Override
     public TestRunContext openMiaSection(Message messageBean) {
         try {
-            if (Strings.isNullOrEmpty(messageBean.getType())) {
+            if (StringUtils.isEmpty(messageBean.getType())) {
                 messageBean.setType(TypeAction.MIA.toString());
             }
             MiaLogRecord miaLogRecord =
@@ -700,7 +699,7 @@ public abstract class AbstractAdapter implements AtpRamAdapter {
     @Override
     public TestRunContext message(Message message) {
         try {
-            if (Strings.isNullOrEmpty(message.getUuid()) || NULL_VALUE.equalsIgnoreCase(message.getUuid())) {
+            if (StringUtils.isEmpty(message.getUuid()) || NULL_VALUE.equalsIgnoreCase(message.getUuid())) {
                 message.setUuid(UUID.randomUUID().toString());
             }
             if (hasFile(message)) {
@@ -789,7 +788,7 @@ public abstract class AbstractAdapter implements AtpRamAdapter {
     @Override
     public TestRunContext bvMessage(Message message) {
         try {
-            if (Strings.isNullOrEmpty(message.getType())) {
+            if (StringUtils.isEmpty(message.getType())) {
                 message.setType(TypeAction.BV.toString());
             }
 
@@ -807,7 +806,7 @@ public abstract class AbstractAdapter implements AtpRamAdapter {
     @Override
     public TestRunContext restMessage(Message message, JSONObject validationTable) {
         try {
-            if (Strings.isNullOrEmpty(message.getType())) {
+            if (StringUtils.isEmpty(message.getType())) {
                 message.setType(TypeAction.REST.toString());
             }
 
@@ -838,7 +837,7 @@ public abstract class AbstractAdapter implements AtpRamAdapter {
     @Override
     public TestRunContext sqlMessage(Message message) {
         try {
-            if (Strings.isNullOrEmpty(message.getType())) {
+            if (StringUtils.isEmpty(message.getType())) {
                 message.setType(TypeAction.SQL.toString());
             }
 
@@ -856,7 +855,7 @@ public abstract class AbstractAdapter implements AtpRamAdapter {
     @Override
     public TestRunContext sshMessage(Message message) {
         try {
-            if (Strings.isNullOrEmpty(message.getType())) {
+            if (StringUtils.isEmpty(message.getType())) {
                 message.setType(TypeAction.SSH.toString());
             }
 
@@ -895,7 +894,7 @@ public abstract class AbstractAdapter implements AtpRamAdapter {
 
     @Override
     public void updateMessageTestingStatusAndFiles(Message message) {
-        message.setUuid(Strings.isNullOrEmpty(context.getCurrentSectionId())
+        message.setUuid(StringUtils.isEmpty(context.getCurrentSectionId())
                 ? context.getAtpCompaund().getSectionId() : context.getCurrentSectionId());
 
         if (hasFile(message)) {
@@ -905,7 +904,7 @@ public abstract class AbstractAdapter implements AtpRamAdapter {
         }
 
         TestingStatuses status = TestingStatuses.findByValue(message.getTestingStatus());
-        if (Strings.isNullOrEmpty(context.getCurrentSectionId()) || Objects.isNull(context.getCurrentSection())) {
+        if (StringUtils.isEmpty(context.getCurrentSectionId()) || Objects.isNull(context.getCurrentSection())) {
             sendMessageStatusAndFiles(message.getUuid(), message.getMessage(), status, message.getFileMetadata());
         } else {
             LogRecord currentLogRecord = context.getCurrentSection();
@@ -1017,7 +1016,7 @@ public abstract class AbstractAdapter implements AtpRamAdapter {
                         RamConstants.SCREENSHOT_FILE_KEY);
             }
         }
-        if (Strings.isNullOrEmpty(response.getFileId())) {
+        if (StringUtils.isEmpty(response.getFileId())) {
             log.error("File id is NULL for Log Record: [{}]. Response {}", logRecordId, response);
         } else {
             log.debug("Uploaded file with id {} for LR {}", response.getFileId(), logRecordId);
@@ -1178,10 +1177,10 @@ public abstract class AbstractAdapter implements AtpRamAdapter {
         }
         logRecord.setSection(isSection);
         if (!isStepFromAtpCompound && Objects.isNull(logRecord.getParentRecordId())) {
-            if (!Strings.isNullOrEmpty(context.getCurrentSectionId())) {
+            if (!StringUtils.isEmpty(context.getCurrentSectionId())) {
                 logRecord.setParentRecordId(UUID.fromString(context.getCurrentSectionId()));
             } else if (Objects.nonNull(context.getAtpCompaund())
-                    && !Strings.isNullOrEmpty(context.getAtpCompaund().getSectionId())) {
+                    && !StringUtils.isEmpty(context.getAtpCompaund().getSectionId())) {
                 logRecord.setParentRecordId(UUID.fromString(context.getAtpCompaund().getSectionId()));
             }
         }

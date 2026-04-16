@@ -1,5 +1,5 @@
 /*
- *  Copyright 2024-2025 NetCracker Technology Corporation
+ *  Copyright 2024-2026 NetCracker Technology Corporation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -23,9 +23,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.google.common.base.Strings;
+import org.apache.commons.lang3.StringUtils;
 import org.qubership.atp.ram.dto.response.MessageParameter;
 import org.qubership.atp.ram.enums.TypeAction;
 import org.qubership.atp.ram.models.BrowserConsoleLogsTable;
@@ -38,6 +36,9 @@ import org.qubership.atp.ram.models.logrecords.parts.Request;
 import org.qubership.atp.ram.models.logrecords.parts.Response;
 import org.qubership.atp.ram.models.logrecords.parts.ValidationTable;
 import org.qubership.atp.ram.models.steplink.ItfLiteStepLinkMetaInfo;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -129,7 +130,7 @@ public class Message {
      * @return type
      */
     public String getType() {
-        if (Strings.isNullOrEmpty(type)) {
+        if (StringUtils.isEmpty(type)) {
             return TypeAction.TECHNICAL.toString();
         }
         return type;

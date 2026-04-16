@@ -1,5 +1,5 @@
 /*
- *  Copyright 2024-2025 NetCracker Technology Corporation
+ *  Copyright 2024-2026 NetCracker Technology Corporation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -42,7 +42,6 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.common.base.Strings;
 import org.qubership.atp.adapter.common.RamConstants;
 import org.qubership.atp.adapter.common.context.TestRunContext;
 import org.qubership.atp.adapter.common.kafka.client.KafkaConfigurator;
@@ -751,7 +750,7 @@ public class AtpKafkaRamAdapter extends AbstractAdapter {
             StepLinkMetaInfo editorMetaInfo = logRecordRequest.getMetaInfo().getEditorMetaInfo();
             if (Objects.nonNull(editorMetaInfo)) {
                 KafkaLogRecord.StepLinkMetaInfo.Builder stepLinkMetaInfoOrBuilder = KafkaLogRecord.StepLinkMetaInfo.newBuilder();
-                stepLinkMetaInfoOrBuilder.setEngineType(editorMetaInfo.getEngineType().toString());
+                stepLinkMetaInfoOrBuilder.setEngineType(editorMetaInfo.getEngineType());
                 stepLinkMetaInfoOrBuilder.setValue((String) editorMetaInfo.getValue());
                 metaInfoBuilder.setEditorMetaInfo(stepLinkMetaInfoOrBuilder.build());
             }
@@ -805,7 +804,7 @@ public class AtpKafkaRamAdapter extends AbstractAdapter {
             builder.setServer(logRecordRequest.getServer());
         }
 
-        if (!Strings.isNullOrEmpty(context.getAtpLogRecordId())) {
+        if (!StringUtils.isEmpty(context.getAtpLogRecordId())) {
             builder.setAtpSource(
                     KafkaLogRecord.ATPSource.newBuilder()
                             .setAtpObjectId(context.getAtpLogRecordId())

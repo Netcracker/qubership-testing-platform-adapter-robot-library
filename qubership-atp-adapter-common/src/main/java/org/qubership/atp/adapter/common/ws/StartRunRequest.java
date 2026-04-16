@@ -1,5 +1,5 @@
 /*
- *  Copyright 2024-2025 NetCracker Technology Corporation
+ *  Copyright 2024-2026 NetCracker Technology Corporation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -25,10 +25,11 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
-import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
+import org.apache.commons.lang3.StringUtils;
 import org.qubership.atp.ram.enums.TestScopeSections;
 import org.qubership.atp.ram.models.MetaInfo;
+
+import com.google.common.base.Preconditions;
 import lombok.Data;
 
 @Data
@@ -87,21 +88,21 @@ public class StartRunRequest {
         }
 
         private void validateFields() {
-            Preconditions.checkArgument(!Strings.isNullOrEmpty(projectName), "ProjectName is required!");
-            Preconditions.checkArgument(!Strings.isNullOrEmpty(testPlanName), "TestPlanName is required!");
-            testSuiteName = Strings.isNullOrEmpty(testSuiteName) ? "Single Test Runs" : testSuiteName;
-            executionRequestName = Strings.isNullOrEmpty(executionRequestName)
+            Preconditions.checkArgument(!StringUtils.isEmpty(projectName), "ProjectName is required!");
+            Preconditions.checkArgument(!StringUtils.isEmpty(testPlanName), "TestPlanName is required!");
+            testSuiteName = StringUtils.isEmpty(testSuiteName) ? "Single Test Runs" : testSuiteName;
+            executionRequestName = StringUtils.isEmpty(executionRequestName)
                     ? generateRequestName() : executionRequestName;
-            testRunName = Strings.isNullOrEmpty(testRunName) ? testCaseName + LocalDateTime.now().toString() :
+            testRunName = StringUtils.isEmpty(testRunName) ? testCaseName + LocalDateTime.now() :
                     testRunName;
-            taHost = Strings.isNullOrEmpty(taHost) ? UNKNOWN : taHost;
-            qaHost = Strings.isNullOrEmpty(qaHost) ? UNKNOWN : qaHost;
-            executor = Strings.isNullOrEmpty(executor) ? UNKNOWN : executor;
-            solutionBuild = Strings.isNullOrEmpty(solutionBuild) ? UNKNOWN : solutionBuild;
-            mailList = Strings.nullToEmpty(mailList);
-            dataSetListId = Strings.nullToEmpty(dataSetListId);
-            dataSetId = Strings.nullToEmpty(dataSetId);
-            testRunId = Strings.nullToEmpty(testRunId);
+            taHost = StringUtils.isEmpty(taHost) ? UNKNOWN : taHost;
+            qaHost = StringUtils.isEmpty(qaHost) ? UNKNOWN : qaHost;
+            executor = StringUtils.isEmpty(executor) ? UNKNOWN : executor;
+            solutionBuild = StringUtils.isEmpty(solutionBuild) ? UNKNOWN : solutionBuild;
+            mailList = StringUtils.defaultString(mailList);
+            dataSetListId = StringUtils.defaultString(dataSetListId);
+            dataSetId = StringUtils.defaultString(dataSetId);
+            testRunId = StringUtils.defaultString(testRunId);
         }
 
         public RequestBuilder setProjectName(String projectName) {
@@ -193,7 +194,7 @@ public class StartRunRequest {
          * Set mailList to request.
          */
         public RequestBuilder setMailList(String mailList) {
-            if (!Strings.isNullOrEmpty(mailList)) {
+            if (!StringUtils.isEmpty(mailList)) {
                 StartRunRequest.this.mailList = mailList.replace(";", ",");
             }
             return this;

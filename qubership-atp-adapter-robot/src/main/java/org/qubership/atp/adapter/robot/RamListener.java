@@ -1,5 +1,5 @@
 /*
- *  Copyright 2024-2025 NetCracker Technology Corporation
+ *  Copyright 2024-2026 NetCracker Technology Corporation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -30,11 +30,8 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringEscapeUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.common.base.Strings;
 import org.qubership.atp.adapter.common.AtpRamAdapter;
 import org.qubership.atp.adapter.common.RamConstants;
 import org.qubership.atp.adapter.common.adapters.AtpReceiverRamAdapter;
@@ -44,6 +41,8 @@ import org.qubership.atp.adapter.common.utils.Config;
 import org.qubership.atp.adapter.common.utils.ExecutionRequestHelper;
 import org.qubership.atp.adapter.common.ws.StartRunRequest;
 import org.qubership.atp.adapter.robot.utils.ScreenShotHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class RamListener implements ListenerInterface {
 
@@ -120,7 +119,7 @@ public class RamListener implements ListenerInterface {
                 .setTestPlanName(atpTestPlanName)
                 .setTestSuiteName(suiteName)
                 .setTestCaseName(name)
-                .setTestRunName(name + "_" + LocalDateTime.now().toString())
+                .setTestRunName(name + "_" + LocalDateTime.now())
                 .setExecutionRequestName(executionRequestName)
                 .setQaHost(serverUrl)
                 .setSolutionBuild(ExecutionRequestHelper.getSolutionBuild(serverUrl))
@@ -186,7 +185,7 @@ public class RamListener implements ListenerInterface {
         ScreenShotHelper helper = new ScreenShotHelper();
         String messageText = (String) message.get("message");
         String fileName = helper.extractImage(messageText);
-        if (!Strings.isNullOrEmpty(fileName)) {
+        if (!StringUtils.isEmpty(fileName)) {
             File screenShot = helper.getScreenshotFile(fileName, paBotPoolId, outPutDir);
             String b64image = Base64.getEncoder().encodeToString(Files.readAllBytes(screenShot.toPath()));
             message.put("screenshot_name", fileName);
@@ -232,7 +231,7 @@ public class RamListener implements ListenerInterface {
                 status = (String) attributes.get("level");
             }
 
-            String message = Strings.nullToEmpty((String) attributes.get("message"));
+            String message = StringUtils.defaultString((String) attributes.get("message"));
 
             String atpStatus;
             if (STATUS_PASS.equalsIgnoreCase(status) || "INFO".equalsIgnoreCase(status)) {

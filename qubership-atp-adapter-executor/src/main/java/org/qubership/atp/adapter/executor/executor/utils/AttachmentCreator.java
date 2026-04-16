@@ -29,7 +29,6 @@ import org.qubership.atp.adapter.report.SourceProvider;
 import org.qubership.atp.ram.models.logrecords.parts.FileMetadata;
 import org.qubership.atp.ram.models.logrecords.parts.FileType;
 
-import com.google.common.base.Strings;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -74,12 +73,12 @@ public class AttachmentCreator {
             }
         } else if ("SNAPSHOT".equalsIgnoreCase(reportType)) {
             String sourceExtension = sourceProvider.getExtension();
-            String extension = Strings.isNullOrEmpty(sourceExtension) || sourceExtension.startsWith(".")
+            String extension = StringUtils.isEmpty(sourceExtension) || sourceExtension.startsWith(".")
                     ? sourceExtension : '.' + sourceExtension;
-            String fileName = Strings.isNullOrEmpty(extension) ? SNAPSHOT_FILE_NAME : SNAPSHOT_NAME + extension;
+            String fileName = StringUtils.isEmpty(extension) ? SNAPSHOT_FILE_NAME : SNAPSHOT_NAME + extension;
 
             File snapshot = File.createTempFile(SNAPSHOT_NAME,
-                    Strings.isNullOrEmpty(extension) ? SNAPSHOT_EXTENSION : extension);
+                    StringUtils.isEmpty(extension) ? SNAPSHOT_EXTENSION : extension);
             FileUtils.writeStringToFile(snapshot, pageSource, "UTF-8");
 
             attachment.setContentType(MimeType.HTML.toString());

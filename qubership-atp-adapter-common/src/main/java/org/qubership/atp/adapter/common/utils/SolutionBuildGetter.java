@@ -1,5 +1,5 @@
 /*
- *  Copyright 2024-2025 NetCracker Technology Corporation
+ *  Copyright 2024-2026 NetCracker Technology Corporation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -24,8 +24,8 @@ import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 
-import com.google.common.base.Strings;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -39,7 +39,7 @@ public class SolutionBuildGetter {
      */
     public String getSolutionBuild(String urlString) {
         log.debug("start getSolutionBuild(urlString: {})", urlString);
-        if (Strings.isNullOrEmpty(urlString)) {
+        if (StringUtils.isEmpty(urlString)) {
             return "Unknown solution build";
         }
 

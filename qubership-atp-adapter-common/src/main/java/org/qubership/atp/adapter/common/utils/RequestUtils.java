@@ -62,7 +62,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.common.base.Strings;
 
 public class RequestUtils {
 
@@ -440,7 +439,7 @@ public class RequestUtils {
                     (String) attribute.get(RamConstants.SCREENSHOT_SOURCE_KEY),
                     (String) attribute.get(RamConstants.SCREENSHOT_EXTERNAL_SOURCE_KEY));
         }
-        if (Strings.isNullOrEmpty(response.getFileId())) {
+        if (StringUtils.isEmpty(response.getFileId())) {
             log.error("File id is NULL for Log Record: [{}]. Response {}", id, response);
         }
         log.debug("Uploaded file with id {} for LR {}", response.getFileId(), id);

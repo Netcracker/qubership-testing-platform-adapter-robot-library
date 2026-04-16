@@ -55,7 +55,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Function;
-import com.google.common.base.Strings;
 import net.sf.json.JSONObject;
 
 public class AtpRamWriter implements ReportWriter {
@@ -113,16 +112,16 @@ public class AtpRamWriter implements ReportWriter {
         try {
             context = TestRunContextHolder.getContext(testRunId);
             String nullValue = "null";
-            UUID executionRequestId = Strings.isNullOrEmpty(context.getAtpExecutionRequestId())
+            UUID executionRequestId = StringUtils.isEmpty(context.getAtpExecutionRequestId())
                     || nullValue.equalsIgnoreCase(context.getAtpExecutionRequestId()) ? null
                     : UUID.fromString(context.getAtpExecutionRequestId());
-            UUID projectId = Strings.isNullOrEmpty(context.getProjectId())
+            UUID projectId = StringUtils.isEmpty(context.getProjectId())
                     || nullValue.equalsIgnoreCase(context.getProjectId()) ? null
                     : UUID.fromString(context.getProjectId());
-            UUID testplanId = Strings.isNullOrEmpty(context.getTestPlanId())
+            UUID testplanId = StringUtils.isEmpty(context.getTestPlanId())
                     || nullValue.equalsIgnoreCase(context.getTestPlanId()) ? null
                     : UUID.fromString(context.getTestPlanId());
-            UUID testcaseId = Strings.isNullOrEmpty(context.getTestCaseId())
+            UUID testcaseId = StringUtils.isEmpty(context.getTestCaseId())
                     || nullValue.equalsIgnoreCase(context.getTestCaseId()) ? null
                     : UUID.fromString(context.getTestCaseId());
 
@@ -200,7 +199,7 @@ public class AtpRamWriter implements ReportWriter {
                 return;
             }
             Message messageBean = new Message();
-            messageBean.setName(Strings.isNullOrEmpty(item.getTitle()) ? SECTION_NAME : item.getTitle());
+            messageBean.setName(StringUtils.isEmpty(item.getTitle()) ? SECTION_NAME : item.getTitle());
             messageBean.setMessage(item.getMessage());
             messageBean.setTestingStatus(TestingStatuses.UNKNOWN.toString());
             messageBean.setSection(true);
@@ -220,7 +219,7 @@ public class AtpRamWriter implements ReportWriter {
                 return;
             }
             messageBean.setSection(true);
-            messageBean.setName(Strings.isNullOrEmpty(messageBean.getName()) ? SECTION_NAME : messageBean.getName());
+            messageBean.setName(StringUtils.isEmpty(messageBean.getName()) ? SECTION_NAME : messageBean.getName());
             writeLogRecordWithParentSections(getAdapter()::openSection, messageBean);
         } catch (Exception e) {
             log.error("Cannot open section", e);
@@ -276,11 +275,11 @@ public class AtpRamWriter implements ReportWriter {
     }
 
     protected void fillStepStack(Stack<AtpCompaund> stack, AtpCompaund compaund) {
-        if (!Strings.isNullOrEmpty(compaund.getSectionId())) {
+        if (!StringUtils.isEmpty(compaund.getSectionId())) {
             stack.push(compaund);
         }
         if (compaund.getParentSection() != null
-                && !Strings.isNullOrEmpty(compaund.getParentSection().getSectionId())) {
+                && !StringUtils.isEmpty(compaund.getParentSection().getSectionId())) {
             fillStepStack(stack, compaund.getParentSection());
         }
     }
@@ -492,16 +491,16 @@ public class AtpRamWriter implements ReportWriter {
 
     private Message setMessageParams(String title,Level level,String message,SourceProvider page) {
         Message beanMessage = new Message();
-        beanMessage.setMessage(Strings.nullToEmpty(message));
-        beanMessage.setName(Strings.isNullOrEmpty(title) ? "Message" : title);
+        beanMessage.setMessage(StringUtils.defaultString(message));
+        beanMessage.setName(StringUtils.isEmpty(title) ? "Message" : title);
         return setMessageParams(beanMessage, level, page);
     }
 
     private Message setMessageParams(Message message, Level level, SourceProvider page) {
         setParentSection(message);
         message.setTestingStatus(getStatus(level));
-        message.setMessage(Strings.nullToEmpty(message.getMessage()));
-        message.setName(Strings.isNullOrEmpty(message.getName()) ? "Message" : message.getName());
+        message.setMessage(StringUtils.defaultString(message.getMessage()));
+        message.setName(StringUtils.isEmpty(message.getName()) ? "Message" : message.getName());
         message.setServer(this.context.getQaHost());
 
         Map<String, Object> atp2message = new HashMap<>();
@@ -511,8 +510,8 @@ public class AtpRamWriter implements ReportWriter {
                 if (attachment.getFileMetadata() != null) {
                     message.setFileMetadata(Collections.singletonList(attachment.getFileMetadata()));
                 }
-                if (!Strings.isNullOrEmpty(this.context.getQaHost())
-                        && !Strings.isNullOrEmpty(this.context.getQaExternalHost())) {
+                if (!StringUtils.isEmpty(this.context.getQaHost())
+                        && !StringUtils.isEmpty(this.context.getQaExternalHost())) {
                     atp2message.put(RamConstants.SCREENSHOT_EXTERNAL_SOURCE_KEY, attachment.getSnapshotSource()
                             .replaceFirst(this.context.getQaHost(), this.context.getQaExternalHost()));
                 }
@@ -549,7 +548,7 @@ public class AtpRamWriter implements ReportWriter {
     }
 
     private boolean isContextEmpty() {
-        if (Strings.isNullOrEmpty(context.getTestRunId())) {
+        if (StringUtils.isEmpty(context.getTestRunId())) {
             log.warn("There is no TestRun in TestRunContext");
             return true;
         }
@@ -579,7 +578,7 @@ public class AtpRamWriter implements ReportWriter {
                 String id = atpCompaund.getSectionId();
                 TestingStatuses statuses = atpCompaund.getTestingStatuses() == null
                         ? TestingStatuses.UNKNOWN : atpCompaund.getTestingStatuses();
-                if (Strings.isNullOrEmpty(id)) {
+                if (StringUtils.isEmpty(id)) {
                     continue;
                 }
                 TypeAction type = atpCompaund.getType() == null ? TypeAction.TECHNICAL : atpCompaund.getType();

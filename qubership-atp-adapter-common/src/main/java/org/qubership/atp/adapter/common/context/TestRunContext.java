@@ -33,7 +33,6 @@ import org.qubership.atp.ram.enums.TestScopeSections;
 import org.qubership.atp.ram.enums.TestingStatuses;
 import org.qubership.atp.ram.models.LogRecord;
 
-import com.google.common.base.Strings;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
@@ -98,7 +97,7 @@ public class TestRunContext implements Cloneable, Serializable {
     }
 
     public String getMailList() {
-        return Strings.nullToEmpty(mailList);
+        return StringUtils.defaultString(mailList);
     }
 
     /**
@@ -149,7 +148,7 @@ public class TestRunContext implements Cloneable, Serializable {
     }
 
     public String getCurrentSectionId() {
-        return Strings.nullToEmpty(currentSectionId);
+        return StringUtils.defaultString(currentSectionId);
     }
 
     /**

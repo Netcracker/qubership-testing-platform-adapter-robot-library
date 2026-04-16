@@ -91,7 +91,6 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.common.base.Strings;
 import lombok.SneakyThrows;
 
 @Deprecated
@@ -127,7 +126,7 @@ public class AtpReceiverRamAdapter extends AbstractAdapter {
         atpRamUrl = cfg.getProperty(ATP_RAM_URL_KEY, "http://localhost:8080");
         logRecordUrl = atpLoggerUrl + "/lr" + FIND_OR_CREATE_PATH;
         testRunUrl = atpLoggerUrl + "/tr" + CREATE_PATH;
-        if (Strings.isNullOrEmpty(testRunName)) {
+        if (StringUtils.isEmpty(testRunName)) {
             log.warn("Cannot get context, testRunName is empty");
         } else {
             context = TestRunContextHolder.getContext(testRunName);
@@ -211,7 +210,7 @@ public class AtpReceiverRamAdapter extends AbstractAdapter {
         logRecordRequest.put(CONFIG_INFO_ID_KEY, configInfo.toString());
         logRecordRequest.put(TYPE_ACTION_KEY, type);
         logRecordRequest.put(SERVER, context.getQaHost());
-        if (!Strings.isNullOrEmpty(context.getAtpLogRecordId())) {
+        if (!StringUtils.isEmpty(context.getAtpLogRecordId())) {
             ObjectNode atpSource = OBJECT_MAPPER.createObjectNode();
             atpSource.put("atpObjectId", context.getAtpLogRecordId());
             logRecordRequest.set("atpSource", atpSource);
