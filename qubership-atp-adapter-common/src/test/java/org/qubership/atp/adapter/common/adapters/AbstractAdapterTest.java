@@ -34,6 +34,8 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -81,7 +83,6 @@ import org.qubership.atp.ram.models.logrecords.SshLogRecord;
 import org.qubership.atp.ram.models.logrecords.TechnicalLogRecord;
 import org.qubership.atp.ram.models.logrecords.UiLogRecord;
 import org.qubership.atp.ram.models.logrecords.parts.ContextVariable;
-import org.springframework.core.io.ClassPathResource;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -315,16 +316,24 @@ public class AbstractAdapterTest {
     }
 
     @Test
-    public void testUploadFile_AttachmentStreamParameterIsAbsent_ScreenshotFileKeyParameterIsUsed() throws IOException {
+    public void testUploadFile_AttachmentStreamParameterIsAbsent_ScreenshotFileKeyParameterIsUsed() throws IOException, URISyntaxException {
+        // Get URL of the resource
+        URL resourceUrl = getClass().getClassLoader().getResource("fileToUpload.txt");
+        if (resourceUrl == null) {
+            throw new IllegalArgumentException("Resource not found: fileToUpload.txt");
+        }
+        // Convert URL to File (it works for file system resources only, not for ones inside JAR)
+        File file = new File(resourceUrl.toURI());
+
         Message message = new Message();
-        ClassPathResource classPathResource = new ClassPathResource("fileToUpload.txt");
-        File file = classPathResource.getFile();
         Map<String, Object> attributes = new HashMap<>();
         attributes.put(RamConstants.SCREENSHOT_TYPE_KEY, "image/png");
         attributes.put(RamConstants.SCREENSHOT_NAME_KEY, "image.png");
         attributes.put(RamConstants.SCREENSHOT_SOURCE_KEY, "image.png");
         attributes.put(RamConstants.SCREENSHOT_FILE_KEY, file);
-        when(requestUtils.postRequestStream(any(String.class), any(), any())).thenReturn(new UploadScreenshotResponse());
+
+        when(requestUtils.postRequestStream(any(String.class), any(), any()))
+                .thenReturn(new UploadScreenshotResponse());
         abstractAdapter.uploadFile(attributes, message);
         verify(requestUtils, times(1))
                 .postRequestStream(any(String.class),

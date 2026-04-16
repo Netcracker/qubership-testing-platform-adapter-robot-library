@@ -1,5 +1,5 @@
 /*
- *  Copyright 2024-2025 NetCracker Technology Corporation
+ *  Copyright 2024-2026 NetCracker Technology Corporation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -16,12 +16,11 @@
 
 package org.qubership.atp.adapter.common.adapters.interceptors;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.apache.http.HttpException;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpRequestInterceptor;
 import org.apache.http.protocol.HttpContext;
@@ -36,7 +35,7 @@ public class MdcHttpRequestInterceptor implements HttpRequestInterceptor {
     }
 
     @Override
-    public void process(HttpRequest request, HttpContext context) throws HttpException, IOException {
+    public void process(HttpRequest request, HttpContext context) {
         businessIds.forEach(idName -> {
             if (MDC.get(idName) != null) {
                 request.addHeader(convertIdNameToHeader(idName), MDC.get(idName));
@@ -45,6 +44,7 @@ public class MdcHttpRequestInterceptor implements HttpRequestInterceptor {
     }
 
     private String convertIdNameToHeader(String idName) {
-        return "X-" + (String) Arrays.stream(idName.split("(?=\\p{Upper})")).map(org.springframework.util.StringUtils::capitalize).collect(Collectors.joining("-"));
+        return "X-" + Arrays.stream(idName.split("(?=\\p{Upper})"))
+                .map(StringUtils::capitalize).collect(Collectors.joining("-"));
     }
 }
