@@ -1,5 +1,5 @@
 /*
- *  Copyright 2024-2025 NetCracker Technology Corporation
+ *  Copyright 2024-2026 NetCracker Technology Corporation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -30,14 +30,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.CRC32;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.qubership.atp.adapter.common.RamConstants;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class ExecutionRequestHelper {
-    private static final Logger log = LoggerFactory.getLogger(ExecutionRequestHelper.class);
-    private static SolutionBuildGetter solutionBuildGetter = new SolutionBuildGetter();
+    private static final SolutionBuildGetter solutionBuildGetter = new SolutionBuildGetter();
 
     /**
      * returns prepared Execution Request name.
@@ -58,7 +57,8 @@ public class ExecutionRequestHelper {
         String erTemplate = Config.getConfig().getProperty("atp.project.er.name", DEFAULT_ER_NAME);
         String hostName = getHostName();
         CRC32 crc32 = new CRC32();
-        crc32.update(hostName.getBytes());
+        byte[] bytes = hostName.getBytes();
+        crc32.update(bytes, 0, bytes.length);
         String res = erTemplate + "_" + crc32.getValue();
         System.setProperty("atp2.ram.er.name", res);
         return res;

@@ -41,12 +41,12 @@ import org.qubership.atp.adapter.common.utils.Config;
 import org.qubership.atp.adapter.common.utils.ExecutionRequestHelper;
 import org.qubership.atp.adapter.common.ws.StartRunRequest;
 import org.qubership.atp.adapter.robot.utils.ScreenShotHelper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class RamListener implements ListenerInterface {
 
-    private static final Logger log = LoggerFactory.getLogger(RamListener.class);
     private ArrayList<Object> messagesCount;
     private String paBotPoolId = null;
     private String outPutDir = null;

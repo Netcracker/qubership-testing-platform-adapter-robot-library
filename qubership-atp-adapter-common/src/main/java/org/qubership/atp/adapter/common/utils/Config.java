@@ -1,5 +1,5 @@
 /*
- *  Copyright 2024-2025 NetCracker Technology Corporation
+ *  Copyright 2024-2026 NetCracker Technology Corporation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -25,15 +25,15 @@ import java.nio.file.Paths;
 import java.util.Properties;
 
 import org.apache.commons.io.filefilter.WildcardFileFilter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class Config {
 
-    private static final Logger log = LoggerFactory.getLogger(Config.class);
-    private static Config config = new Config();
+    private static final Config config = new Config();
     private File[] configs;
-    private Properties props = new Properties();
+    private final Properties props = new Properties();
 
     private Config() {
         init();

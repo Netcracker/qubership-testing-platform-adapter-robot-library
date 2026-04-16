@@ -58,14 +58,13 @@ import org.qubership.atp.adapter.common.entities.Message;
 import org.qubership.atp.adapter.common.entities.UploadScreenshotResponse;
 import org.qubership.atp.ram.enums.ExecutionStatuses;
 import org.qubership.atp.ram.enums.TypeAction;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class RequestUtils {
 
-    private static final Logger log = LoggerFactory.getLogger(RequestUtils.class);
     private static final Executor executor = Executors.newCachedThreadPool();
     private static final String IMAGE_PNG = "image/png";
     private static final String HTTPS = "https";

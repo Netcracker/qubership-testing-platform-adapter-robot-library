@@ -93,18 +93,16 @@ import org.qubership.atp.ram.models.logrecords.UiLogRecord;
 import org.qubership.atp.ram.models.logrecords.parts.ContextVariable;
 import org.qubership.atp.ram.models.logrecords.parts.FileMetadata;
 import org.qubership.atp.ram.models.logrecords.parts.Response;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import net.sf.json.JSONObject;
 
+@Slf4j
 public abstract class AbstractAdapter implements AtpRamAdapter {
-
-    private static final Logger log = LoggerFactory.getLogger(AbstractAdapter.class);
 
     private static final Map<TypeAction, Class<? extends LogRecord>> logRecordTypeByTypeAction;
 

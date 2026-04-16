@@ -85,25 +85,23 @@ import org.qubership.atp.ram.models.logrecords.RestLogRecord;
 import org.qubership.atp.ram.models.logrecords.SqlLogRecord;
 import org.qubership.atp.ram.models.logrecords.SshLogRecord;
 import org.qubership.atp.ram.models.logrecords.UiLogRecord;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Deprecated
 public class AtpReceiverRamAdapter extends AbstractAdapter {
 
     private static final String EXECUTION_REQUEST_UPDATE_STATUS_PATH = "/er/updateStatus";
     private static final String TEST_RUN_UPDATE_STATUS_PATH = "/tr/updateOrCreate";
 
-    private static final Logger log = LoggerFactory.getLogger(AtpReceiverRamAdapter.class);
     private static final Executor executor = Executors.newCachedThreadPool();
 
     private final String atpLoggerUrl;
-
     private final String logRecordUrl;
     private final String testRunUrl;
 
