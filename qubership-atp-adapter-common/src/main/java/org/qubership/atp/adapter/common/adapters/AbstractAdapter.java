@@ -1,5 +1,5 @@
 /*
- *  Copyright 2024-2025 NetCracker Technology Corporation
+ *  Copyright 2024-2026 NetCracker Technology Corporation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -16,13 +16,13 @@
 
 package org.qubership.atp.adapter.common.adapters;
 
+import static java.util.Objects.isNull;
 import static org.qubership.atp.adapter.common.RamConstants.NULL_VALUE;
 import static org.qubership.atp.adapter.common.RamConstants.OBJECT_MAPPER;
 import static org.qubership.atp.adapter.common.utils.ExecutionRequestHelper.getCurrentTimestamp;
 import static org.qubership.atp.ram.enums.ExecutionStatuses.FINISHED;
 import static org.qubership.atp.ram.enums.ExecutionStatuses.IN_PROGRESS;
 import static org.qubership.atp.ram.enums.ExecutionStatuses.findByValue;
-import static java.util.Objects.isNull;
 
 import java.io.File;
 import java.io.IOException;
@@ -43,18 +43,11 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.http.client.fluent.Content;
 import org.apache.http.client.fluent.Request;
 import org.apache.http.entity.ContentType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.common.base.Strings;
 import org.qubership.atp.adapter.common.AtpRamAdapter;
 import org.qubership.atp.adapter.common.RamConstants;
 import org.qubership.atp.adapter.common.adapters.error.AdapterMethodIsNotSupported;
@@ -92,7 +85,6 @@ import org.qubership.atp.ram.models.logrecords.BvLogRecord;
 import org.qubership.atp.ram.models.logrecords.CompoundLogRecord;
 import org.qubership.atp.ram.models.logrecords.ItfLogRecord;
 import org.qubership.atp.ram.models.logrecords.MiaLogRecord;
-import org.qubership.atp.ram.models.logrecords.RbmLogRecord;
 import org.qubership.atp.ram.models.logrecords.RestLogRecord;
 import org.qubership.atp.ram.models.logrecords.SqlLogRecord;
 import org.qubership.atp.ram.models.logrecords.SshLogRecord;
@@ -101,6 +93,13 @@ import org.qubership.atp.ram.models.logrecords.UiLogRecord;
 import org.qubership.atp.ram.models.logrecords.parts.ContextVariable;
 import org.qubership.atp.ram.models.logrecords.parts.FileMetadata;
 import org.qubership.atp.ram.models.logrecords.parts.Response;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.common.base.Strings;
 import lombok.SneakyThrows;
 import net.sf.json.JSONObject;
 
@@ -1487,5 +1486,5 @@ public abstract class AbstractAdapter implements AtpRamAdapter {
                     this.context != null ? this.context.getExecutionRequestId() : "null");
             log.trace(String.valueOf(this.context));
         }
-    };
+    }
 }

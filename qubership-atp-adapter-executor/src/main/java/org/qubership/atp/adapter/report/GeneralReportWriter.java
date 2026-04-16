@@ -1,5 +1,5 @@
 /*
- *  Copyright 2024-2025 NetCracker Technology Corporation
+ *  Copyright 2024-2026 NetCracker Technology Corporation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -16,9 +16,6 @@
 
 package org.qubership.atp.adapter.report;
 
-import org.qubership.atp.adapter.testcase.Config;
-import org.qubership.atp.adapter.utils.Utils;
-import java.io.Closeable;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -40,6 +37,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.KeyManager;
@@ -47,9 +45,12 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
-import org.apache.commons.lang.StringEscapeUtils;
+
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.qubership.atp.adapter.testcase.Config;
+import org.qubership.atp.adapter.utils.Utils;
 
 public class GeneralReportWriter implements ReportWriter {
     private static final Log LOG = LogFactory.getLog(GeneralReportWriter.class);
@@ -65,16 +66,16 @@ public class GeneralReportWriter implements ReportWriter {
     private static String SERVER_ALIAS_KEY;
     private static String serverInfo;
     private final long startTime = System.currentTimeMillis();
-    private final Map<Thread, List<ScenarioInfo>> scenarios = new LinkedHashMap();
-    private final List<ScenarioInfo> scenariosOrdered = new LinkedList();
-    private File webReportDir = getWebReportDir();
+    private final Map<Thread, List<ScenarioInfo>> scenarios = new LinkedHashMap<>();
+    private final List<ScenarioInfo> scenariosOrdered = new LinkedList<>();
+    private final File webReportDir = getWebReportDir();
     private static int failedRequestsCount;
 
     public static String getEnvValue(String key, String def) {
         String value = System.getProperty(key, "");
-        if (value.length() == 0) {
+        if (value.isEmpty()) {
             value = Config.getString(key, def);
-            if (value == null || value.length() == 0) {
+            if (value == null || value.isEmpty()) {
                 value = def;
             }
         }
@@ -89,24 +90,24 @@ public class GeneralReportWriter implements ReportWriter {
         do {
             if (!iterator.hasNext()) {
                 String suffix = Config.getString("suffix", "");
-                if (suffix.length() > 0) {
+                if (!suffix.isEmpty()) {
                     suffix = "_" + suffix;
                 }
 
                 String reportDirname = Config.getString("report.dir");
-                if (reportDirname.length() > 0) {
+                if (!reportDirname.isEmpty()) {
                     reportDirname = reportDirname + suffix;
                 }
 
                 String reportRootDir = Config.getString("report.dir.root");
-                if (reportRootDir.length() == 0) {
+                if (reportRootDir.isEmpty()) {
                     reportRootDir = "results";
                 }
 
                 return new File(reportRootDir, reportDirname);
             }
 
-            reportWriter = (ReportWriter)iterator.next();
+            reportWriter = iterator.next();
         } while(!(reportWriter instanceof WebReportWriter));
 
         return ((WebReportWriter)reportWriter).getReportDir();
@@ -167,8 +168,7 @@ public class GeneralReportWriter implements ReportWriter {
             LOG.error("Failed to get connection to server " + serverURL, var4);
             ++failedRequestsCount;
         } catch (IOException var5) {
-            IOException e = var5;
-            LOG.error("Failed to get server version information", e);
+            LOG.error("Failed to get server version information", var5);
         }
 
         return "";
@@ -181,7 +181,7 @@ public class GeneralReportWriter implements ReportWriter {
         synchronized(this.scenarios) {
             if (!this.scenarios.isEmpty()) {
                 List<ScenarioInfo> scenarioList = (List)this.scenarios.get(thread);
-                ((ScenarioInfo)scenarioList.get(scenarioList.size() - 1)).setLevel(message.getLevel().toInt());
+                scenarioList.get(scenarioList.size() - 1).setLevel(message.getLevel().toInt());
                 Throwable throwable = message.getThrowable();
                 String cause;
                 if (throwable == null) {
@@ -194,8 +194,8 @@ public class GeneralReportWriter implements ReportWriter {
                     cause = "<pre>" + Utils.getStackTrace(throwable) + "</pre>";
                 }
 
-                ((ScenarioInfo)scenarioList.get(scenarioList.size() - 1)).setCause(cause);
-                ((ScenarioInfo)scenarioList.get(scenarioList.size() - 1)).setEndTime(System.currentTimeMillis());
+                scenarioList.get(scenarioList.size() - 1).setCause(cause);
+                scenarioList.get(scenarioList.size() - 1).setEndTime(System.currentTimeMillis());
             } else {
                 this.newScenario(new WebReportItem.OpenLog(message.getTitle(), message.getMessage()), thread);
                 this.report(message, thread);
@@ -211,7 +211,7 @@ public class GeneralReportWriter implements ReportWriter {
                 scenarioList = new ArrayList();
                 this.scenarios.put(thread, scenarioList);
             } else {
-                ((ScenarioInfo)((List)scenarioList).get(((List)scenarioList).size() - 1)).setEndTime(System.currentTimeMillis());
+                ((ScenarioInfo)((List)scenarioList).get(scenarioList.size() - 1)).setEndTime(System.currentTimeMillis());
             }
 
             ScenarioInfo soinfo = new ScenarioInfo(message.getLogName(), message.getDescription());
@@ -225,12 +225,12 @@ public class GeneralReportWriter implements ReportWriter {
         int info = 0;
         int warn = 0;
         int error = 0;
-        Iterator i$ = this.scenariosOrdered.iterator();
 
-        while(i$.hasNext()) {
-            ScenarioInfo si = (ScenarioInfo)i$.next();
+        for (ScenarioInfo si : this.scenariosOrdered) {
             sb.append("<tr>");
-            sb.append("<td bgcolor=\"").append(si.getLevel()[0]).append("\" >").append("<b><font color=\"").append(si.getLevel()[1]).append("\" >").append(si.getLevel()[2]).append("</font></b>").append("</td>");
+            sb.append("<td bgcolor=\"").append(si.getLevel()[0]).append("\" >").append("<b><font color=\"")
+                    .append(si.getLevel()[1]).append("\" >").append(si.getLevel()[2]).append("</font></b>")
+                    .append("</td>");
             sb.append("<td>").append("<b>").append(si.getName()).append("</b>").append("</td>");
             sb.append("<td>").append("<b>").append(si.getDescription()).append("</b>").append("</td>");
             sb.append("<td>").append("<b>").append(si.getExecutionTime()).append("</b>").append("</td>");
@@ -281,12 +281,21 @@ public class GeneralReportWriter implements ReportWriter {
 
         FileOutputStream fos = null;
         if (GeneralReportWriter.serverInfo.isEmpty()) {
-            StringBuilder serverInfo = new StringBuilder();
-            serverInfo.append("<b>Server: </b>").append("<a target=\"_blank\" href=\"" + Config.getString(SERVER_URL_KEY) + "\">").append(Config.getString(SERVER_URL_KEY)).append("</a>").append("<br /> <b>Build:</b>").append("<a target=\"_blank\" href=\"" + Config.getString(SERVER_URL_KEY) + "/version.jsp\">").append(getServerVersionInfo(Config.getString(SERVER_URL_KEY))).append("</a>").append("<br>");
-            setServerInfo(serverInfo.toString());
+            setServerInfo("<b>Server: </b>"
+                    + "<a target=\"_blank\" href=\"" + Config.getString(SERVER_URL_KEY) + "\">"
+                    + Config.getString(SERVER_URL_KEY) + "</a>"
+                    + "<br /> <b>Build:</b>"
+                    + "<a target=\"_blank\" href=\"" + Config.getString(SERVER_URL_KEY) + "/version.jsp\">"
+                    + getServerVersionInfo(Config.getString(SERVER_URL_KEY)) + "</a>" + "<br>");
         }
 
-        this.generateReportFile((new StringBuilder(HEAD1)).append(GeneralReportWriter.serverInfo).append(headerPart).append("<br/><table bordercolor=\"black\" bgcolor=\"#F6FFF2\" border='2' cellpadding='2' cellspacing='0' style=\"font-size:12px;font-style:normal;font-family:arial,verbana,times;\"><tr class='pass'><td width='75px'><b>Status</b></td><td width='300px'><b>Test Case</b></td><td width='600px'><b>Description</b></td><td width='85px'><b>Execution time</b></td><td width='35px'><b>Cause</b></td></tr>").append(sb.toString()).toString(), "GeneralReport.html");
+        this.generateReportFile(HEAD1 + GeneralReportWriter.serverInfo + headerPart
+                + "<br/><table bordercolor=\"black\" bgcolor=\"#F6FFF2\" border='2' cellpadding='2' cellspacing='0' "
+                + "style=\"font-size:12px;font-style:normal;font-family:arial,verbana,times;\"><tr class='pass'>"
+                + "<td width='75px'><b>Status</b></td><td width='300px'><b>Test Case</b></td><td width='600px'>"
+                + "<b>Description</b></td><td width='85px'><b>Execution time</b></td><td width='35px'>"
+                + "<b>Cause</b></td></tr>" + sb,
+                "GeneralReport.html");
     }
 
     public synchronized void reportXmlJunitDetails() {
@@ -296,17 +305,20 @@ public class GeneralReportWriter implements ReportWriter {
         for(Iterator i$ = this.scenariosOrdered.iterator(); i$.hasNext(); sb.append("</testcase>")) {
             ScenarioInfo si = (ScenarioInfo)i$.next();
             ++testCount;
-            sb.append(String.format("<testcase classname=\"%s\" name=\"%s\">", StringEscapeUtils.escapeXml("Test Scope"), StringEscapeUtils.escapeXml(si.name)));
+            sb.append(String.format("<testcase classname=\"%s\" name=\"%s\">",
+                    StringEscapeUtils.escapeXml("Test Scope"),
+                    StringEscapeUtils.escapeXml(si.name)));
             if (si.level == 40000) {
                 if ("true".equals(Config.getString("report.junit.ci.url"))) {
-                    sb.append("<failure type=\"\"  message=\"" + Config.getString("report.detailed.path") + this.getFolderByScenarioName(si.getName()) + "/report.html\"/>");
+                    sb.append("<failure type=\"\"  message=\"" + Config.getString("report.detailed.path")
+                            + this.getFolderByScenarioName(si.getName()) + "/report.html\"/>");
                 } else {
                     sb.append("<failure type=\"\">" + StringEscapeUtils.escapeXml(si.getCause()) + "</failure>");
                 }
             }
         }
 
-        this.generateReportFile("<testsuite tests=\"" + testCount + "\">" + sb.toString() + "</testsuite>", "JUnitReport.xml");
+        this.generateReportFile("<testsuite tests=\"" + testCount + "\">" + sb + "</testsuite>", "JUnitReport.xml");
     }
 
     public String getFolderByScenarioName(String name) {
@@ -337,10 +349,9 @@ public class GeneralReportWriter implements ReportWriter {
                 fos.write(text.getBytes());
             }
         } catch (IOException var12) {
-            IOException e = var12;
-            LOG.error("Failed to clone or open file: " + getWebReportDir(), e);
+            LOG.error("Failed to clone or open file: " + getWebReportDir(), var12);
         } finally {
-            Utils.close(new Closeable[]{fos});
+            Utils.close(fos);
         }
 
     }
@@ -381,10 +392,10 @@ public class GeneralReportWriter implements ReportWriter {
 
     private static class ScenarioInfo {
         private final String name;
-        private String description;
+        private final String description;
         private String cause;
         private int level;
-        private long start;
+        private final long start;
         private long end;
         private boolean hasError = false;
 
@@ -397,7 +408,7 @@ public class GeneralReportWriter implements ReportWriter {
         }
 
         void setLevel(int newLevel) {
-            this.level = newLevel > this.level ? newLevel : this.level;
+            this.level = Math.max(newLevel, this.level);
         }
 
         public String getName() {

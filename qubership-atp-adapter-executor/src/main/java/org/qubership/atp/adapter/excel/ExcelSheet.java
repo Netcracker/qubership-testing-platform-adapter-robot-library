@@ -1,5 +1,5 @@
 /*
- *  Copyright 2024-2025 NetCracker Technology Corporation
+ *  Copyright 2024-2026 NetCracker Technology Corporation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -16,31 +16,32 @@
 
 package org.qubership.atp.adapter.excel;
 
-import org.qubership.atp.adapter.excel.exceptions.DataNotSetException;
-import org.qubership.atp.adapter.excel.exceptions.InvalidFormatOfSourceException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.apache.commons.collections.IteratorUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
+import org.qubership.atp.adapter.excel.exceptions.DataNotSetException;
+import org.qubership.atp.adapter.excel.exceptions.InvalidFormatOfSourceException;
 
 public class ExcelSheet {
-    private static Log log = LogFactory.getLog(ExcelSheet.class);
+    private static final Log log = LogFactory.getLog(ExcelSheet.class);
     public static final int DEFAULT_HEADER_INDEX = 1;
     private Sheet currentSheet;
     private String currentSheetName;
     private ExcelBook excelBook;
     private ExcelRow currentRow;
     private int headerRowIndex;
-    private Map<Integer, String> headers;
+    private final Map<Integer, String> headers;
 
     public ExcelSheet(ExcelBook excelBook, String sheetName, int currentRowIndex, String... headerRowIdentifiers) throws InvalidFormatOfSourceException {
         this.currentSheet = null;
@@ -48,7 +49,7 @@ public class ExcelSheet {
         this.excelBook = null;
         this.currentRow = null;
         this.headerRowIndex = -1;
-        this.headers = new LinkedHashMap();
+        this.headers = new LinkedHashMap<>();
         this.excelBook = excelBook;
         this.currentSheetName = sheetName;
         if (!excelBook.hasSheet(sheetName)) {
@@ -85,18 +86,17 @@ public class ExcelSheet {
 
             if (currentRowIndex != -1 && this.getRow(currentRowIndex) != null) {
                 this.setHeaderRowIndex(currentRowIndex);
-                Iterator i$ = IteratorUtils.toList(this.getCurrentRow().iterator()).iterator();
-
-                while(i$.hasNext()) {
-                    ExcelCell cell = (ExcelCell)i$.next();
+                for (Object o : IteratorUtils.toList(this.getCurrentRow().iterator())) {
+                    ExcelCell cell = (ExcelCell) o;
                     String cellValue = cell.getValue();
                     if (StringUtils.isNotBlank(cellValue)) {
                         this.headers.put(cell.getPosition().getColNum(), cellValue);
                     }
                 }
-
             } else {
-                throw new InvalidFormatOfSourceException(String.format("Header row on '%s' sheet hasn't been defined. File name is '%s'.", this.getSheetName(), this.getExcelBookName()));
+                throw new InvalidFormatOfSourceException(
+                        String.format("Header row on '%s' sheet hasn't been defined. File name is '%s'.",
+                                this.getSheetName(), this.getExcelBookName()));
             }
         }
     }
@@ -122,16 +122,12 @@ public class ExcelSheet {
     }
 
     public List<Integer> getHeaderIndexesByName(String headerName, int startIndex) {
-        List<Integer> headerIndexes = new ArrayList();
-        Iterator i$ = this.headers.keySet().iterator();
-
-        while(i$.hasNext()) {
-            int key = (Integer)i$.next();
-            if (((String)this.headers.get(key)).equalsIgnoreCase(headerName) && key >= startIndex) {
+        List<Integer> headerIndexes = new ArrayList<>();
+        for (int key : this.headers.keySet()) {
+            if (this.headers.get(key).equalsIgnoreCase(headerName) && key >= startIndex) {
                 headerIndexes.add(key);
             }
         }
-
         return headerIndexes;
     }
 
@@ -144,8 +140,7 @@ public class ExcelSheet {
                 log.error("Cell by header index " + headerIndex + " and with value " + content + " is not found");
                 return null;
             }
-
-            excelRow = (ExcelRow)rowIterator.next();
+            excelRow = rowIterator.next();
         } while(excelRow.isCellNull(headerIndex) || !excelRow.getCell(headerIndex).getValue().equals(content));
 
         return excelRow.getCell(headerIndex);
@@ -168,14 +163,14 @@ public class ExcelSheet {
     public ExcelCell getCellByHeaderName(int rowNumber, String headerName, int startIndex) {
         this.validateRowIndex(rowNumber, true);
         List<Integer> indexes = this.getHeaderIndexesByName(headerName, startIndex);
-        if (indexes.size() != 0 && (Integer)indexes.get(0) != -1) {
-            return this.getRow(rowNumber).getCell((Integer)indexes.get(0));
+        if (!indexes.isEmpty() && indexes.get(0) != -1) {
+            return this.getRow(rowNumber).getCell(indexes.get(0));
         } else {
             String basicMessage = String.format("Error during operation with headers. Excel file name is '%s', excel sheet name is '%s'. Header row index = %s", this.getExcelBookName(), this.getSheetName(), this.headerRowIndex);
             if (this.getHeaderRowIndex() <= -1) {
                 throw new DataNotSetException(String.format("%s. Header row is not defined!", basicMessage));
             } else {
-                throw new DataNotSetException(String.format("%s. Header name '%s' doesn't exist in header row: '%s'", basicMessage, headerName, this.headers.values().toString()));
+                throw new DataNotSetException(String.format("%s. Header name '%s' doesn't exist in header row: '%s'", basicMessage, headerName, this.headers.values()));
             }
         }
     }
@@ -203,13 +198,12 @@ public class ExcelSheet {
             row = (ExcelRow)i$.next();
             valuesCount = 0;
             boolean isEmpty = false;
-            Iterator iterator = IteratorUtils.toList(row.iterator()).iterator();
 
-            while(iterator.hasNext()) {
-                ExcelCell cell = (ExcelCell)iterator.next();
+            for (Object o : IteratorUtils.toList(row.iterator())) {
+                ExcelCell cell = (ExcelCell) o;
                 String cellValue = cell.getValue();
 
-                for(int i = 0; i < content.length; ++i) {
+                for (int i = 0; i < content.length; ++i) {
                     String contentVal = content[i];
                     if (StringUtils.equalsIgnoreCase(cellValue, contentVal)) {
                         if (StringUtils.isNotEmpty(cellValue)) {
@@ -273,10 +267,9 @@ public class ExcelSheet {
 
     public int getMaxCellNumForThisSheet() {
         int currentMaxCell = 0;
-        Iterator i$ = IteratorUtils.toList(this.iterator()).iterator();
 
-        while(i$.hasNext()) {
-            ExcelRow row = (ExcelRow)i$.next();
+        for (Object o : IteratorUtils.toList(this.iterator())) {
+            ExcelRow row = (ExcelRow) o;
             int currentLastCellNum = row.getRow() == null ? 0 : row.getMaxCellNum();
             if (currentMaxCell < currentLastCellNum) {
                 currentMaxCell = currentLastCellNum;
@@ -293,7 +286,7 @@ public class ExcelSheet {
     public Iterator<ExcelRow> iterator() {
         return new Iterator<ExcelRow>() {
             int index = 1;
-            int endIndex = ExcelSheet.this.getMaxRowNum();
+            final int endIndex = ExcelSheet.this.getMaxRowNum();
 
             public boolean hasNext() {
                 return this.index <= this.endIndex;
@@ -361,7 +354,7 @@ public class ExcelSheet {
     }
 
     public boolean equals(Object object) {
-        return !(object instanceof ExcelSheet) ? false : this.toString().equals(((ExcelSheet)object).toString());
+        return object instanceof ExcelSheet && this.toString().equals(((ExcelSheet) object).toString());
     }
 
     public ExcelBook getExcelBook() {

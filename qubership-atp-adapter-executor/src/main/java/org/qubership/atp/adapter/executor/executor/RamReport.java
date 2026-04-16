@@ -1,5 +1,5 @@
 /*
- *  Copyright 2024-2025 NetCracker Technology Corporation
+ *  Copyright 2024-2026 NetCracker Technology Corporation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -23,9 +23,8 @@ import java.util.Objects;
 
 import javax.annotation.Nullable;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Level;
-
 import org.qubership.atp.adapter.common.context.TestRunContext;
 import org.qubership.atp.adapter.common.entities.Message;
 import org.qubership.atp.adapter.executor.executor.items.MiaOpenSectionItem;
@@ -34,14 +33,14 @@ import org.qubership.atp.adapter.executor.executor.items.SqlMessageItem;
 import org.qubership.atp.adapter.executor.executor.items.SshMessageItem;
 import org.qubership.atp.adapter.executor.executor.items.TechMessageItem;
 import org.qubership.atp.adapter.executor.executor.items.UiMessageItem;
+import org.qubership.atp.adapter.report.Report;
+import org.qubership.atp.adapter.report.SourceProvider;
+import org.qubership.atp.adapter.report.WebReportItem;
 import org.qubership.atp.ram.enums.TestingStatuses;
 import org.qubership.atp.ram.models.BrowserConsoleLogsTable;
 import org.qubership.atp.ram.models.logrecords.parts.Request;
 import org.qubership.atp.ram.models.logrecords.parts.Response;
 import org.qubership.atp.ram.models.logrecords.parts.ValidationTable;
-import org.qubership.atp.adapter.report.Report;
-import org.qubership.atp.adapter.report.SourceProvider;
-import org.qubership.atp.adapter.report.WebReportItem;
 
 public class RamReport {
     protected static Report report;

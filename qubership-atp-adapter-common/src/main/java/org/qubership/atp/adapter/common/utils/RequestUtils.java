@@ -1,5 +1,5 @@
 /*
- *  Copyright 2024-2025 NetCracker Technology Corporation
+ *  Copyright 2024-2026 NetCracker Technology Corporation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -38,7 +38,7 @@ import java.util.stream.Collectors;
 
 import javax.net.ssl.SSLContext;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpRequestInterceptor;
 import org.apache.http.client.fluent.Content;
 import org.apache.http.client.fluent.Request;
@@ -52,17 +52,17 @@ import org.apache.http.entity.ContentType;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.conn.BasicHttpClientConnectionManager;
 import org.apache.http.ssl.SSLContexts;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.common.base.Strings;
 import org.qubership.atp.adapter.common.RamConstants;
 import org.qubership.atp.adapter.common.adapters.interceptors.MdcHttpRequestInterceptor;
 import org.qubership.atp.adapter.common.entities.Message;
 import org.qubership.atp.adapter.common.entities.UploadScreenshotResponse;
 import org.qubership.atp.ram.enums.ExecutionStatuses;
 import org.qubership.atp.ram.enums.TypeAction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.common.base.Strings;
 
 public class RequestUtils {
 
@@ -333,12 +333,12 @@ public class RequestUtils {
         final Content postResult;
         try {
             postResult = getHttpExecutor()
-                    .execute(Request.Post(url + "/?fileName="
-                            + fileName + "&contentType=" + contentType + "&snapshotSource="
-                            + URLEncoder.encode(StringUtils.defaultIfEmpty(snapshotSource, ""), "UTF-8")
-                            + "&snapshotExternalSource=" + URLEncoder.encode(StringUtils.defaultIfEmpty(
-                            snapshotExternalSource, ""), "UTF-8"))
-                            .bodyStream(stream, ContentType.APPLICATION_OCTET_STREAM)).returnContent();
+                    .execute(Request.Post(url + "/?fileName=" + fileName + "&contentType=" + contentType
+                                    + "&snapshotSource="
+                                    + URLEncoder.encode(StringUtils.defaultIfEmpty(snapshotSource, ""), "UTF-8")
+                                    + "&snapshotExternalSource="
+                                    + URLEncoder.encode(StringUtils.defaultIfEmpty(snapshotExternalSource, ""), "UTF-8")
+                            ).bodyStream(stream, ContentType.APPLICATION_OCTET_STREAM)).returnContent();
             output = OBJECT_MAPPER.readValue(postResult.asString(), UploadScreenshotResponse.class);
             log.debug("Url: {}, RAM response: {} ", url, output);
         } catch (IOException ioException) {

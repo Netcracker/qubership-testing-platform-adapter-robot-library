@@ -1,5 +1,5 @@
 /*
- *  Copyright 2024-2025 NetCracker Technology Corporation
+ *  Copyright 2024-2026 NetCracker Technology Corporation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -16,11 +16,11 @@
 
 package org.qubership.atp.adapter.keyworddriven.configuration;
 
-import org.qubership.atp.adapter.keyworddriven.context.ContextUtils;
-import org.qubership.atp.adapter.testcase.Config;
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
+import org.qubership.atp.adapter.keyworddriven.context.ContextUtils;
+import org.qubership.atp.adapter.testcase.Config;
 
 public class KdtProperties {
     private static final Logger LOG = Logger.getLogger(KdtProperties.class);
@@ -75,13 +75,19 @@ public class KdtProperties {
         KDT_SERVER_VERSION_LOCATION = Config.getString("kdt.server.version.location", "/version.txt");
         LOG.info("KDT server version location = " + KDT_SERVER_VERSION_LOCATION);
         KDT_UI_ELEMENTS_PARSER_TYPE = Config.getString("kdt.ui.elements.parser.type", "NEW");
-        KDT_REPORT_FOLDERS_WITH_NAMES = Boolean.valueOf(Config.getString("kdt.report.folders.with.names", "false"));
-        KDT_RESOURCE_RELEASE_AFTER_TESTCASE = Boolean.valueOf(Config.getString("kdt.release.resources.after.testcase", "false"));
-        KDT_FIX_BROWSER_STATE_BEFORE_EACH_TEST = Boolean.valueOf(Config.getString("kdt.fix.browser.state.before.test", "true"));
-        KDT_CONTEXT_TYPE_IS_NEW = Boolean.valueOf(Config.getString("kdt.context.type.new", "true"));
+        KDT_REPORT_FOLDERS_WITH_NAMES = Boolean
+                .parseBoolean(Config.getString("kdt.report.folders.with.names", "false"));
+        KDT_RESOURCE_RELEASE_AFTER_TESTCASE = Boolean
+                .parseBoolean(Config.getString("kdt.release.resources.after.testcase", "false"));
+        KDT_FIX_BROWSER_STATE_BEFORE_EACH_TEST = Boolean
+                .parseBoolean(Config.getString("kdt.fix.browser.state.before.test", "true"));
+        KDT_CONTEXT_TYPE_IS_NEW = Boolean
+                .parseBoolean(Config.getString("kdt.context.type.new", "true"));
         KDT_ROUTES_MATCHING_STRATEGY_LAZY = "LAZY".equalsIgnoreCase(Config.getString("kdt.routes.matching.strategy", "LAZY"));
-        KDT_WARNINGS_TO_REPORT = Boolean.valueOf(Config.getString("kdt.print.warnings.to.report", "true"));
-        REPLACE_PARAMETERS_ON_READ = Boolean.valueOf(Config.getString("kdt.replace.parameters.on.read", "true"));
+        KDT_WARNINGS_TO_REPORT = Boolean
+                .parseBoolean(Config.getString("kdt.print.warnings.to.report", "true"));
+        REPLACE_PARAMETERS_ON_READ = Boolean
+                .parseBoolean(Config.getString("kdt.replace.parameters.on.read", "true"));
     }
 }
 

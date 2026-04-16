@@ -1,5 +1,5 @@
 /*
- *  Copyright 2024-2025 NetCracker Technology Corporation
+ *  Copyright 2024-2026 NetCracker Technology Corporation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -60,17 +60,10 @@ import java.util.UUID;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.fluent.Content;
 import org.apache.http.client.fluent.Request;
 import org.apache.http.entity.ContentType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.common.base.Strings;
 import org.qubership.atp.adapter.common.RamConstants;
 import org.qubership.atp.adapter.common.context.TestRunContext;
 import org.qubership.atp.adapter.common.context.TestRunContextHolder;
@@ -92,6 +85,13 @@ import org.qubership.atp.ram.models.logrecords.RestLogRecord;
 import org.qubership.atp.ram.models.logrecords.SqlLogRecord;
 import org.qubership.atp.ram.models.logrecords.SshLogRecord;
 import org.qubership.atp.ram.models.logrecords.UiLogRecord;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.common.base.Strings;
 import lombok.SneakyThrows;
 
 @Deprecated
@@ -105,8 +105,8 @@ public class AtpReceiverRamAdapter extends AbstractAdapter {
 
     private final String atpLoggerUrl;
 
-    private String logRecordUrl;
-    private String testRunUrl;
+    private final String logRecordUrl;
+    private final String testRunUrl;
 
     public AtpReceiverRamAdapter(TestRunContext context) {
         this(context.getTestRunName());

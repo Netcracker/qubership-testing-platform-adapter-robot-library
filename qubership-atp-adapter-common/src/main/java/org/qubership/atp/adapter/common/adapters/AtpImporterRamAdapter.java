@@ -1,5 +1,5 @@
 /*
- *  Copyright 2024-2025 NetCracker Technology Corporation
+ *  Copyright 2024-2026 NetCracker Technology Corporation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -23,10 +23,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
 import org.qubership.atp.adapter.common.RamConstants;
 import org.qubership.atp.adapter.common.adapters.error.FailedToCreateRamEntity;
 import org.qubership.atp.adapter.common.context.TestRunContext;
@@ -51,6 +49,8 @@ import org.qubership.atp.ram.models.logrecords.SqlLogRecord;
 import org.qubership.atp.ram.models.logrecords.SshLogRecord;
 import org.qubership.atp.ram.models.logrecords.UiLogRecord;
 import org.qubership.atp.ram.models.logrecords.parts.ContextVariable;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
@@ -69,7 +69,7 @@ public class AtpImporterRamAdapter extends AbstractAdapter {
 
     private final BulkLogRecordSender bulkLogRecordSender;
 
-    private String atpRamImporterUrl;
+    private final String atpRamImporterUrl;
     protected String uploadUrlTemplate;
 
     /**

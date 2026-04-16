@@ -1,5 +1,5 @@
 /*
- *  Copyright 2024-2025 NetCracker Technology Corporation
+ *  Copyright 2024-2026 NetCracker Technology Corporation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -22,14 +22,14 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang.StringUtils;
-
-import com.google.common.base.Strings;
+import org.apache.commons.lang3.StringUtils;
 import org.qubership.atp.adapter.executor.executor.NttAttachment;
 import org.qubership.atp.adapter.executor.executor.providers.ExtendedFileSourceProvider;
+import org.qubership.atp.adapter.report.SourceProvider;
 import org.qubership.atp.ram.models.logrecords.parts.FileMetadata;
 import org.qubership.atp.ram.models.logrecords.parts.FileType;
-import org.qubership.atp.adapter.report.SourceProvider;
+
+import com.google.common.base.Strings;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j

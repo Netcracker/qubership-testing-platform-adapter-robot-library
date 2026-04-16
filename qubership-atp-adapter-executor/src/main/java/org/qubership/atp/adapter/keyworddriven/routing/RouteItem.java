@@ -1,5 +1,5 @@
 /*
- *  Copyright 2024-2025 NetCracker Technology Corporation
+ *  Copyright 2024-2026 NetCracker Technology Corporation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -16,13 +16,14 @@
 
 package org.qubership.atp.adapter.keyworddriven.routing;
 
-import org.qubership.atp.adapter.testcase.Config;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.apache.commons.lang.math.NumberUtils;
+
+import org.apache.commons.lang3.math.NumberUtils;
+import org.qubership.atp.adapter.testcase.Config;
 
 public class RouteItem {
-    private static boolean escapeConstants = Boolean.parseBoolean(Config.getString("kdt.quote.constants", "true"));
+    private static final boolean escapeConstants = Boolean.parseBoolean(Config.getString("kdt.quote.constants", "true"));
     private static final String paramNameGroup = "^\\[(.*)\\]";
     private static final String cellPatternGroup = "(?:\\((.*)\\))?";
     private static final String cellCountGroup = "(?:\\{(.*)\\})?";
@@ -31,7 +32,7 @@ public class RouteItem {
     private Pattern cellContentPattern = Pattern.compile("(?s).*?");
     private boolean isParameter = false;
     private String paramName;
-    private Object source;
+    private final Object source;
 
     public RouteItem(Object source) {
         this.source = source;

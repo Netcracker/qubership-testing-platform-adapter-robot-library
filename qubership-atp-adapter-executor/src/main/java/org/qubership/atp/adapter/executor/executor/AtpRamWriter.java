@@ -1,5 +1,5 @@
 /*
- *  Copyright 2024-2025 NetCracker Technology Corporation
+ *  Copyright 2024-2026 NetCracker Technology Corporation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -16,8 +16,8 @@
 
 package org.qubership.atp.adapter.executor.executor;
 
-import static org.qubership.atp.adapter.common.RamConstants.SCREENSHOT_FILE_KEY;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
+import static org.qubership.atp.adapter.common.RamConstants.SCREENSHOT_FILE_KEY;
 
 import java.io.File;
 import java.io.InputStream;
@@ -30,15 +30,9 @@ import java.util.Objects;
 import java.util.Stack;
 import java.util.UUID;
 
-import org.qubership.atp.ram.models.BrowserConsoleLogsTable;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Level;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.common.base.Function;
-import com.google.common.base.Strings;
 import org.qubership.atp.adapter.common.AtpRamAdapter;
 import org.qubership.atp.adapter.common.RamConstants;
 import org.qubership.atp.adapter.common.adapters.providers.RamAdapterProvider;
@@ -49,13 +43,19 @@ import org.qubership.atp.adapter.common.entities.Message;
 import org.qubership.atp.adapter.common.utils.ExecutionRequestHelper;
 import org.qubership.atp.adapter.common.ws.StartRunRequest;
 import org.qubership.atp.adapter.executor.executor.utils.AttachmentCreator;
-import org.qubership.atp.ram.enums.TestingStatuses;
-import org.qubership.atp.ram.enums.TypeAction;
-import org.qubership.atp.ram.models.logrecords.parts.FileMetadata;
-import org.qubership.atp.ram.models.logrecords.parts.ValidationTable;
 import org.qubership.atp.adapter.report.ReportWriter;
 import org.qubership.atp.adapter.report.SourceProvider;
 import org.qubership.atp.adapter.report.WebReportItem;
+import org.qubership.atp.ram.enums.TestingStatuses;
+import org.qubership.atp.ram.enums.TypeAction;
+import org.qubership.atp.ram.models.BrowserConsoleLogsTable;
+import org.qubership.atp.ram.models.logrecords.parts.FileMetadata;
+import org.qubership.atp.ram.models.logrecords.parts.ValidationTable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Function;
+import com.google.common.base.Strings;
 import net.sf.json.JSONObject;
 
 public class AtpRamWriter implements ReportWriter {
@@ -588,11 +588,7 @@ public class AtpRamWriter implements ReportWriter {
                         statuses.toString(), String.valueOf(type), compaund.isHidden());
                 message.setLastInSection(atpCompaund.isLastInSection());
                 message.setStartDate(atpCompaund.getStartDate());
-                if (compaunds.isEmpty()) {
-                    getAdapter().openCompoundSection(message, true);
-                } else {
-                    getAdapter().openCompoundSection(message, false);
-                }
+                getAdapter().openCompoundSection(message, compaunds.isEmpty());
                 parentSectionsCount++;
             }
         }
@@ -648,7 +644,7 @@ public class AtpRamWriter implements ReportWriter {
 
     private static class ReportThreadLocal extends ThreadLocal<AtpRamWriter> {
 
-        private static boolean isReportThreadLocal = true;
+        private static final boolean isReportThreadLocal = true;
         private AtpRamWriter report;
 
         @Override
