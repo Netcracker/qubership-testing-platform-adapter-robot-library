@@ -16,24 +16,25 @@
 
 package org.qubership.atp.adapter.keyworddriven.basicformat;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+
+import org.apache.commons.lang3.StringUtils;
 import org.qubership.atp.adapter.excel.ExcelBook;
 import org.qubership.atp.adapter.keyworddriven.InvalidFormatOfSourceException;
 import org.qubership.atp.adapter.keyworddriven.executable.Section;
 import org.qubership.atp.adapter.testcase.Config;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
 
 public abstract class ExcelParametersReader implements ParametersReader<Section> {
     public static final String EXCEL_PARAMETERS_READER = "kdt.excel.parameters.reader";
-    private static final Logger log = Logger.getLogger(ExcelParametersReader.class);
     protected final ExcelBook excelBook;
     protected final String sheetName;
 
     public static ExcelParametersReader get(ExcelBook book, String sheetName) throws InvalidFormatOfSourceException {
         String reader = Config.getString("kdt.excel.parameters.reader");
-        return (ExcelParametersReader)(StringUtils.isEmpty(reader) ? new BasicFormatParametersReader(book, sheetName) : getCustomParametersReader(book, sheetName, reader));
+        return StringUtils.isEmpty(reader)
+                ? new BasicFormatParametersReader(book, sheetName)
+                : getCustomParametersReader(book, sheetName, reader);
     }
 
     private static ExcelParametersReader getCustomParametersReader(ExcelBook book, String sheetName, String reader) throws InvalidFormatOfSourceException {
@@ -41,18 +42,15 @@ public abstract class ExcelParametersReader implements ParametersReader<Section>
             Class<? extends ExcelParametersReader> c = Class.forName(reader).asSubclass(ExcelParametersReader.class);
             Constructor ctor = c.getConstructor(book.getClass(), sheetName.getClass());
             return (ExcelParametersReader)ctor.newInstance(book, sheetName);
-        } catch (ClassNotFoundException var5) {
-            ClassNotFoundException e = var5;
+        } catch (ClassNotFoundException e) {
             throw new InvalidFormatOfSourceException("kdt.excel.parameters.reader class is not found: " + reader, e);
-        } catch (ClassCastException var6) {
-            ClassCastException e = var6;
+        } catch (ClassCastException e) {
             throw new InvalidFormatOfSourceException("kdt.excel.parameters.reader class '" + reader + "' does not extend " + ExcelParametersReader.class, e);
-        } catch (NoSuchMethodException var7) {
-            NoSuchMethodException e = var7;
+        } catch (NoSuchMethodException e) {
             throw new InvalidFormatOfSourceException("kdt.excel.parameters.reader class '" + reader + "' does not have constructor with book / sheetName parameters", e);
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException var8) {
-            ReflectiveOperationException e = var8;
-            throw new InvalidFormatOfSourceException("Can not create kdt.excel.parameters.reader instance '" + reader + "'. Error: " + ((ReflectiveOperationException)e).getMessage(), e);
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+            throw new InvalidFormatOfSourceException("Can not create kdt.excel.parameters.reader instance '" + reader
+                    + "'. Error: " + e.getMessage(), e);
         }
     }
 

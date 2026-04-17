@@ -1,5 +1,5 @@
 /*
- *  Copyright 2024-2025 NetCracker Technology Corporation
+ *  Copyright 2024-2026 NetCracker Technology Corporation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -16,15 +16,17 @@
 
 package org.qubership.atp.adapter.keyworddriven.executor;
 
-import com.google.common.base.Preconditions;
-import com.google.common.base.Predicate;
-import com.google.common.collect.Collections2;
+import javax.annotation.Nullable;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.log4j.Logger;
 import org.qubership.atp.adapter.keyworddriven.basicformat.flags.TestCaseType;
 import org.qubership.atp.adapter.keyworddriven.executable.Executable;
 import org.qubership.atp.adapter.keyworddriven.resources.ResourceFactory;
-import javax.annotation.Nullable;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.log4j.Logger;
+
+import com.google.common.base.Preconditions;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Collections2;
 
 public class BeforeAfterTestSuiteExecutor extends PooledTestSuiteExecutor {
     private static final Logger log = Logger.getLogger(PooledTestSuiteExecutor.class);
@@ -39,7 +41,7 @@ public class BeforeAfterTestSuiteExecutor extends PooledTestSuiteExecutor {
         try {
             log.info("[START] Prerequisites execution");
             this.execute(Collections2.filter(suite.getChildren(), by(TestCaseType.PRE_CONDITION)));
-            log.info("[START] Prerequisites execution");
+            log.info("[END] Prerequisites execution");
             log.info("[START] test cases execution");
             this.execute(Collections2.filter(suite.getChildren(), by(TestCaseType.TEST_CASE)));
             log.info("[END] test cases execution");

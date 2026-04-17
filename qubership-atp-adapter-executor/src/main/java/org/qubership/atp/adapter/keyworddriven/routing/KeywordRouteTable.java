@@ -1,5 +1,5 @@
 /*
- *  Copyright 2024-2025 NetCracker Technology Corporation
+ *  Copyright 2024-2026 NetCracker Technology Corporation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -16,13 +16,6 @@
 
 package org.qubership.atp.adapter.keyworddriven.routing;
 
-import com.google.inject.Inject;
-import org.qubership.atp.adapter.keyworddriven.configuration.DefaultConfiguration;
-import org.qubership.atp.adapter.keyworddriven.configuration.KdtProperties;
-import org.qubership.atp.adapter.keyworddriven.executable.DataItem;
-import org.qubership.atp.adapter.keyworddriven.executable.Keyword;
-import org.qubership.atp.adapter.keyworddriven.routing.annotation.RouteAlias;
-import org.qubership.atp.adapter.utils.KDTUtils;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -30,22 +23,31 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
+
 import javax.annotation.Nullable;
+
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.qubership.atp.adapter.keyworddriven.configuration.DefaultConfiguration;
+import org.qubership.atp.adapter.keyworddriven.configuration.KdtProperties;
+import org.qubership.atp.adapter.keyworddriven.executable.DataItem;
+import org.qubership.atp.adapter.keyworddriven.executable.Keyword;
+import org.qubership.atp.adapter.keyworddriven.routing.annotation.RouteAlias;
+import org.qubership.atp.adapter.utils.KDTUtils;
 import org.reflections.Reflections;
 import org.reflections.scanners.MethodAnnotationsScanner;
-import org.reflections.scanners.Scanner;
 import org.reflections.scanners.SubTypesScanner;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
 import org.reflections.util.FilterBuilder;
 
+import com.google.inject.Inject;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class KeywordRouteTable {
-    private static final Logger LOG = Logger.getLogger(KeywordRouteTable.class);
     public static final String DEFAULT_GROUP_NAME = "Other";
-    private static LinkedHashMap<String, RouteGroup> routeGroups = new LinkedHashMap();
+    private static final LinkedHashMap<String, RouteGroup> routeGroups = new LinkedHashMap<>();
     @Inject
     public static KeywordMapper mapper;
 
@@ -106,20 +108,20 @@ public class KeywordRouteTable {
                 }
             }
 
-            if (result.size() == 0) {
-                LOG.error(String.format("No one route is found for keyword '%s'", keyword));
+            if (result.isEmpty()) {
+                log.error("No one route is found for keyword '{}'", keyword);
                 return null;
             } else if (result.size() == 1) {
-                return (Route)result.get(0);
+                return result.get(0);
             } else {
-                LOG.error(String.format("More than one route is found for keyword '%s'. Matched routes: %s", keyword, result));
+                log.error("More than one route is found for keyword '{}'. Matched routes: {}", keyword, result);
                 return null;
             }
         }
     }
 
     public static void calculateRoutesRating() {
-        LOG.info("Routes calculation started");
+        log.info("Routes calculation started");
         Iterator var0 = routeGroups.values().iterator();
 
         while(var0.hasNext()) {
@@ -147,11 +149,11 @@ public class KeywordRouteTable {
             }
         }
 
-        LOG.info("Routes calculation completed");
+        log.info("Routes calculation completed");
     }
 
     public static ArrayList<Route> getRoutesByName(String name) {
-        ArrayList<Route> list = new ArrayList();
+        ArrayList<Route> list = new ArrayList<>();
         Iterator var2 = routeGroups.values().iterator();
 
         while(var2.hasNext()) {
@@ -185,7 +187,7 @@ public class KeywordRouteTable {
         while(var2.hasNext()) {
             DataItem dataItem = (DataItem)var2.next();
             if (dataItem.getRouteItem() == null) {
-                KDTUtils.criticalMessAndExit("Fatal error in assigning route to keyword.\nRoute: " + route.toString() + "\nRoute Mask: " + route.getRouteMask() + "\nKeyword: " + keyword.toString() + "\nKeyword Compare String: " + keyword.getStringToCompare());
+                KDTUtils.criticalMessAndExit("Fatal error in assigning route to keyword.\nRoute: " + route.toString() + "\nRoute Mask: " + route.getRouteMask() + "\nKeyword: " + keyword + "\nKeyword Compare String: " + keyword.getStringToCompare());
             }
         }
 
@@ -201,7 +203,7 @@ public class KeywordRouteTable {
     }
 
     public static void registerLast(Route route) {
-        registerLast((String)null, route);
+        registerLast(null, route);
     }
 
     public static void registerLast(String groupName, Route route) {
@@ -229,49 +231,40 @@ public class KeywordRouteTable {
     }
 
     public static void registerAnnotatedRoutes(String actionsPackage) {
-        LOG.debug("[START] Register routes from package: " + actionsPackage);
-        Reflections reflections = new Reflections((new ConfigurationBuilder()).filterInputsBy((new FilterBuilder()).includePackage(new String[]{actionsPackage})).setUrls(ClasspathHelper.forPackage(actionsPackage, new ClassLoader[0])).setScanners(new Scanner[]{new SubTypesScanner(), new MethodAnnotationsScanner()}));
+        log.debug("[START] Register routes from package: {}", actionsPackage);
+        Reflections reflections = new Reflections((new ConfigurationBuilder()).filterInputsBy((new FilterBuilder()).includePackage(actionsPackage)).setUrls(ClasspathHelper.forPackage(actionsPackage)).setScanners(new SubTypesScanner(), new MethodAnnotationsScanner()));
         Set<Method> annotated = reflections.getMethodsAnnotatedWith(org.qubership.atp.adapter.keyworddriven.routing.annotation.Route.class);
         annotated.addAll(reflections.getMethodsAnnotatedWith(RouteAlias.class));
         CollectionUtils.filter(annotated, (arg) -> {
             return Modifier.isPublic(arg.getModifiers());
         });
-        registerMethods((Method[])annotated.toArray(new Method[0]));
-        LOG.debug("[END] Register routes from package: " + actionsPackage);
+        registerMethods(annotated.toArray(new Method[0]));
+        log.debug("[END] Register routes from package: {}", actionsPackage);
     }
 
     public static void registerAnnotatedRoutes(Class<?> actionClass) {
-        LOG.debug("[START] Register routes from class: " + actionClass);
+        log.debug("[START] Register routes from class: {}", actionClass);
         registerMethods(actionClass.getMethods());
-        LOG.debug("[END] Register routes from class: " + actionClass);
+        log.debug("[END] Register routes from class: {}", actionClass);
     }
 
     private static void registerMethods(Method... methods) {
-        Method[] var1 = methods;
-        int var2 = methods.length;
-
-        for(int var3 = 0; var3 < var2; ++var3) {
-            Method method = var1[var3];
+        for (Method method : methods) {
             registerRouteAnnotation(method);
             registerRouteAliasAnnotation(method);
         }
-
     }
 
     private static void registerRouteAnnotation(Method method) {
-        org.qubership.atp.adapter.keyworddriven.routing.annotation.Route annotation = (org.qubership.atp.adapter.keyworddriven.routing.annotation.Route)method.getAnnotation(org.qubership.atp.adapter.keyworddriven.routing.annotation.Route.class);
-        register(method, getGroupName(method), annotation, (String)null);
+        org.qubership.atp.adapter.keyworddriven.routing.annotation.Route annotation = method.getAnnotation(org.qubership.atp.adapter.keyworddriven.routing.annotation.Route.class);
+        register(method, getGroupName(method), annotation, null);
     }
 
     private static void registerRouteAliasAnnotation(Method method) {
-        RouteAlias routeAlias = (RouteAlias)method.getAnnotation(RouteAlias.class);
+        RouteAlias routeAlias = method.getAnnotation(RouteAlias.class);
         if (routeAlias != null) {
             String groupName = getGroupName(method);
-            org.qubership.atp.adapter.keyworddriven.routing.annotation.Route[] var3 = routeAlias.value();
-            int var4 = var3.length;
-
-            for(int var5 = 0; var5 < var4; ++var5) {
-                org.qubership.atp.adapter.keyworddriven.routing.annotation.Route annotation = var3[var5];
+            for (org.qubership.atp.adapter.keyworddriven.routing.annotation.Route annotation : routeAlias.value()) {
                 register(method, groupName, annotation, routeAlias.description());
             }
         }
@@ -281,14 +274,16 @@ public class KeywordRouteTable {
     private static void register(Method method, String groupName, org.qubership.atp.adapter.keyworddriven.routing.annotation.Route annotation, String description) {
         if (annotation != null) {
             description = StringUtils.isEmpty(annotation.description()) ? description : annotation.description();
-            registerLast(groupName, new MethodKeywordRoute(method.isAnnotationPresent(Deprecated.class), description, annotation.value(), method.getDeclaringClass(), method.getName(), method.getParameterTypes(), (Object[])null));
+            registerLast(groupName, new MethodKeywordRoute(method.isAnnotationPresent(Deprecated.class), description, annotation.value(), method.getDeclaringClass(), method.getName(), method.getParameterTypes(), null));
         }
 
     }
 
     private static String getGroupName(Method method) {
-        org.qubership.atp.adapter.keyworddriven.routing.annotation.RouteGroup groupAnnotaton = (org.qubership.atp.adapter.keyworddriven.routing.annotation.RouteGroup)method.getDeclaringClass().getAnnotation(org.qubership.atp.adapter.keyworddriven.routing.annotation.RouteGroup.class);
-        return groupAnnotaton == null ? null : groupAnnotaton.value();
+        org.qubership.atp.adapter.keyworddriven.routing.annotation.RouteGroup groupAnnotation =
+                method.getDeclaringClass()
+                        .getAnnotation(org.qubership.atp.adapter.keyworddriven.routing.annotation.RouteGroup.class);
+        return groupAnnotation == null ? null : groupAnnotation.value();
     }
 }
 

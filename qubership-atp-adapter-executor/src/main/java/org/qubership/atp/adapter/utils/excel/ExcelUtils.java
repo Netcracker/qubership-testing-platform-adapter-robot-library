@@ -1,5 +1,5 @@
 /*
- *  Copyright 2024-2025 NetCracker Technology Corporation
+ *  Copyright 2024-2026 NetCracker Technology Corporation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -16,23 +16,25 @@
 
 package org.qubership.atp.adapter.utils.excel;
 
-import org.qubership.atp.adapter.excel.ExcelBook;
-import org.qubership.atp.adapter.excel.ExcelRow;
-import org.qubership.atp.adapter.excel.ExcelSheet;
-import org.qubership.atp.adapter.excel.exceptions.DataNotSetException;
-import org.qubership.atp.adapter.keyworddriven.InvalidFormatOfSourceException;
-import org.qubership.atp.adapter.utils.KDTUtils;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.apache.commons.collections.ListUtils;
-import org.apache.log4j.Logger;
 
+import org.apache.commons.collections.ListUtils;
+import org.qubership.atp.adapter.excel.ExcelBook;
+import org.qubership.atp.adapter.excel.ExcelRow;
+import org.qubership.atp.adapter.excel.ExcelSheet;
+import org.qubership.atp.adapter.excel.exceptions.DataNotSetException;
+import org.qubership.atp.adapter.keyworddriven.InvalidFormatOfSourceException;
+import org.qubership.atp.adapter.utils.KDTUtils;
+
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class ExcelUtils {
-    private static final Logger log = Logger.getLogger(ExcelUtils.class);
 
     public ExcelUtils() {
     }
@@ -42,8 +44,7 @@ public class ExcelUtils {
             ExcelBook excelBook = new ExcelBook(KDTUtils.checkCriticalFileExistAndExit(sourceFile));
             excelBook.setVerifyTopCellsRage(false);
             return excelBook;
-        } catch (org.qubership.atp.adapter.excel.exceptions.InvalidFormatOfSourceException var2) {
-            org.qubership.atp.adapter.excel.exceptions.InvalidFormatOfSourceException e = var2;
+        } catch (org.qubership.atp.adapter.excel.exceptions.InvalidFormatOfSourceException e) {
             throw new InvalidFormatOfSourceException(e.getMessage(), e);
         }
     }
@@ -53,7 +54,7 @@ public class ExcelUtils {
     }
 
     public static Map<String, String> readRowWithHeaders(ExcelSheet sheet, ExcelRow row, int startIndex, int endIndex) {
-        Map<String, String> map = new HashMap();
+        Map<String, String> map = new HashMap<>();
         if (row != null) {
             for(int colNum = startIndex; colNum < endIndex; ++colNum) {
                 map.put(sheet.getHeaders().get(colNum), row.getCell(colNum).getValue());
@@ -72,7 +73,7 @@ public class ExcelUtils {
     }
 
     public static List<String> readRow(ExcelRow row, int startIndex, int endIndex) {
-        List<String> array = new ArrayList();
+        List<String> array = new ArrayList<>();
         if (row != null) {
             for(int colNum = startIndex; colNum < endIndex; ++colNum) {
                 array.add(row.getCell(colNum).getValue());
@@ -82,17 +83,18 @@ public class ExcelUtils {
         return array;
     }
 
-    public static Integer getInteger(ExcelSheet sheet, String columnName, Integer defaultValue) throws InvalidFormatOfSourceException {
+    public static Integer getInteger(ExcelSheet sheet, String columnName, Integer defaultValue) {
         String valueByHeaderName = "";
 
         try {
             valueByHeaderName = sheet.getCellByHeaderName(sheet.getCurrentRow().getRowNum(), columnName).getValue();
             return Integer.valueOf(valueByHeaderName);
-        } catch (DataNotSetException var5) {
-            DataNotSetException e = var5;
+        } catch (DataNotSetException e) {
             log.warn(e.getMessage());
-        } catch (NumberFormatException var6) {
-            log.debug(String.format("Value '%s' of '%s' is not defined or has incorrect format in row '%s' in file '%s'. Value by default is: %s", valueByHeaderName, columnName, sheet.getCurrentRow().getRowNum(), sheet.getExcelBook().getCurrentFile().getName(), defaultValue));
+        } catch (NumberFormatException e) {
+            log.debug("Value '{}' of '{}' is not defined or has incorrect format in row '{}' in file '{}'. "
+                    + "Value by default is: {}", valueByHeaderName, columnName, sheet.getCurrentRow().getRowNum(),
+                    sheet.getExcelBook().getCurrentFile().getName(), defaultValue, e);
         }
 
         return defaultValue;
@@ -105,8 +107,7 @@ public class ExcelUtils {
     public static String getCellValue(ExcelSheet sheet, String columnName, String defaultValue) {
         try {
             return sheet.getCellByHeaderName(sheet.getCurrentRow().getRowNum(), columnName).getValue();
-        } catch (DataNotSetException var4) {
-            DataNotSetException e = var4;
+        } catch (DataNotSetException e) {
             log.warn(e.getMessage());
             return defaultValue;
         }
@@ -116,10 +117,12 @@ public class ExcelUtils {
         checkHeaders(sheet, Arrays.asList(headers));
     }
 
-    public static void checkHeaders(ExcelSheet sheet, List<String> expectedHeaders) throws InvalidFormatOfSourceException {
+    public static void checkHeaders(ExcelSheet sheet, List<String> expectedHeaders)
+            throws InvalidFormatOfSourceException {
         List missedHeaders = ListUtils.removeAll(expectedHeaders, sheet.getHeaders().values());
-        if (missedHeaders.size() > 0) {
-            throw new InvalidFormatOfSourceException("Following rows are not present in header on sheet " + sheet + " : " + missedHeaders);
+        if (!missedHeaders.isEmpty()) {
+            throw new InvalidFormatOfSourceException("Following rows are not present in header on sheet " + sheet
+                    + " : " + missedHeaders);
         }
     }
 }

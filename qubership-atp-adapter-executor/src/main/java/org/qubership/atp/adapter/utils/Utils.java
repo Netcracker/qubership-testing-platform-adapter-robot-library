@@ -1,5 +1,5 @@
 /*
- *  Copyright 2024-2025 NetCracker Technology Corporation
+ *  Copyright 2024-2026 NetCracker Technology Corporation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 
 package org.qubership.atp.adapter.utils;
 
-import com.googlecode.htmlcompressor.compressor.HtmlCompressor;
 import java.io.BufferedInputStream;
 import java.io.Closeable;
 import java.io.File;
@@ -36,11 +35,11 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
@@ -48,17 +47,20 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
+
 import org.apache.commons.io.FileUtils;
-import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+import com.googlecode.htmlcompressor.compressor.HtmlCompressor;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class Utils {
-    private static final Logger log = Logger.getLogger(Utils.class);
     protected static final Pattern XML_PROLOG_JUNK_PATTERN = Pattern.compile("^([\\W]+)<");
-    private static HtmlCompressor compressor = new HtmlCompressor();
+    private static final HtmlCompressor compressor = new HtmlCompressor();
 
     public Utils() {
     }
@@ -66,9 +68,8 @@ public class Utils {
     public static String readFileToString(File file) {
         try {
             return FileUtils.readFileToString(file, "UTF-8");
-        } catch (IOException var2) {
-            IOException e = var2;
-            log.error("Failed to read file: " + file.getAbsolutePath(), e);
+        } catch (IOException e) {
+            log.error("Failed to read file: {}", file.getAbsolutePath(), e);
             return "";
         }
     }
@@ -80,9 +81,8 @@ public class Utils {
     public static void writeStringToFile(File file, String data) {
         try {
             FileUtils.writeStringToFile(file, data, "UTF-8");
-        } catch (IOException var3) {
-            IOException e = var3;
-            log.error("Failed to write to file: " + file.getAbsolutePath(), e);
+        } catch (IOException e) {
+            log.error("Failed to write to file: {}", file.getAbsolutePath(), e);
         }
 
     }
@@ -112,7 +112,7 @@ public class Utils {
             t.setOutputProperty("indent", "no");
             t.transform(new DOMSource(node), new StreamResult(sw));
         } catch (TransformerException var3) {
-            System.out.println("nodeToString Transformer Exception");
+            log.warn("nodeToString Transformer Exception", var3);
         }
 
         return sw.toString();
@@ -125,24 +125,19 @@ public class Utils {
         factory.setAttribute("http://apache.org/xml/features/nonvalidating/load-dtd-grammar", false);
         factory.setAttribute("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
         factory.setNamespaceAware(true);
-        DocumentBuilder builder = null;
+        DocumentBuilder builder;
 
         try {
             builder = factory.newDocumentBuilder();
-        } catch (ParserConfigurationException var7) {
-            ParserConfigurationException e = var7;
-            log.fatal("ParserConfigurationException", e);
+        } catch (ParserConfigurationException e) {
+            log.error("ParserConfigurationException", e);
             throw new RuntimeException("ParserConfigurationException", e);
         }
 
-        if (xmlString.length() > 0) {
+        if (!xmlString.isEmpty()) {
             try {
                 return builder.parse(new InputSource(new StringReader(xmlString)));
-            } catch (SAXException var5) {
-                SAXException e = var5;
-                log.error("Failed to parse XML", e);
-            } catch (IOException var6) {
-                IOException e = var6;
+            } catch (SAXException | IOException e) {
                 log.error("Failed to parse XML", e);
             }
         }
@@ -163,14 +158,7 @@ public class Utils {
             DOMSource source = new DOMSource(node);
             transformer.transform(source, result);
             return result.getWriter().toString();
-        } catch (TransformerConfigurationException var4) {
-            TransformerConfigurationException e = var4;
-            log.error("Failed to output XML to String", e);
-        } catch (TransformerFactoryConfigurationError var5) {
-            TransformerFactoryConfigurationError e = var5;
-            log.error("Failed to output XML to String", e);
-        } catch (TransformerException var6) {
-            TransformerException e = var6;
+        } catch (TransformerException | TransformerFactoryConfigurationError e) {
             log.error("Failed to output XML to String", e);
         }
 
@@ -181,7 +169,7 @@ public class Utils {
         try {
             return XPathFactory.newInstance().newXPath().evaluate(expression, node);
         } catch (XPathExpressionException var3) {
-            log.error("Failed to extract xpath value from xml: xpath=" + expression);
+            log.error("Failed to extract xpath value from xml: xpath={}", expression);
             return "";
         }
     }
@@ -193,12 +181,11 @@ public class Utils {
         try {
             is = new FileInputStream(propertiesFile);
             p.load(is);
-        } catch (IOException var7) {
-            IOException e = var7;
+        } catch (IOException e) {
             if (!propertiesFile.exists()) {
-                log.error("Properties file '" + propertiesFile.getName() + "' doesn't exist");
+                log.error("Properties file '{}' doesn't exist", propertiesFile.getName());
             } else {
-                log.error("Failed to read properties file: " + propertiesFile.getName(), e);
+                log.error("Failed to read properties file: {}", propertiesFile.getName(), e);
             }
         } finally {
             close(is);
@@ -212,8 +199,7 @@ public class Utils {
 
         try {
             p.load(propStream);
-        } catch (IOException var3) {
-            IOException e = var3;
+        } catch (IOException e) {
             log.error("Failed to read properties from InputStream", e);
         }
 
@@ -233,9 +219,8 @@ public class Utils {
             byte[] buf = new byte[data.available()];
             data.read(buf);
             var5 = new String(buf);
-        } catch (IOException var9) {
-            IOException e = var9;
-            log.error("Failed to read resource: " + resourcePath, e);
+        } catch (IOException e) {
+            log.error("Failed to read resource: {}", resourcePath, e);
             return "";
         } finally {
             close(str);
@@ -247,32 +232,25 @@ public class Utils {
     public static void sleep(long millis) {
         try {
             Thread.sleep(millis);
-        } catch (InterruptedException var3) {
-            InterruptedException e = var3;
-            log.error("Exception caugth while sleeping", e);
+        } catch (InterruptedException e) {
+            log.error("Exception caught while sleeping", e);
         }
 
     }
 
     public static void sleepSeconds(int seconds) {
-        sleep((long)(1000 * seconds));
+        sleep(1000L * seconds);
     }
 
     public static void close(Closeable... closeables) {
         if (closeables != null) {
-            Closeable[] var1 = closeables;
-            int var2 = closeables.length;
-
-            for(int var3 = 0; var3 < var2; ++var3) {
-                Closeable c = var1[var3];
-
+            for (Closeable c : closeables) {
                 try {
                     if (c != null) {
                         c.close();
                     }
-                } catch (IOException var6) {
-                    IOException e = var6;
-                    log.error("Failed to close " + c.getClass().getSimpleName(), e);
+                } catch (IOException e) {
+                    log.error("Failed to close {}", c.getClass().getSimpleName(), e);
                 }
             }
 
@@ -296,7 +274,7 @@ public class Utils {
 
             while(true) {
                 while(e.hasMoreElements()) {
-                    ZipEntry entry = (ZipEntry)e.nextElement();
+                    ZipEntry entry = e.nextElement();
                     File file = new File(extractToDir, entry.getName());
                     if (entry.isDirectory() && !file.exists()) {
                         file.mkdirs();
@@ -322,9 +300,8 @@ public class Utils {
 
                 return;
             }
-        } catch (IOException var12) {
-            IOException e = var12;
-            log.error("Failed to unzip :" + zipFile + " to dir: " + extractToDir, e);
+        } catch (IOException e) {
+            log.error("Failed to unzip :{} to dir: {}", zipFile, extractToDir, e);
         }
     }
 
@@ -353,10 +330,9 @@ public class Utils {
                     }
                 }
             }
-        } catch (IOException var14) {
-            IOException e = var14;
+        } catch (IOException e) {
             if (entry != null) {
-                log.error("Failed to unzip :" + entry.getName() + " to dir: " + extractToDir, e);
+                log.error("Failed to unzip :{} to dir: {}", entry.getName(), extractToDir, e);
             }
         } finally {
             close(input);
@@ -374,21 +350,16 @@ public class Utils {
             } else if (file.isFile()) {
                 zip(new File[]{file}, file.getParentFile(), zos);
             }
-        } catch (IOException var7) {
-            IOException e = var7;
-            log.error("Failed to zip directory: " + file, e);
+        } catch (IOException e) {
+            log.error("Failed to zip directory: {}", file, e);
         } finally {
             close(zos);
         }
 
     }
 
-    private static final void zip(File[] files, File baseDir, ZipOutputStream zos) throws IOException {
-        File[] var3 = files;
-        int var4 = files.length;
-
-        for(int var5 = 0; var5 < var4; ++var5) {
-            File file = var3[var5];
+    private static void zip(File[] files, File baseDir, ZipOutputStream zos) throws IOException {
+        for (File file : files) {
             if (file.isDirectory()) {
                 zip(file.listFiles(), baseDir, zos);
             } else {

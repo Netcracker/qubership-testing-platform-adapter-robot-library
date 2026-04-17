@@ -1,5 +1,5 @@
 /*
- *  Copyright 2024-2025 NetCracker Technology Corporation
+ *  Copyright 2024-2026 NetCracker Technology Corporation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -16,13 +16,16 @@
 
 package org.qubership.atp.adapter.report.rmi;
 
+import java.rmi.RemoteException;
+
 import org.qubership.atp.adapter.report.ReportAdapter;
 import org.qubership.atp.adapter.report.ReportWriter;
-import java.rmi.RemoteException;
-import org.apache.log4j.Logger;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class RemoteToLocalReportAdapter implements ReportAdapter {
-    private RemoteReportAdapter remoteReportAdapter;
+    private final RemoteReportAdapter remoteReportAdapter;
 
     public RemoteToLocalReportAdapter(RemoteReportAdapter remoteReportAdapter) {
         this.remoteReportAdapter = remoteReportAdapter;
@@ -33,9 +36,8 @@ public class RemoteToLocalReportAdapter implements ReportAdapter {
             if (!RemoteParametersStorage.getIsServer()) {
                 this.remoteReportAdapter.write(item);
             }
-        } catch (RemoteException var4) {
-            RemoteException e = var4;
-            Logger.getLogger(RemoteToLocalReportAdapter.class).error(e);
+        } catch (RemoteException e) {
+            log.error("RemoteException occurred", e);
         }
 
     }

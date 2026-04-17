@@ -1,5 +1,5 @@
 /*
- *  Copyright 2024-2025 NetCracker Technology Corporation
+ *  Copyright 2024-2026 NetCracker Technology Corporation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -16,10 +16,10 @@
 
 package org.qubership.atp.adapter.keyworddriven.resources;
 
-import org.apache.log4j.Logger;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class Resources {
-    private static final Logger log = Logger.getLogger(Resources.class);
 
     private Resources() {
     }
@@ -31,9 +31,8 @@ public class Resources {
     public static void releaseResourcesForCurrentThreadSilently() {
         try {
             ResourceFactory.getInstance().releaseResourcesForCurrentThread();
-        } catch (Throwable var1) {
-            Throwable e = var1;
-            log.error("Failed to release resources for thread: " + Thread.currentThread(), e);
+        } catch (Throwable e) {
+            log.error("Failed to release resources for thread: {}", Thread.currentThread(), e);
         }
 
     }

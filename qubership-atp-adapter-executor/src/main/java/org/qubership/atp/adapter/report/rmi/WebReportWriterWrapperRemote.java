@@ -16,17 +16,19 @@
 
 package org.qubership.atp.adapter.report.rmi;
 
-import org.qubership.atp.adapter.report.InterruptScenarioException;
-import org.qubership.atp.adapter.report.ReportWriter;
 import java.rmi.ConnectException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-import org.apache.log4j.Logger;
 
+import org.qubership.atp.adapter.report.InterruptScenarioException;
+import org.qubership.atp.adapter.report.ReportWriter;
+
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class WebReportWriterWrapperRemote implements ReportWriter {
-    private static Logger logger = Logger.getLogger("org.qubership.atp.adapter.report.rmi.WebReportWriterWrapperRemote");
     private static WebReportWriterServer server = null;
     private static WebReportWriterClient client = null;
 
@@ -37,11 +39,7 @@ public class WebReportWriterWrapperRemote implements ReportWriter {
         if (server != null) {
             try {
                 server.stop();
-            } catch (RemoteException var1) {
-                RemoteException e = var1;
-                throw new InterruptScenarioException(e);
-            } catch (NotBoundException var2) {
-                NotBoundException e = var2;
+            } catch (RemoteException | NotBoundException e) {
                 throw new InterruptScenarioException(e);
             }
         }
@@ -56,11 +54,7 @@ public class WebReportWriterWrapperRemote implements ReportWriter {
         if (!server.isStarted()) {
             try {
                 server.start();
-            } catch (NotBoundException var1) {
-                NotBoundException e = var1;
-                throw new InterruptScenarioException(e);
-            } catch (RemoteException var2) {
-                RemoteException e = var2;
+            } catch (NotBoundException | RemoteException e) {
                 throw new InterruptScenarioException(e);
             }
         }
@@ -71,7 +65,7 @@ public class WebReportWriterWrapperRemote implements ReportWriter {
     public static WebReportWriterClient getClient() {
         if (client == null) {
             client = new WebReportWriterClient();
-            logger.info("RMI Client started. Communicating via address: " + RemoteParametersStorage.getBindAddress());
+            log.info("RMI Client started. Communicating via address: {}", RemoteParametersStorage.getBindAddress());
         }
 
         return client;
@@ -99,7 +93,7 @@ public class WebReportWriterWrapperRemote implements ReportWriter {
                     registry = LocateRegistry.createRegistry(Integer.parseInt(RemoteParametersStorage.getPort(), 10));
                     registry.rebind(RemoteParametersStorage.getServerName(), writer);
                     this.started = true;
-                    WebReportWriterWrapperRemote.logger.info("RMI Server started. Listening at address: " + RemoteParametersStorage.getBindAddress());
+                    log.info("RMI Server started. Listening at address: {}", RemoteParametersStorage.getBindAddress());
                 } catch (ConnectException var2) {
                     throw new InterruptScenarioException("Failed to start RMI server on given address: " + RemoteParametersStorage.getBindAddress());
                 }
@@ -110,7 +104,7 @@ public class WebReportWriterWrapperRemote implements ReportWriter {
             if (registry != null) {
                 registry.unbind(RemoteParametersStorage.getBindAddress());
                 this.started = false;
-                WebReportWriterWrapperRemote.logger.info("RMI Server stopped.");
+                log.info("RMI Server stopped.");
             }
 
         }
@@ -134,15 +128,12 @@ public class WebReportWriterWrapperRemote implements ReportWriter {
         public static RemoteToLocalReportAdapter getAdapter() {
             if (adapter == null) {
                 try {
-                    adapter = new RemoteToLocalReportAdapter((RemoteReportAdapter)LocateRegistry.getRegistry(RemoteParametersStorage.getHost(), new Integer(RemoteParametersStorage.getPort())).lookup(RemoteParametersStorage.getServerName()));
-                } catch (NotBoundException var1) {
-                    NotBoundException e = var1;
+                    adapter = new RemoteToLocalReportAdapter((RemoteReportAdapter)LocateRegistry.getRegistry(RemoteParametersStorage.getHost(), Integer.parseInt(RemoteParametersStorage.getPort())).lookup(RemoteParametersStorage.getServerName()));
+                } catch (NotBoundException e) {
                     throw new InterruptScenarioException("Unable to find RMI server on given address: " + RemoteParametersStorage.getBindAddress(), e);
-                } catch (ConnectException var2) {
-                    ConnectException e = var2;
+                } catch (ConnectException e) {
                     throw new InterruptScenarioException("Client was unable to connect to the server. Exception: " + e.getMessage());
-                } catch (RemoteException var3) {
-                    RemoteException e = var3;
+                } catch (RemoteException e) {
                     throw new InterruptScenarioException(e);
                 }
             }

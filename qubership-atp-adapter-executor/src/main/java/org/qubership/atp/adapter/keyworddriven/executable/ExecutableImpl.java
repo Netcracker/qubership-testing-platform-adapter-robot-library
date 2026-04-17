@@ -1,5 +1,5 @@
 /*
- *  Copyright 2024-2025 NetCracker Technology Corporation
+ *  Copyright 2024-2026 NetCracker Technology Corporation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -16,8 +16,14 @@
 
 package org.qubership.atp.adapter.keyworddriven.executable;
 
-import com.google.common.collect.Collections2;
-import com.google.common.collect.Maps;
+import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.log4j.Logger;
 import org.qubership.atp.adapter.keyworddriven.TestCaseException;
 import org.qubership.atp.adapter.keyworddriven.configuration.KdtProperties;
 import org.qubership.atp.adapter.keyworddriven.context.KDTContextDataStorageProvider;
@@ -27,21 +33,17 @@ import org.qubership.atp.adapter.report.InterruptScenarioException;
 import org.qubership.atp.adapter.tools.tacomponents.context.Context;
 import org.qubership.atp.adapter.tools.tacomponents.context.ContextDataStorage;
 import org.qubership.atp.adapter.tools.tacomponents.context.ContextType;
-import java.lang.ref.WeakReference;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.log4j.Logger;
+
+import com.google.common.collect.Collections2;
+import com.google.common.collect.Maps;
 
 public abstract class ExecutableImpl implements Executable {
-    private Map<String, Object> executeParam = new LinkedHashMap();
+    private final Map<String, Object> executeParam = new LinkedHashMap<>();
     private String name;
-    private List<Executable> childrens = new ArrayList();
+    private final List<Executable> children = new ArrayList<>();
     private WeakReference<Executable> parent = null;
     private Logger logger;
-    private Map<String, Flag> flags = Maps.newHashMapWithExpectedSize(2);
+    private final Map<String, Flag> flags = Maps.newHashMapWithExpectedSize(2);
 
     public ExecutableImpl(String name, Executable parent) {
         this.name = name;
@@ -57,7 +59,7 @@ public abstract class ExecutableImpl implements Executable {
     }
 
     public List<Executable> getChildren() {
-        return this.childrens;
+        return this.children;
     }
 
     public String getName() {
@@ -69,7 +71,7 @@ public abstract class ExecutableImpl implements Executable {
     }
 
     public Executable getParent() {
-        return (Executable)this.parent.get();
+        return this.parent.get();
     }
 
     public void execute() throws Exception {
@@ -88,11 +90,9 @@ public abstract class ExecutableImpl implements Executable {
     public void prepare() {
         try {
             this.getExecutor().prepare(this);
-        } catch (InterruptScenarioException var2) {
-            InterruptScenarioException e = var2;
+        } catch (InterruptScenarioException e) {
             throw e;
-        } catch (Exception var3) {
-            Exception e = var3;
+        } catch (Exception e) {
             this.log().error(this.getClass().toString(), e);
         }
 
@@ -169,7 +169,7 @@ public abstract class ExecutableImpl implements Executable {
     }
 
     public Flag getFlag(String name) {
-        Flag flag = (Flag)this.flags.get(name);
+        Flag flag = this.flags.get(name);
         if (flag != null) {
             if (flag.isEnabled()) {
                 return flag;
@@ -190,7 +190,7 @@ public abstract class ExecutableImpl implements Executable {
     }
 
     public List<Flag> getEnabledFlags() {
-        List<Flag> resultFlags = new ArrayList(this.flags.size());
+        List<Flag> resultFlags = new ArrayList<>(this.flags.size());
         if (this.getParent() != null) {
             resultFlags.addAll(CollectionUtils.subtract(this.getParent().getEnabledFlags(), this.flags.values()));
         }
@@ -204,7 +204,7 @@ public abstract class ExecutableImpl implements Executable {
             return false;
         } else {
             boolean parentHas = this.getParent().hasFlag(name);
-            Flag _flag = (Flag)this.flags.get(name);
+            Flag _flag = this.flags.get(name);
             return _flag == null && parentHas;
         }
     }

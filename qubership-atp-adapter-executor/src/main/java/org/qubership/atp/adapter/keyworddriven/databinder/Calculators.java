@@ -1,5 +1,5 @@
 /*
- *  Copyright 2024-2025 NetCracker Technology Corporation
+ *  Copyright 2024-2026 NetCracker Technology Corporation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -16,34 +16,31 @@
 
 package org.qubership.atp.adapter.keyworddriven.databinder;
 
-import org.qubership.atp.adapter.keyworddriven.executable.KeywordParameter;
 import java.lang.reflect.Type;
 import java.util.HashMap;
-import org.apache.log4j.Logger;
 
+import org.qubership.atp.adapter.keyworddriven.executable.KeywordParameter;
+
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class Calculators {
-    private static HashMap<Type, DataBinder<?>> calculators = new HashMap();
-    private static Logger log = Logger.getLogger(Calculators.class);
+    private static final HashMap<Type, DataBinder<?>> calculators = new HashMap<>();
 
     public Calculators() {
     }
 
     public static DataBinder<?> getCalculator(Type type) {
-        return (DataBinder)calculators.get(type);
+        return calculators.get(type);
     }
 
     public static void addCalculator(DataBinder<?> calculator) {
         try {
             Type type = calculator.getClass().getMethod("calculate", KeywordParameter.class).getGenericReturnType();
             addCalculator(type, calculator);
-        } catch (SecurityException var2) {
-            SecurityException e = var2;
-            log.error(Calculators.class.toString(), e);
-        } catch (NoSuchMethodException var3) {
-            NoSuchMethodException e = var3;
+        } catch (SecurityException | NoSuchMethodException e) {
             log.error(Calculators.class.toString(), e);
         }
-
     }
 
     protected static void addCalculator(Type type, DataBinder<?> calculator) {

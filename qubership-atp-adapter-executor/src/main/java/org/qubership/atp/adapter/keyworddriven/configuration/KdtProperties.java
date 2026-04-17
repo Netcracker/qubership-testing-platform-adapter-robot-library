@@ -18,12 +18,13 @@ package org.qubership.atp.adapter.keyworddriven.configuration;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
 import org.qubership.atp.adapter.keyworddriven.context.ContextUtils;
 import org.qubership.atp.adapter.testcase.Config;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class KdtProperties {
-    private static final Logger LOG = Logger.getLogger(KdtProperties.class);
     @OptionalProperty
     public static final String KDT_TEST_CASE_FILTER_BY_NAME = "kdt.test.cases";
     public static final String[] KDT_TEST_CASES_NAMES = StringUtils.isEmpty(Config.getString("kdt.test.cases")) ? null : Config.getStringArray("kdt.test.cases");
@@ -71,9 +72,10 @@ public class KdtProperties {
     }
 
     static {
-        LOG.info("KDT test cases to be executed: " + (KDT_TEST_CASES_NAMES == null ? "ALL" : ArrayUtils.toString(KDT_TEST_CASES_NAMES)));
+        log.info("KDT test cases to be executed: {}",
+                KDT_TEST_CASES_NAMES == null ? "ALL" : ArrayUtils.toString(KDT_TEST_CASES_NAMES));
         KDT_SERVER_VERSION_LOCATION = Config.getString("kdt.server.version.location", "/version.txt");
-        LOG.info("KDT server version location = " + KDT_SERVER_VERSION_LOCATION);
+        log.info("KDT server version location = {}", KDT_SERVER_VERSION_LOCATION);
         KDT_UI_ELEMENTS_PARSER_TYPE = Config.getString("kdt.ui.elements.parser.type", "NEW");
         KDT_REPORT_FOLDERS_WITH_NAMES = Boolean
                 .parseBoolean(Config.getString("kdt.report.folders.with.names", "false"));
