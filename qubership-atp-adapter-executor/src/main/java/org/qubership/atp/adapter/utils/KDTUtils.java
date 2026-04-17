@@ -1,5 +1,5 @@
 /*
- *  Copyright 2024-2025 NetCracker Technology Corporation
+ *  Copyright 2024-2026 NetCracker Technology Corporation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -16,6 +16,25 @@
 
 package org.qubership.atp.adapter.utils;
 
+import java.io.File;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.math.BigInteger;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.regex.Pattern;
+
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.qubership.atp.adapter.keyworddriven.basicformat.BasicFormatTestSuiteReader;
 import org.qubership.atp.adapter.keyworddriven.basicformat.StringValueSubstitution;
 import org.qubership.atp.adapter.keyworddriven.executable.Executable;
@@ -28,24 +47,6 @@ import org.qubership.atp.adapter.report.SourceProvider;
 import org.qubership.atp.adapter.report.WebReportWriter;
 import org.qubership.atp.adapter.testcase.Config;
 import org.qubership.atp.adapter.wd.shell.browser.ReportType;
-import java.io.File;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.math.BigInteger;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.regex.Pattern;
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang3.StringEscapeUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 
 public class KDTUtils {
     public static final String STORE_TEST_CASE_PARAMETERS_SHEET = "Stored Parameters";
@@ -343,8 +344,8 @@ public class KDTUtils {
 
                 for(Executable current = section; current != null; current = current.getParent()) {
                     if (current.getNormalPriorityParams().size() > 0) {
-                        if (current instanceof Section) {
-                            source.append(htmlBold(((Section)current).getFullName()));
+                        if (current instanceof Section section1) {
+                            source.append(htmlBold(section1.getFullName()));
                         } else {
                             source.append(htmlBold(current.getName()));
                         }
@@ -371,8 +372,8 @@ public class KDTUtils {
         for(Iterator var2 = map.keySet().iterator(); var2.hasNext(); buf.append(htmlRow(key.toString(), value))) {
             key = var2.next();
             Object objValue = map.get(key);
-            if (objValue instanceof Map) {
-                value = mapToTable((Map)objValue);
+            if (objValue instanceof Map map1) {
+                value = mapToTable(map1);
             } else {
                 value = String.valueOf(objValue).replaceAll(" ", "&nbsp;");
             }

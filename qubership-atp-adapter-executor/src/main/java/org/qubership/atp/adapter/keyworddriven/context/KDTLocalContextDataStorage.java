@@ -1,5 +1,5 @@
 /*
- *  Copyright 2024-2025 NetCracker Technology Corporation
+ *  Copyright 2024-2026 NetCracker Technology Corporation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -16,13 +16,6 @@
 
 package org.qubership.atp.adapter.keyworddriven.context;
 
-import com.google.common.eventbus.EventBus;
-import org.qubership.atp.adapter.keyworddriven.executable.Executable;
-import org.qubership.atp.adapter.tools.tacomponents.context.Context;
-import org.qubership.atp.adapter.tools.tacomponents.context.ContextDataStorage;
-import org.qubership.atp.adapter.tools.tacomponents.context.ContextRecord;
-import org.qubership.atp.adapter.tools.tacomponents.context.ContextType;
-import org.qubership.atp.adapter.tools.tacomponents.context.DefaultContextDataStorage;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
@@ -30,8 +23,17 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.function.Function;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+
+import org.qubership.atp.adapter.keyworddriven.executable.Executable;
+import org.qubership.atp.adapter.tools.tacomponents.context.Context;
+import org.qubership.atp.adapter.tools.tacomponents.context.ContextDataStorage;
+import org.qubership.atp.adapter.tools.tacomponents.context.ContextRecord;
+import org.qubership.atp.adapter.tools.tacomponents.context.ContextType;
+import org.qubership.atp.adapter.tools.tacomponents.context.DefaultContextDataStorage;
+
+import com.google.common.eventbus.EventBus;
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 
 public class KDTLocalContextDataStorage implements ContextDataStorage {
     protected static final Map<Executable, ContextDataStorage> map = Collections.synchronizedMap(new WeakHashMap());

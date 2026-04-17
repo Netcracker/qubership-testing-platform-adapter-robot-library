@@ -1,5 +1,5 @@
 /*
- *  Copyright 2024-2025 NetCracker Technology Corporation
+ *  Copyright 2024-2026 NetCracker Technology Corporation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -16,8 +16,6 @@
 
 package org.qubership.atp.adapter.report;
 
-import org.qubership.atp.adapter.testcase.Config;
-import org.qubership.atp.adapter.utils.Utils;
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
@@ -34,10 +32,13 @@ import java.util.Locale;
 import java.util.Properties;
 import java.util.Stack;
 import java.util.regex.Pattern;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.qubership.atp.adapter.testcase.Config;
+import org.qubership.atp.adapter.utils.Utils;
 
 public class WebReportWriter extends AbstractWebReportWriter {
     private static final Log log = LogFactory.getLog(WebReportWriter.class);
@@ -162,7 +163,7 @@ public class WebReportWriter extends AbstractWebReportWriter {
         }
 
         this.description = description;
-        String filename = "report" + String.format("%04d", this.logId++) + ".xml";
+        String filename = "report" + "%04d".formatted(this.logId++) + ".xml";
         this.currentLogName = logName;
         this.currentLogCallStack.clear();
         this.timeStack.clear();
@@ -247,7 +248,7 @@ public class WebReportWriter extends AbstractWebReportWriter {
     }
 
     private File createSnapshot(SourceProvider page) {
-        String pageFilename = "page" + String.format("%04d", this.pageId++);
+        String pageFilename = "page" + "%04d".formatted(this.pageId++);
         File pageFileHTML = new File(new File(this.reportDir, "pages"), pageFilename + "." + page.getExtension());
         if (this.logReportSnapshots) {
             snapshotFiles.add(pageFileHTML);
@@ -292,7 +293,7 @@ public class WebReportWriter extends AbstractWebReportWriter {
                 Object keyO = i$.next();
                 String key;
                 if (!(key = NON_ALPHANUMERIC.matcher(keyO.toString()).replaceAll("")).isEmpty()) {
-                    result.append(String.format(" %s=\"%s\"", key, addValues.get(keyO).toString()));
+                    result.append(" %s=\"%s\"".formatted(key, addValues.get(keyO).toString()));
                 }
             }
         }

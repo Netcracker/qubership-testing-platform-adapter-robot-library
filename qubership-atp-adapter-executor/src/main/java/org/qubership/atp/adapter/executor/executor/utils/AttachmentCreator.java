@@ -107,8 +107,8 @@ public class AttachmentCreator {
 
     private static void createFileMetadata(SourceProvider sourceProvider, String fileName, NttAttachment attachment) {
         FileMetadata fileMetadata;
-        if (sourceProvider instanceof ExtendedFileSourceProvider) {
-            fileMetadata = ((ExtendedFileSourceProvider) sourceProvider).getFileMetadata();
+        if (sourceProvider instanceof ExtendedFileSourceProvider provider) {
+            fileMetadata = provider.getFileMetadata();
         } else {
             fileMetadata = new FileMetadata(FileType.COMMON, fileName);
         }

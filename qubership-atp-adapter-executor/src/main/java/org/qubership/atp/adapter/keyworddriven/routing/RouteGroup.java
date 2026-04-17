@@ -1,5 +1,5 @@
 /*
- *  Copyright 2024-2025 NetCracker Technology Corporation
+ *  Copyright 2024-2026 NetCracker Technology Corporation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -16,15 +16,18 @@
 
 package org.qubership.atp.adapter.keyworddriven.routing;
 
+import java.io.Serial;
 import java.util.Collection;
 import java.util.LinkedList;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class RouteGroup extends LinkedList<Route> {
     private static final Log log = LogFactory.getLog(RouteGroup.class);
     private final String name;
-    private static final long serialVersionUID = -5456796519418419700L;
+  @Serial
+  private static final long serialVersionUID = -5456796519418419700L;
 
     public RouteGroup(String name) {
         this.name = name;

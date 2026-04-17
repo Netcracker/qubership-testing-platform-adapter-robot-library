@@ -1,5 +1,5 @@
 /*
- *  Copyright 2024-2025 NetCracker Technology Corporation
+ *  Copyright 2024-2026 NetCracker Technology Corporation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -16,9 +16,8 @@
 
 package org.qubership.atp.adapter.common.context;
 
-import org.junit.Assert;
-import org.junit.Test;
-
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.qubership.atp.ram.enums.ExecutionStatuses;
 import org.qubership.atp.ram.enums.TestingStatuses;
 import org.qubership.atp.ram.models.LogRecord;
@@ -33,7 +32,7 @@ public class LogRecordsStackTest {
 
         LogRecordsStack stack = new LogRecordsStack();
         stack.push(logRecord);
-        Assert.assertFalse("Current log record should not be changed", stack.isCurrentLogRecordChanged());
+        Assertions.assertFalse(stack.isCurrentLogRecordChanged(), "Current log record should not be changed");
     }
 
     @Test
@@ -45,7 +44,7 @@ public class LogRecordsStackTest {
         LogRecordsStack stack = new LogRecordsStack();
         stack.push(logRecord);
         logRecord.setTestingStatus(TestingStatuses.PASSED);
-        Assert.assertTrue("Current log record should be changed", stack.isCurrentLogRecordChanged());
+        Assertions.assertTrue(stack.isCurrentLogRecordChanged(), "Current log record should be changed");
     }
 
     @Test
@@ -70,12 +69,12 @@ public class LogRecordsStackTest {
         logRecord.setTestingStatus(TestingStatuses.PASSED);
         logRecord3.setDuration(10);
 
-        Assert.assertTrue("Current log record should be changed", stack.isCurrentLogRecordChanged());
+        Assertions.assertTrue(stack.isCurrentLogRecordChanged(), "Current log record should be changed");
         stack.pop();
-        Assert.assertFalse("Current log record should not be changed", stack.isCurrentLogRecordChanged());
+        Assertions.assertFalse(stack.isCurrentLogRecordChanged(), "Current log record should not be changed");
         stack.pop();
-        Assert.assertTrue("Current log record should be changed", stack.isCurrentLogRecordChanged());
+        Assertions.assertTrue(stack.isCurrentLogRecordChanged(), "Current log record should be changed");
         stack.pop();
-        Assert.assertTrue("Stack should be empty", stack.isEmpty());
+        Assertions.assertTrue(stack.isEmpty(), "Stack should be empty");
     }
 }

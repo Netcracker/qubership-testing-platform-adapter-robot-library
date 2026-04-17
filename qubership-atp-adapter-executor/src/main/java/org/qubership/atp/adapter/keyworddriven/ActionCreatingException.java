@@ -1,5 +1,5 @@
 /*
- *  Copyright 2024-2025 NetCracker Technology Corporation
+ *  Copyright 2024-2026 NetCracker Technology Corporation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -16,8 +16,11 @@
 
 package org.qubership.atp.adapter.keyworddriven;
 
+import java.io.Serial;
+
 public class ActionCreatingException extends Exception {
-    private static final long serialVersionUID = -8017013044911600635L;
+  @Serial
+  private static final long serialVersionUID = -8017013044911600635L;
 
     public ActionCreatingException(Throwable e) {
         super(e);

@@ -21,9 +21,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpRequest;
-import org.apache.http.HttpRequestInterceptor;
-import org.apache.http.protocol.HttpContext;
+import org.apache.hc.core5.http.ClassicHttpRequest;
+import org.apache.hc.core5.http.HttpRequestInterceptor;
+import org.apache.hc.core5.http.protocol.HttpContext;
 import org.slf4j.MDC;
 
 public class MdcHttpRequestInterceptor implements HttpRequestInterceptor {
@@ -35,7 +35,7 @@ public class MdcHttpRequestInterceptor implements HttpRequestInterceptor {
     }
 
     @Override
-    public void process(HttpRequest request, HttpContext context) {
+    public void process(ClassicHttpRequest request, HttpContext context) {
         businessIds.forEach(idName -> {
             if (MDC.get(idName) != null) {
                 request.addHeader(convertIdNameToHeader(idName), MDC.get(idName));

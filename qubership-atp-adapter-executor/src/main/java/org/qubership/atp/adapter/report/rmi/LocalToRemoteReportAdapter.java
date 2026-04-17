@@ -1,5 +1,5 @@
 /*
- *  Copyright 2024-2025 NetCracker Technology Corporation
+ *  Copyright 2024-2026 NetCracker Technology Corporation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -16,30 +16,30 @@
 
 package org.qubership.atp.adapter.report.rmi;
 
+import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
+
 import org.qubership.atp.adapter.report.WebReportItem;
 import org.qubership.atp.adapter.report.WebReportWriterDiff;
 import org.qubership.atp.adapter.report.WebReportWriterWraper;
 import org.qubership.atp.adapter.testcase.Config;
 import org.qubership.atp.adapter.utils.Utils;
-import java.rmi.RemoteException;
-import java.rmi.server.UnicastRemoteObject;
 
 public class LocalToRemoteReportAdapter extends UnicastRemoteObject implements RemoteReportAdapter {
-    private WebReportWriterWraper wraper = new WebReportWriterWraper();
-    private WebReportWriterDiff writer = new WebReportWriterDiff();
-    private String threadName;
+    private final WebReportWriterWraper wrapper = new WebReportWriterWraper();
+    private final WebReportWriterDiff writer = new WebReportWriterDiff();
+    private final String threadName;
 
     public LocalToRemoteReportAdapter(String threadName) throws RemoteException {
         this.threadName = threadName;
     }
 
     public void write(Object item) throws RemoteException {
-        if (item instanceof WebReportItem) {
+        if (item instanceof WebReportItem reportItem) {
             String oldThreadName = Thread.currentThread().getName();
             Thread.currentThread().setName(this.threadName);
             if (Config.getBoolean("use.diff.report", false)) {
-                if (item instanceof WebReportItem.Message) {
-                    WebReportItem.Message msg = (WebReportItem.Message)item;
+                if (item instanceof WebReportItem.Message msg) {
                     StringBuilder message = new StringBuilder(msg.getMessage());
                     if (msg.getThrowable() != null) {
                         message.append("<pre>").append(Utils.getStackTrace(msg.getThrowable())).append("</pre>");
@@ -48,7 +48,7 @@ public class LocalToRemoteReportAdapter extends UnicastRemoteObject implements R
                     this.writer.message(msg.getTitle(), msg.getLevel(), message.toString(), msg.getPage());
                 }
             } else {
-                ((WebReportItem)item).message(this.wraper);
+                reportItem.message(this.wrapper);
             }
 
             Thread.currentThread().setName(oldThreadName);

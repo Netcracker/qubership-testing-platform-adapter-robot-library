@@ -36,8 +36,8 @@ public class RouteItem {
 
     public RouteItem(Object source) {
         this.source = source;
-        if (source instanceof String) {
-            this.parseMaskItem((String)source);
+        if (source instanceof String string) {
+            this.parseMaskItem(string);
         }
 
     }

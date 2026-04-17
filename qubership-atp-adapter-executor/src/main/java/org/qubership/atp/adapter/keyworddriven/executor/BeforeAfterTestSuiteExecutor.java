@@ -16,8 +16,6 @@
 
 package org.qubership.atp.adapter.keyworddriven.executor;
 
-import javax.annotation.Nullable;
-
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.log4j.Logger;
 import org.qubership.atp.adapter.keyworddriven.basicformat.flags.TestCaseType;
@@ -27,6 +25,7 @@ import org.qubership.atp.adapter.keyworddriven.resources.ResourceFactory;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
+import jakarta.annotation.Nullable;
 
 public class BeforeAfterTestSuiteExecutor extends PooledTestSuiteExecutor {
     private static final Logger log = Logger.getLogger(PooledTestSuiteExecutor.class);

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2024-2025 NetCracker Technology Corporation
+ *  Copyright 2024-2026 NetCracker Technology Corporation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -16,11 +16,10 @@
 
 package org.qubership.atp.adapter.excel;
 
-import org.qubership.atp.adapter.excel.exceptions.InvalidFormatOfSourceException;
-import org.qubership.atp.adapter.excel.style.ExcelCellStyle;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.poi.ss.format.CellFormat;
@@ -32,6 +31,8 @@ import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.FormulaEvaluator;
 import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.qubership.atp.adapter.excel.exceptions.InvalidFormatOfSourceException;
+import org.qubership.atp.adapter.excel.style.ExcelCellStyle;
 
 public class ExcelCell {
     private static Log log = LogFactory.getLog(ExcelCell.class);
@@ -84,8 +85,8 @@ public class ExcelCell {
                 } catch (Exception var6) {
                     Exception e = var6;
                     if (this.cell.getCellType() == 5) {
-                        if (this.cell instanceof XSSFCell) {
-                            result = ((XSSFCell)this.cell).getErrorCellString();
+                        if (this.cell instanceof XSSFCell fCell) {
+                            result = fCell.getErrorCellString();
                         } else {
                             result = "####";
                         }

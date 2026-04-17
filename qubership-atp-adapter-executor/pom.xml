@@ -3,7 +3,7 @@
     <parent>
         <groupId>org.qubership.atp.adapter.robot</groupId>
         <artifactId>qubership-atp-adapter-robot-parent-java</artifactId>
-        <version>4.5.73-SNAPSHOT</version>
+        <version>5.0.0-SNAPSHOT</version>
         <relativePath>../parent/parent-java/pom.xml</relativePath>
     </parent>
 
@@ -79,9 +79,15 @@
             <version>1.5.2</version>
         </dependency>
         <dependency>
-            <groupId>xmlunit</groupId>
-            <artifactId>xmlunit</artifactId>
-            <version>1.3</version>
+            <groupId>org.xmlunit</groupId>
+            <artifactId>xmlunit-legacy</artifactId>
+            <version>2.11.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>5.14.3</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.github.tony19</groupId>
@@ -98,6 +104,12 @@
             <groupId>org.seleniumhq.selenium</groupId>
             <artifactId>htmlunit-driver</artifactId>
             <version>2.27</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>junit</groupId>
+                    <artifactId>junit</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
@@ -120,28 +132,10 @@
             <artifactId>oval</artifactId>
             <version>1.84</version>
         </dependency>
-
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>test</scope>
-        </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
-            <version>2.23.4</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.powermock</groupId>
-            <artifactId>powermock-module-junit4</artifactId>
-            <version>2.0.9</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.powermock</groupId>
-            <artifactId>powermock-api-mockito2</artifactId>
-            <version>2.0.9</version>
+            <version>5.23.0</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -320,7 +314,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-failsafe-plugin</artifactId>
-                        <version>2.20.1</version>
+                        <version>3.1.2</version>
                         <executions>
                             <!-- execute all integration (mostly UI tests) -->
                             <execution>

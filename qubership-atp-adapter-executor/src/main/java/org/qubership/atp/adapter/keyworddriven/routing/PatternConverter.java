@@ -1,5 +1,5 @@
 /*
- *  Copyright 2024-2025 NetCracker Technology Corporation
+ *  Copyright 2024-2026 NetCracker Technology Corporation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package org.qubership.atp.adapter.keyworddriven.routing;
 
 import java.util.regex.Pattern;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -42,7 +43,7 @@ public class PatternConverter {
 
         sb.append(str.substring(indexE + 2));
         automaton = sb.toString();
-        log.trace(String.format("Convert route java regexp to automaton regexp '%s' > '%s'", str, automaton));
+        log.trace("Convert route java regexp to automaton regexp '%s' > '%s'".formatted(str, automaton));
         return automaton;
     }
 }

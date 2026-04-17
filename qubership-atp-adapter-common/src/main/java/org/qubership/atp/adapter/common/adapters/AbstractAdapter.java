@@ -45,9 +45,9 @@ import java.util.UUID;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.hc.core5.http.ContentType;
 import org.apache.http.client.fluent.Content;
 import org.apache.http.client.fluent.Request;
-import org.apache.http.entity.ContentType;
 import org.qubership.atp.adapter.common.AtpRamAdapter;
 import org.qubership.atp.adapter.common.RamConstants;
 import org.qubership.atp.adapter.common.adapters.error.AdapterMethodIsNotSupported;
@@ -214,7 +214,7 @@ public abstract class AbstractAdapter implements AtpRamAdapter {
         } catch (IOException ioException) {
             log.error("Failed to create ER!", ioException);
             throw new FailedToCreateRamEntity(
-                    String.format("Failed to create ER with name %s", executionRequest),
+                "Failed to create ER with name %s".formatted(executionRequest),
                     ioException);
         }
     }
@@ -659,14 +659,14 @@ public abstract class AbstractAdapter implements AtpRamAdapter {
             log.debug("Close section with ID {}", section.getUuid());
 
             TestingStatuses status = section.getTestingStatus();
-            if (section instanceof CompoundLogRecordContainer) {
+            if (section instanceof CompoundLogRecordContainer container) {
                 boolean isCompoundStatusUpdate = context.isParentStatusUpdate();
 
                 TestingStatuses parentCompoundStatus = context.getSections().empty()
                         ? null : context.getSections().peek().getTestingStatus();
                 context.setParentStatusUpdate(
                         Objects.nonNull(parentCompoundStatus) && !parentCompoundStatus.equals(status));
-                if (isCompoundStatusUpdate || ((CompoundLogRecordContainer) section).isStep()) {
+                if (isCompoundStatusUpdate || container.isStep()) {
                     updateSectionStatus(status.name());
                     context = updateTestingStatus(section.getUuid().toString(), status.toString());
                 }
@@ -706,7 +706,7 @@ public abstract class AbstractAdapter implements AtpRamAdapter {
 
             LogRecord logRecord = createLogRecord(message, false, false);
 
-            if (logRecord instanceof UiLogRecord) {
+            if (logRecord instanceof UiLogRecord record) {
                 log.debug("Configured log record (Ui Log Record) with ID {} message {}", logRecord.getUuid(),
                         logRecord.getMessage());
                 updateSectionStatus(message.getTestingStatus());
@@ -716,7 +716,7 @@ public abstract class AbstractAdapter implements AtpRamAdapter {
                 if (CollectionUtils.isNotEmpty(message.getBrowserLogs())) {
                     sendBrowserLogs(message.getBrowserLogs(), message.getUuid());
                 }
-                return sendUiLogRecord((UiLogRecord) logRecord);
+                return sendUiLogRecord(record);
             }
 
             log.debug("Configured log record (message) with ID {} message {}", logRecord.getUuid(),
@@ -918,13 +918,12 @@ public abstract class AbstractAdapter implements AtpRamAdapter {
 
     public void uploadFileForLogRecord(String logRecordId, InputStream fileContent, String fileName) {
         try {
-            String url = String.format(
-                    uploadUrlTemplate,
-                    logRecordId,
-                    URLEncoder.encode(fileName, RamConstants.UTF8_CHARSET),
-                    "text/html",
-                    URLEncoder.encode(fileName, RamConstants.UTF8_CHARSET),
-                    "");
+            String url = uploadUrlTemplate.formatted(
+                logRecordId,
+                URLEncoder.encode(fileName, RamConstants.UTF8_CHARSET),
+                "text/html",
+                URLEncoder.encode(fileName, RamConstants.UTF8_CHARSET),
+                "");
             UploadScreenshotResponse response = requestUtils.postRequestStream(
                     url, fileContent, UploadScreenshotResponse.class);
             log.debug("File '{}' was uploaded for Log Record {}. Response {}", fileName, logRecordId, response);
@@ -942,13 +941,12 @@ public abstract class AbstractAdapter implements AtpRamAdapter {
         String contentType = (String) attribute.get(RamConstants.SCREENSHOT_TYPE_KEY);
         String snapshotSource = (String) attribute.get(RamConstants.SCREENSHOT_SOURCE_KEY);
         String snapshotExternalSource = (String) attribute.get(RamConstants.SCREENSHOT_EXTERNAL_SOURCE_KEY);
-        return String.format(
-                uploadUrlTemplate,
-                message.getUuid(),
-                URLEncoder.encode(fileName, RamConstants.UTF8_CHARSET),
-                contentType,
-                URLEncoder.encode(StringUtils.defaultIfEmpty(snapshotSource, ""), RamConstants.UTF8_CHARSET),
-                URLEncoder.encode(StringUtils.defaultIfEmpty(snapshotExternalSource, ""), RamConstants.UTF8_CHARSET));
+        return uploadUrlTemplate.formatted(
+            message.getUuid(),
+            URLEncoder.encode(fileName, RamConstants.UTF8_CHARSET),
+            contentType,
+            URLEncoder.encode(StringUtils.defaultIfEmpty(snapshotSource, ""), RamConstants.UTF8_CHARSET),
+            URLEncoder.encode(StringUtils.defaultIfEmpty(snapshotExternalSource, ""), RamConstants.UTF8_CHARSET));
     }
 
     /**

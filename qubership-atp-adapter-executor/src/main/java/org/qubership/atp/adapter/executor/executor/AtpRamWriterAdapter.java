@@ -1,5 +1,5 @@
 /*
- *  Copyright 2024-2025 NetCracker Technology Corporation
+ *  Copyright 2024-2026 NetCracker Technology Corporation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -17,12 +17,10 @@
 package org.qubership.atp.adapter.executor.executor;
 
 import static org.qubership.atp.adapter.report.WebReportItem.CloseSection;
-import static org.qubership.atp.adapter.report.WebReportItem.Message;
 import static org.qubership.atp.adapter.report.WebReportItem.OpenLog;
 import static org.qubership.atp.adapter.report.WebReportItem.OpenSection;
 
 import org.apache.log4j.Level;
-
 import org.qubership.atp.adapter.executor.executor.items.BvMessageItem;
 import org.qubership.atp.adapter.executor.executor.items.CreateContextItem;
 import org.qubership.atp.adapter.executor.executor.items.ItfOpenSectionItem;
@@ -44,26 +42,21 @@ public class AtpRamWriterAdapter implements ReportAdapter {
 
     @Override
     public void write(ReportWriter wr, Object item) {
-        if (wr instanceof AtpRamWriterWraper) {
-            AtpRamWriter writer = ((AtpRamWriterWraper) wr).getAtpRamWriter();
-            if (item instanceof OpenLog) {
-                OpenLog i = (OpenLog) item;
+        if (wr instanceof AtpRamWriterWraper wrapper) {
+            AtpRamWriter writer = wrapper.getAtpRamWriter();
+            if (item instanceof OpenLog i) {
                 writer.openLog(i.getLogName(), i.getDescription());
             }
-            if (item instanceof CreateContextItem) {
-                CreateContextItem i = (CreateContextItem) item;
+            if (item instanceof CreateContextItem i) {
                 writer.createContext(i.getTestRunId());
             }
-            if (item instanceof CloseLog) {
-                CloseLog i = (CloseLog) item;
+            if (item instanceof CloseLog i) {
                 writer.closeLog(i);
             }
-            if (item instanceof OpenSection) {
-                OpenSection i = (OpenSection) item;
+            if (item instanceof OpenSection i) {
                 writer.openSection(i);
             }
-            if (item instanceof Message) {
-                WebReportItem.Message msg = (WebReportItem.Message) item;
+            if (item instanceof WebReportItem.Message msg) {
                 StringBuilder sb = new StringBuilder();
                 String message = msg.getMessage();
                 if (message != null) {
@@ -80,45 +73,34 @@ public class AtpRamWriterAdapter implements ReportAdapter {
 
                 writer.message(title, level, message1, page);
             }
-            if (item instanceof CloseSection) {
-                CloseSection i = (CloseSection) item;
+            if (item instanceof CloseSection i) {
                 writer.closeSection(i);
             }
-            if (item instanceof UiMessageItem) {
-                UiMessageItem i = (UiMessageItem) item;
+            if (item instanceof UiMessageItem i) {
                 i.message(writer);
             }
-            if (item instanceof TechMessageItem) {
-                TechMessageItem i = (TechMessageItem) item;
+            if (item instanceof TechMessageItem i) {
                 i.message(writer);
             }
-            if (item instanceof ItfOpenSectionItem) {
-                ItfOpenSectionItem i = (ItfOpenSectionItem) item;
+            if (item instanceof ItfOpenSectionItem i) {
                 i.openSection(writer);
             }
-            if (item instanceof BvMessageItem) {
-                BvMessageItem i = (BvMessageItem) item;
+            if (item instanceof BvMessageItem i) {
                 i.message(writer);
             }
-            if (item instanceof RestMessageItem) {
-                RestMessageItem i = (RestMessageItem) item;
+            if (item instanceof RestMessageItem i) {
                 i.message(writer);
             }
-            if (item instanceof MiaOpenSectionItem) {
-                MiaOpenSectionItem i = (MiaOpenSectionItem) item;
+            if (item instanceof MiaOpenSectionItem i) {
                 i.openSection(writer);
             }
-            if (item instanceof SqlMessageItem) {
-                SqlMessageItem i = (SqlMessageItem) item;
+            if (item instanceof SqlMessageItem i) {
                 i.message(writer);
             }
-            if (item instanceof SshMessageItem) {
-                SshMessageItem i = (SshMessageItem) item;
+            if (item instanceof SshMessageItem i) {
                 i.message(writer);
             }
-            if (item instanceof ActionMessage) {
-                //needed to support screenshot
-                ActionMessage msg = (ActionMessage)item;
+            if (item instanceof ActionMessage msg) {
                 StringBuilder sb = new StringBuilder();
                 String message = msg.getMessage();
                 if (message != null) {
@@ -130,8 +112,6 @@ public class AtpRamWriterAdapter implements ReportAdapter {
                 SourceProvider page = msg.getPage();
                 writer.message(title, level, message1, page);
             }
-
-
         }
     }
 }

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2024-2025 NetCracker Technology Corporation
+ *  Copyright 2024-2026 NetCracker Technology Corporation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -23,11 +23,10 @@ import java.util.concurrent.Executors;
 
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-
 import org.qubership.atp.adapter.common.RamConstants;
 import org.qubership.atp.adapter.common.kafka.pool.KafkaPoolManagementService;
 import org.qubership.atp.adapter.common.kafka.pool.KafkaProducersPooledObjectFactory;
@@ -42,7 +41,7 @@ public class KafkaAdapterTest {
 
     KafkaProducersPooledObjectFactory kafkaProducersPooledObjectFactory = new KafkaProducersPooledObjectFactory();
 
-    @Before
+    @BeforeEach
     public void init() {
         Config cfg = Config.getConfig();
         cfg.setProperty(RamConstants.KAFKA_PRODUCERS_POOL_MAX_TOTAL_PER_KEY, String.valueOf(poolSize));
@@ -61,7 +60,7 @@ public class KafkaAdapterTest {
         Mockito.doNothing().when(kafkaPoolManagementService).sendRecord(Mockito.any(), Mockito.any());
         kafkaPoolManagementService.sendProducerRecord(new ProducerRecord("", ""), ProducerType.PROTOBUF);
         Mockito.verify(kafkaPoolManagementService, Mockito.times(1)).sendRecord(Mockito.any(), Mockito.any());
-        Assert.assertEquals(1, kafkaPoolManagementService.getKafkaProducersKeyedPool().getCreatedCount());
+        Assertions.assertEquals(1, kafkaPoolManagementService.getKafkaProducersKeyedPool().getCreatedCount());
     }
 
     @Test
@@ -74,7 +73,7 @@ public class KafkaAdapterTest {
         kafkaPoolManagementService.sendProducerRecord(new ProducerRecord("", ""), ProducerType.PROTOBUF);
         kafkaPoolManagementService.sendProducerRecord(new ProducerRecord("", ""), ProducerType.PROTOBUF);
         Mockito.verify(kafkaPoolManagementService, Mockito.times(6)).sendRecord(Mockito.any(), Mockito.any());
-        Assert.assertEquals(1, kafkaPoolManagementService.getKafkaProducersKeyedPool().getCreatedCount());
+        Assertions.assertEquals(1, kafkaPoolManagementService.getKafkaProducersKeyedPool().getCreatedCount());
     }
 
     @Test
@@ -102,7 +101,7 @@ public class KafkaAdapterTest {
         latch6.await();
 
         Mockito.verify(kafkaPoolManagementService, Mockito.times(6)).sendRecord(Mockito.any(), Mockito.any());
-        Assert.assertTrue(poolSize >= kafkaPoolManagementService.getKafkaProducersKeyedPool().getCreatedCount());
+        Assertions.assertTrue(poolSize >= kafkaPoolManagementService.getKafkaProducersKeyedPool().getCreatedCount());
     }
 
     class SendThread implements Runnable {

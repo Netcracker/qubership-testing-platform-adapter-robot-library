@@ -1,5 +1,5 @@
 /*
- *  Copyright 2024-2025 NetCracker Technology Corporation
+ *  Copyright 2024-2026 NetCracker Technology Corporation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -16,39 +16,39 @@
 
 package org.qubership.atp.adapter.common.utils;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class ConfigTest {
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         System.clearProperty("atp.url");
     }
 
     @Test
     public void getConfig() {
-        Assert.assertNotNull(Config.getConfig());
+        Assertions.assertNotNull(Config.getConfig());
     }
 
     @Test
     public void getPropertyWithoutDefaultValue() {
         String value = "http://localhost:8081";
-        Assert.assertEquals(value, Config.getConfig().getProperty("atp.url"));
-        Assert.assertNull(Config.getConfig().getProperty("atp2.url"));
+        Assertions.assertEquals(value, Config.getConfig().getProperty("atp.url"));
+        Assertions.assertNull(Config.getConfig().getProperty("atp2.url"));
     }
 
     @Test
     public void getPropertyWithDefaultValue() {
         String defValue = "http://localhost:8888";
-        Assert.assertNotEquals(defValue, Config.getConfig().getProperty("atp.url", defValue));
-        Assert.assertEquals(defValue, Config.getConfig().getProperty("atp2.url", defValue));
+        Assertions.assertNotEquals(defValue, Config.getConfig().getProperty("atp.url", defValue));
+        Assertions.assertEquals(defValue, Config.getConfig().getProperty("atp2.url", defValue));
     }
 
     @Test
     public void allPropertiesFilesShouldBeLoaded() {
-        Assert.assertNotNull(Config.getConfig().getProperty("atp3.url"));
+        Assertions.assertNotNull(Config.getConfig().getProperty("atp3.url"));
     }
 
     @Test
@@ -60,18 +60,18 @@ public class ConfigTest {
     public void setProperty() {
         String key = "prop.should.be.empty";
         String value = "newValue";
-        Assert.assertNull(Config.getConfig().getProperty(key));
+        Assertions.assertNull(Config.getConfig().getProperty(key));
         Config.getConfig().setProperty(key, value);
-        Assert.assertEquals(value, Config.getConfig().getProperty(key));
+        Assertions.assertEquals(value, Config.getConfig().getProperty(key));
     }
 
     @Test
     public void systemPropertyShouldBePriority() {
         String value = "http://localhost:8081";
         String newValue = "http://localhost:8181";
-        Assert.assertEquals(Config.getConfig().getProperty("atp.url"), value);
+        Assertions.assertEquals(Config.getConfig().getProperty("atp.url"), value);
         System.setProperty("atp.url", newValue);
         System.out.println(Config.getConfig().getProperty("atp.url"));
-        Assert.assertEquals(newValue, Config.getConfig().getProperty("atp.url"));
+        Assertions.assertEquals(newValue, Config.getConfig().getProperty("atp.url"));
     }
 }

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2024-2025 NetCracker Technology Corporation
+ *  Copyright 2024-2026 NetCracker Technology Corporation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -16,11 +16,9 @@
 
 package org.qubership.atp.adapter.robot;
 
-import org.junit.Assert;
-import org.junit.Test;
-
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.qubership.atp.adapter.robot.utils.ScreenShotHelper;
-
 
 public class RamListenerTest {
     @Test
@@ -28,6 +26,6 @@ public class RamListenerTest {
         String messageText = "</td></tr><tr><td colspan=\"3\"><a href=\"selenium-screenshot-1.png\"><img src=\"selenium-screenshot-1.png\" width=\"800px\"></a>";
         ScreenShotHelper helper = new ScreenShotHelper();
         String imgName = helper.extractImage(messageText);
-        Assert.assertEquals("selenium-screenshot-1.png", imgName);
+        Assertions.assertEquals("selenium-screenshot-1.png", imgName);
     }
 }

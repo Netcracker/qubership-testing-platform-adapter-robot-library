@@ -1,5 +1,5 @@
 /*
- *  Copyright 2024-2025 NetCracker Technology Corporation
+ *  Copyright 2024-2026 NetCracker Technology Corporation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -16,6 +16,13 @@
 
 package org.qubership.atp.adapter.report;
 
+import java.io.File;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
+
+import org.apache.log4j.Level;
 import org.qubership.atp.adapter.report.adapter.GeneralReportWriterAdapter;
 import org.qubership.atp.adapter.report.adapter.WebReportWriterAdapter;
 import org.qubership.atp.adapter.report.adapter.WebReportWriterDiffAdapter;
@@ -23,12 +30,6 @@ import org.qubership.atp.adapter.report.adapter.WebReportWriterJointAdapter;
 import org.qubership.atp.adapter.report.rmi.RemoteParametersStorage;
 import org.qubership.atp.adapter.report.rmi.WebReportWriterWrapperRemote;
 import org.qubership.atp.adapter.testcase.Config;
-import java.io.File;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import org.apache.log4j.Level;
 
 public class Report {
     private static Report instance;
@@ -215,11 +216,10 @@ public class Report {
 
         while(i$.hasNext()) {
             ReportWriter reportWriter = (ReportWriter)i$.next();
-            if (reportWriter instanceof WebReportWriterWraper) {
-                WebReportWriterWraper webReportWriterWraper = (WebReportWriterWraper)reportWriter;
+            if (reportWriter instanceof WebReportWriterWraper webReportWriterWraper) {
                 abstractWebReportWriter = webReportWriterWraper.getWebReportWriter();
-            } else if (reportWriter instanceof AbstractWebReportWriter) {
-                abstractWebReportWriter = (AbstractWebReportWriter)reportWriter;
+            } else if (reportWriter instanceof AbstractWebReportWriter writer) {
+                abstractWebReportWriter = writer;
             }
         }
 

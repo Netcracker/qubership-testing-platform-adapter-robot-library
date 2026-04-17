@@ -1,5 +1,5 @@
 /*
- *  Copyright 2024-2025 NetCracker Technology Corporation
+ *  Copyright 2024-2026 NetCracker Technology Corporation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -16,8 +16,6 @@
 
 package org.qubership.atp.adapter.report;
 
-import org.qubership.atp.adapter.testcase.Config;
-import org.qubership.atp.adapter.utils.Utils;
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -35,9 +33,12 @@ import java.util.Enumeration;
 import java.util.Properties;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.qubership.atp.adapter.testcase.Config;
+import org.qubership.atp.adapter.utils.Utils;
 
 public abstract class AbstractWebReportWriter implements ReportWriter {
     private static final Log LOG = LogFactory.getLog(AbstractWebReportWriter.class);
@@ -64,8 +65,8 @@ public abstract class AbstractWebReportWriter implements ReportWriter {
         try {
             String s = this.getResourcesLocationInJar();
             URLConnection connection = this.getClass().getClassLoader().getResource(s).openConnection();
-            if (connection instanceof JarURLConnection) {
-                JarFile archive = ((JarURLConnection)connection).getJarFile();
+            if (connection instanceof JarURLConnection lConnection) {
+                JarFile archive = lConnection.getJarFile();
                 Enumeration<? extends JarEntry> e = archive.entries();
 
                 label119:

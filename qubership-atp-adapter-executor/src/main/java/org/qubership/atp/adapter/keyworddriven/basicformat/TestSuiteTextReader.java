@@ -1,5 +1,5 @@
 /*
- *  Copyright 2024-2025 NetCracker Technology Corporation
+ *  Copyright 2024-2026 NetCracker Technology Corporation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -16,6 +16,15 @@
 
 package org.qubership.atp.adapter.keyworddriven.basicformat;
 
+import java.io.File;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.qubership.atp.adapter.keyworddriven.InvalidFormatOfSourceException;
 import org.qubership.atp.adapter.keyworddriven.executable.Executable;
 import org.qubership.atp.adapter.keyworddriven.executable.FileTestCase;
@@ -23,14 +32,6 @@ import org.qubership.atp.adapter.keyworddriven.executable.TestCase;
 import org.qubership.atp.adapter.keyworddriven.executable.TestSuite;
 import org.qubership.atp.adapter.testcase.Config;
 import org.qubership.atp.adapter.utils.KDTUtils;
-import java.io.File;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 public class TestSuiteTextReader implements TestSuiteReader {
     private static Log log = LogFactory.getLog(TestSuiteTextReader.class);
@@ -123,7 +124,7 @@ public class TestSuiteTextReader implements TestSuiteReader {
 
     public List<TestCase> parserList(Executable parent) throws InvalidFormatOfSourceException {
         if (this.lst == null) {
-            throw new InvalidFormatOfSourceException(String.format("No strings read from file. May be file does not exist / file structure is wrong? File name: %s", this.fileLocation));
+            throw new InvalidFormatOfSourceException("No strings read from file. May be file does not exist / file structure is wrong? File name: %s".formatted(this.fileLocation));
         } else {
             List<TestCase> listCases = new ArrayList();
 

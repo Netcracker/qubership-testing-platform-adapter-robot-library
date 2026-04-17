@@ -1,5 +1,5 @@
 /*
- *  Copyright 2024-2025 NetCracker Technology Corporation
+ *  Copyright 2024-2026 NetCracker Technology Corporation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -20,7 +20,8 @@ import org.qubership.atp.adapter.keyworddriven.executable.Executable;
 import org.qubership.atp.adapter.keyworddriven.executor.KeywordExecutor;
 import org.qubership.atp.adapter.tools.tacomponents.context.ContextDataStorage;
 import org.qubership.atp.adapter.tools.tacomponents.context.ContextDataStorageProvider;
-import javax.annotation.Nullable;
+
+import jakarta.annotation.Nullable;
 
 public class KDTContextDataStorageProvider implements ContextDataStorageProvider {
     private static ThreadLocal<Executable> executable = new ThreadLocal();

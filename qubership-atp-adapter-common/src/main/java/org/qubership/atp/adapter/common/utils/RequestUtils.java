@@ -39,19 +39,19 @@ import java.util.stream.Collectors;
 import javax.net.ssl.SSLContext;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpRequestInterceptor;
-import org.apache.http.client.fluent.Content;
-import org.apache.http.client.fluent.Request;
-import org.apache.http.config.Registry;
-import org.apache.http.config.RegistryBuilder;
-import org.apache.http.conn.socket.ConnectionSocketFactory;
-import org.apache.http.conn.socket.PlainConnectionSocketFactory;
-import org.apache.http.conn.ssl.NoopHostnameVerifier;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.entity.ContentType;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.conn.BasicHttpClientConnectionManager;
-import org.apache.http.ssl.SSLContexts;
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
+import org.apache.hc.client5.http.impl.io.BasicHttpClientConnectionManager;
+import org.apache.hc.client5.http.socket.ConnectionSocketFactory;
+import org.apache.hc.client5.http.socket.PlainConnectionSocketFactory;
+import org.apache.hc.client5.http.ssl.NoopHostnameVerifier;
+import org.apache.hc.client5.http.ssl.SSLConnectionSocketFactory;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.HttpRequestInterceptor;
+import org.apache.hc.core5.http.client.fluent.Content;
+import org.apache.hc.core5.http.client.fluent.Request;
+import org.apache.hc.core5.http.config.Registry;
+import org.apache.hc.core5.http.config.RegistryBuilder;
+import org.apache.hc.core5.ssl.SSLContexts;
 import org.qubership.atp.adapter.common.RamConstants;
 import org.qubership.atp.adapter.common.adapters.interceptors.MdcHttpRequestInterceptor;
 import org.qubership.atp.adapter.common.entities.Message;
@@ -358,7 +358,7 @@ public class RequestUtils {
      *
      * @return Executor
      */
-    public static org.apache.http.client.fluent.Executor getHttpExecutor() {
+    public static org.apache.hc.core5.http.client.fluent.Executor getHttpExecutor() {
         HttpClientBuilder httpClientBuilder = Optional.ofNullable(httpClientBuilderProvider)
                 .map(HttpClientBuilderProvider::getBuilder)
                 .orElseGet(HttpClientBuilder::create);
@@ -382,7 +382,7 @@ public class RequestUtils {
         for (HttpRequestInterceptor interceptor : interceptors) {
             httpClientBuilder.addInterceptorLast(interceptor);
         }
-        return org.apache.http.client.fluent.Executor.newInstance(httpClientBuilder.build());
+        return org.apache.hc.core5.http.client.fluent.Executor.newInstance(httpClientBuilder.build());
     }
 
     /**

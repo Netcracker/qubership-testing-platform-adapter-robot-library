@@ -1,5 +1,5 @@
 /*
- *  Copyright 2024-2025 NetCracker Technology Corporation
+ *  Copyright 2024-2026 NetCracker Technology Corporation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -26,21 +26,18 @@ public class WebReportWriterJointAdapter extends GenericsReportAdapter<WebReport
     }
 
     public void writeItem(WebReportWriterJoint writer, Object item) {
-        if (item instanceof WebReportItem.Message) {
-            WebReportItem.Message msg = (WebReportItem.Message)item;
+        if (item instanceof WebReportItem.Message msg) {
             StringBuilder message = new StringBuilder(msg.getMessage());
             if (msg.getThrowable() != null) {
                 message.append("<pre>").append(Utils.getStackTrace(msg.getThrowable())).append("</pre>");
             }
 
             writer.message(msg.getTitle(), msg.getLevel(), message.toString(), msg.getPage());
-        } else if (item instanceof WebReportItem.OpenSection) {
-            WebReportItem.OpenSection os = (WebReportItem.OpenSection)item;
+        } else if (item instanceof WebReportItem.OpenSection os) {
             writer.openSection(os.getTitle(), os.getMessage(), os.getPage());
         } else if (item instanceof WebReportItem.CloseSection) {
             writer.closeSection();
-        } else if (item instanceof WebReportItem.OpenLog) {
-            WebReportItem.OpenLog ol = (WebReportItem.OpenLog)item;
+        } else if (item instanceof WebReportItem.OpenLog ol) {
             writer.openLog(ol.getLogName(), ol.getDescription());
         } else if (item instanceof WebReportItem.CloseLog) {
             writer.closeLog();

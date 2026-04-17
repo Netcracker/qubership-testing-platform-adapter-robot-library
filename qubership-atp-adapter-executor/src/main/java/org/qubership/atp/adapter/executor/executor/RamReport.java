@@ -21,8 +21,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import javax.annotation.Nullable;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Level;
 import org.qubership.atp.adapter.common.context.TestRunContext;
@@ -41,6 +39,8 @@ import org.qubership.atp.ram.models.BrowserConsoleLogsTable;
 import org.qubership.atp.ram.models.logrecords.parts.Request;
 import org.qubership.atp.ram.models.logrecords.parts.Response;
 import org.qubership.atp.ram.models.logrecords.parts.ValidationTable;
+
+import jakarta.annotation.Nullable;
 
 public class RamReport {
     protected static Report report;

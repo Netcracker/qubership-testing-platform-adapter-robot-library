@@ -1,5 +1,5 @@
 /*
- *  Copyright 2024-2025 NetCracker Technology Corporation
+ *  Copyright 2024-2026 NetCracker Technology Corporation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -16,10 +16,10 @@
 
 package org.qubership.atp.adapter.keyworddriven.basicformat;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.qubership.atp.adapter.keyworddriven.executable.Executable;
 import org.qubership.atp.adapter.keyworddriven.executable.Section;
 import org.qubership.atp.adapter.keyworddriven.executor.KeywordExecutor;
-import org.apache.commons.lang3.ArrayUtils;
 
 public abstract class Filter<T> {
     private Filter() {
@@ -64,7 +64,7 @@ public abstract class Filter<T> {
             public boolean match(T section) {
                 int level = section.getValidationLevel();
                 if (level > KeywordExecutor.validationLevel) {
-                    section.log().debug(String.format("Section '%s' was skipped because validation level of it is bigger than execution level (%d > %d)", section.getName(), level, KeywordExecutor.validationLevel));
+                    section.log().debug("Section '%s' was skipped because validation level of it is bigger than execution level (%d > %d)".formatted(section.getName(), level, KeywordExecutor.validationLevel));
                     return false;
                 } else {
                     return true;

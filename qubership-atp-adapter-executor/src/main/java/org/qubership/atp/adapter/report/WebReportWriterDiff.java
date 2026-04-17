@@ -119,7 +119,7 @@ public class WebReportWriterDiff extends AbstractWebReportWriter {
         this.log().description = description;
         String filename;
         synchronized(this) {
-            filename = String.format("report%04d", LOG_COUNTER.incrementAndGet()) + ".xml";
+            filename = "report%04d".formatted(LOG_COUNTER.incrementAndGet()) + ".xml";
         }
 
         this.log().currentLogName = logName;
@@ -208,7 +208,7 @@ public class WebReportWriterDiff extends AbstractWebReportWriter {
 
     private String createSnapshot(SourceProvider page) {
         Long startTime = System.currentTimeMillis();
-        String pageFilename = "page" + String.format("%04d", PAGE_COUNTER.incrementAndGet());
+        String pageFilename = "page" + "%04d".formatted(PAGE_COUNTER.incrementAndGet());
         File pageFileHTML = new File(new File(this.reportDir, "pages"), pageFilename + "." + page.getExtension());
         if (this.originName == null) {
             this.originName = pageFileHTML.getName();

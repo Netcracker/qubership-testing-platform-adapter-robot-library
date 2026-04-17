@@ -1,5 +1,5 @@
 /*
- *  Copyright 2024-2025 NetCracker Technology Corporation
+ *  Copyright 2024-2026 NetCracker Technology Corporation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -72,8 +72,10 @@ public class AtpStandaloneRamAdapterTest {
         ram2Context.setCompoundAndUpdateCompoundStatuses(compaund);
         ram2Context.setTestScopeId(testScopeId.toString());
         ram2Context.setEnvironmentId(environmentId.toString());
-//        ram2Context.setTestPlanId(testPlanId.toString());
-//        ram2Context.setProjectId(projectId.toString());
+        /*
+        ram2Context.setTestPlanId(testPlanId.toString());
+        ram2Context.setProjectId(projectId.toString());
+         */
 
         return ram2Context;
     }
@@ -119,83 +121,85 @@ public class AtpStandaloneRamAdapterTest {
                 Files.readAllBytes(Paths.get("./src/test/resources", "logRecordsTree.json")));
             due to Stored_Absolute_Path_Traversal and Input_Path_Not_Canonicalized vulnerabilities
          */
-        String jsonRequest = "{ \"testCaseId\": \"257794f0-8c6e-4e01-a95d-bbebf6218a31\",\n"
-                + "  \"metaInfo\": {\n"
-                + "    \"scenarioHashSum\": \"ac458c1b88d799676536b4e673f83360\"\n"
-                + "  },\n"
-                + "  \"trees\": [\n"
-                + "    {\n"
-                + "      \"logRecordId\": null,\n"
-                + "      \"parentRecordId\": null,\n"
-                + "      \"name\": \"section 1\",\n"
-                + "      \"message\": null,\n"
-                + "      \"testingStatus\": \"Unknown\",\n"
-                + "      \"metaInfo\": {\n"
-                + "        \"scenarioId\": \"654de161-3ca5-44c3-bbd7-33263665fe8a\",\n"
-                + "        \"scenarioHashSum\": \"a6d1f65664a59a753c8524f7d8f04d2a\",\n"
-                + "        \"line\": 1\n"
-                + "      },\n"
-                + "      \"configInfo\": null,\n"
-                + "      \"child\": [\n"
-                + "        {\n"
-                + "          \"logRecordId\": null,\n"
-                + "          \"parentRecordId\": null,\n"
-                + "          \"name\": \"message 1\",\n"
-                + "          \"message\": \"there is a body for message 1\",\n"
-                + "          \"testingStatus\": \"Unknown\",\n"
-                + "          \"metaInfo\": null,\n"
-                + "          \"configInfo\": null,\n"
-                + "          \"child\": []\n"
-                + "        },\n"
-                + "        {\n"
-                + "          \"logRecordId\": null,\n"
-                + "          \"parentRecordId\": null,\n"
-                + "          \"name\": \"message 2\",\n"
-                + "          \"message\": \"there is a body for message 2\",\n"
-                + "          \"testingStatus\": \"Unknown\",\n"
-                + "          \"metaInfo\": null,\n"
-                + "          \"configInfo\": null,\n"
-                + "          \"child\": []\n"
-                + "        },\n"
-                + "        {\n"
-                + "          \"logRecordId\": null,\n"
-                + "          \"parentRecordId\": null,\n"
-                + "          \"name\": \"section 2\",\n"
-                + "          \"message\": null,\n"
-                + "          \"testingStatus\": \"Unknown\",\n"
-                + "          \"metaInfo\": {\n"
-                + "            \"scenarioId\": \"b4a9af89-3dc2-4daa-95b5-65e60f079458\",\n"
-                + "            \"scenarioHashSum\": \"scenarioIdHashSum_section2metainfo\",\n"
-                + "            \"line\": 2\n"
-                + "          },\n"
-                + "          \"configInfo\": null,\n"
-                + "          \"child\": [\n"
-                + "            {\n"
-                + "              \"logRecordId\": null,\n"
-                + "              \"parentRecordId\": null,\n"
-                + "              \"name\": \"message 1 from section 2\",\n"
-                + "              \"message\": \"there is a body for message 1 from section 2\",\n"
-                + "              \"testingStatus\": \"Unknown\",\n"
-                + "              \"metaInfo\": null,\n"
-                + "              \"configInfo\": null,\n"
-                + "              \"child\": []\n"
-                + "            },\n"
-                + "            {\n"
-                + "              \"logRecordId\": null,\n"
-                + "              \"parentRecordId\": null,\n"
-                + "              \"name\": \"message 2 from section 2\",\n"
-                + "              \"message\": \"there is a body for message 2 from section 2\",\n"
-                + "              \"testingStatus\": \"Unknown\",\n"
-                + "              \"metaInfo\": null,\n"
-                + "              \"configInfo\": null,\n"
-                + "              \"child\": []\n"
-                + "            }\n"
-                + "          ]\n"
-                + "        }\n"
-                + "      ]\n"
-                + "    }\n"
-                + "  ]\n"
-                + "}\n";
+        String jsonRequest = """
+                { "testCaseId": "257794f0-8c6e-4e01-a95d-bbebf6218a31",
+                  "metaInfo": {
+                    "scenarioHashSum": "ac458c1b88d799676536b4e673f83360"
+                  },
+                  "trees": [
+                    {
+                      "logRecordId": null,
+                      "parentRecordId": null,
+                      "name": "section 1",
+                      "message": null,
+                      "testingStatus": "Unknown",
+                      "metaInfo": {
+                        "scenarioId": "654de161-3ca5-44c3-bbd7-33263665fe8a",
+                        "scenarioHashSum": "a6d1f65664a59a753c8524f7d8f04d2a",
+                        "line": 1
+                      },
+                      "configInfo": null,
+                      "child": [
+                        {
+                          "logRecordId": null,
+                          "parentRecordId": null,
+                          "name": "message 1",
+                          "message": "there is a body for message 1",
+                          "testingStatus": "Unknown",
+                          "metaInfo": null,
+                          "configInfo": null,
+                          "child": []
+                        },
+                        {
+                          "logRecordId": null,
+                          "parentRecordId": null,
+                          "name": "message 2",
+                          "message": "there is a body for message 2",
+                          "testingStatus": "Unknown",
+                          "metaInfo": null,
+                          "configInfo": null,
+                          "child": []
+                        },
+                        {
+                          "logRecordId": null,
+                          "parentRecordId": null,
+                          "name": "section 2",
+                          "message": null,
+                          "testingStatus": "Unknown",
+                          "metaInfo": {
+                            "scenarioId": "b4a9af89-3dc2-4daa-95b5-65e60f079458",
+                            "scenarioHashSum": "scenarioIdHashSum_section2metainfo",
+                            "line": 2
+                          },
+                          "configInfo": null,
+                          "child": [
+                            {
+                              "logRecordId": null,
+                              "parentRecordId": null,
+                              "name": "message 1 from section 2",
+                              "message": "there is a body for message 1 from section 2",
+                              "testingStatus": "Unknown",
+                              "metaInfo": null,
+                              "configInfo": null,
+                              "child": []
+                            },
+                            {
+                              "logRecordId": null,
+                              "parentRecordId": null,
+                              "name": "message 2 from section 2",
+                              "message": "there is a body for message 2 from section 2",
+                              "testingStatus": "Unknown",
+                              "metaInfo": null,
+                              "configInfo": null,
+                              "child": []
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+                """;
 
         Scenario scenario = new ObjectMapper().readValue(jsonRequest, Scenario.class);
 

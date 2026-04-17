@@ -1,5 +1,5 @@
 /*
- *  Copyright 2024-2025 NetCracker Technology Corporation
+ *  Copyright 2024-2026 NetCracker Technology Corporation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -16,6 +16,25 @@
 
 package org.qubership.atp.adapter.keyworddriven.basicformat;
 
+import java.io.File;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.TimeZone;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.FileAppender;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.apache.log4j.PatternLayout;
 import org.qubership.atp.adapter.excel.ExcelBook;
 import org.qubership.atp.adapter.excel.ExcelRow;
 import org.qubership.atp.adapter.excel.ExcelSheet;
@@ -28,24 +47,6 @@ import org.qubership.atp.adapter.keyworddriven.executable.TestCase;
 import org.qubership.atp.adapter.testcase.Config;
 import org.qubership.atp.adapter.utils.KDTUtils;
 import org.qubership.atp.adapter.utils.excel.ExcelUtils;
-import java.io.File;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import java.util.TimeZone;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.log4j.FileAppender;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PatternLayout;
 
 public class BasicFormatTestCaseReader implements TestCaseReader {
     /** @deprecated */
@@ -87,7 +88,7 @@ public class BasicFormatTestCaseReader implements TestCaseReader {
     public BasicFormatTestCaseReader(ExcelBook excelBook) throws InvalidFormatOfSourceException {
         this.sectionHeaderIndexes = new ArrayList();
         if (!excelBook.hasSheet(TEST_CASE_MAIN_SHEET)) {
-            throw new InvalidFormatOfSourceException(String.format("Sheet '%s' hasn't been found in the '%s' WB. Available sheets are: %s", TEST_CASE_MAIN_SHEET, excelBook.getCurrentFile(), excelBook.getAllSheets()));
+            throw new InvalidFormatOfSourceException("Sheet '%s' hasn't been found in the '%s' WB. Available sheets are: %s".formatted(TEST_CASE_MAIN_SHEET, excelBook.getCurrentFile(), excelBook.getAllSheets()));
         } else {
             try {
                 this.excelSheet = new ExcelSheet(excelBook, TEST_CASE_MAIN_SHEET, 1, this.getHeaders());
@@ -122,7 +123,7 @@ public class BasicFormatTestCaseReader implements TestCaseReader {
     }
 
     private void setLogger(FileTestCase testCase) {
-        String logFileName = String.format("logs/%s-%s.log", testCase.getName(), dateFormat.format(new Date()));
+        String logFileName = "logs/%s-%s.log".formatted(testCase.getName(), dateFormat.format(new Date()));
         FileAppender appender = new FileAppender(appenderLayout, logFileName, false);
 
         Logger logger = Logger.getLogger(testCase.getName());
@@ -133,7 +134,7 @@ public class BasicFormatTestCaseReader implements TestCaseReader {
 
     private void loadSection(FileTestCase testCase, ExcelSheet excelSheet, String sectionName) throws InvalidFormatOfSourceException {
         if (StringUtils.isBlank(sectionName)) {
-            log.error(String.format("Section is blank in %s test case", testCase.getName()));
+            log.error("Section is blank in %s test case".formatted(testCase.getName()));
         } else {
             int firstIndex = 0;
             int lastIndex = 0;
@@ -161,7 +162,7 @@ public class BasicFormatTestCaseReader implements TestCaseReader {
                 }
             }
 
-            log.error(String.format("Section '%s' not found", sectionName));
+            log.error("Section '%s' not found".formatted(sectionName));
         }
     }
 

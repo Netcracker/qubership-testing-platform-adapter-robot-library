@@ -1,5 +1,5 @@
 /*
- *  Copyright 2024-2025 NetCracker Technology Corporation
+ *  Copyright 2024-2026 NetCracker Technology Corporation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -16,8 +16,15 @@
 
 package org.qubership.atp.adapter.keyworddriven.handlers;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Collections2;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.lang.reflect.Type;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
 import org.qubership.atp.adapter.keyworddriven.ActionExecutionException;
 import org.qubership.atp.adapter.keyworddriven.ActionsFactory;
 import org.qubership.atp.adapter.keyworddriven.ParametersHandlerException;
@@ -26,15 +33,10 @@ import org.qubership.atp.adapter.keyworddriven.databinder.DataBinder;
 import org.qubership.atp.adapter.keyworddriven.executable.Keyword;
 import org.qubership.atp.adapter.keyworddriven.executable.KeywordParameter;
 import org.qubership.atp.adapter.keyworddriven.routing.RouteItem;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.lang.reflect.Type;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import javax.annotation.Nullable;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+
+import com.google.common.base.Function;
+import com.google.common.collect.Collections2;
+import jakarta.annotation.Nullable;
 
 public abstract class ActionMethodExecutor implements ActionExecutor {
     private static final Logger log = Logger.getLogger(ActionMethodExecutor.class);

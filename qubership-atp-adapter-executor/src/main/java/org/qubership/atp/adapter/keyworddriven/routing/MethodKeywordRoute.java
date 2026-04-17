@@ -1,5 +1,5 @@
 /*
- *  Copyright 2024-2025 NetCracker Technology Corporation
+ *  Copyright 2024-2026 NetCracker Technology Corporation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -16,16 +16,17 @@
 
 package org.qubership.atp.adapter.keyworddriven.routing;
 
-import org.qubership.atp.adapter.keyworddriven.databinder.Calculators;
-import org.qubership.atp.adapter.keyworddriven.handlers.ActionMethodExecutor;
-import org.qubership.atp.adapter.keyworddriven.handlers.DefaultActionExecutor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.qubership.atp.adapter.keyworddriven.databinder.Calculators;
+import org.qubership.atp.adapter.keyworddriven.handlers.ActionMethodExecutor;
+import org.qubership.atp.adapter.keyworddriven.handlers.DefaultActionExecutor;
 
 public class MethodKeywordRoute extends Route {
     private static final Log log = LogFactory.getLog(MethodKeywordRoute.class);
@@ -72,9 +73,9 @@ public class MethodKeywordRoute extends Route {
             ((ActionMethodExecutor)this.getExecutor()).setDefaultValues(defaultValuesParsed);
             this.checkCalcs(method, defaultValuesParsed);
         } catch (SecurityException var11) {
-            throw new IllegalArgumentException(String.format("There is no access to method '%s.%s(%s)'. Route: %s", actionClass.getCanonicalName(), methodName, toString(signature), this.toString()));
+            throw new IllegalArgumentException("There is no access to method '%s.%s(%s)'. Route: %s".formatted(actionClass.getCanonicalName(), methodName, toString(signature), this.toString()));
         } catch (NoSuchMethodException var12) {
-            throw new IllegalArgumentException(String.format("Method '%s.%s(%s)' does not exist. Route: %s", actionClass.getCanonicalName(), methodName, toString(signature), this.toString()));
+            throw new IllegalArgumentException("Method '%s.%s(%s)' does not exist. Route: %s".formatted(actionClass.getCanonicalName(), methodName, toString(signature), this.toString()));
         }
     }
 

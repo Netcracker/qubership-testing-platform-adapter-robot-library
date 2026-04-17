@@ -1,5 +1,5 @@
 /*
- *  Copyright 2024-2025 NetCracker Technology Corporation
+ *  Copyright 2024-2026 NetCracker Technology Corporation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -16,18 +16,6 @@
 
 package org.qubership.atp.adapter.keyworddriven.executor;
 
-import com.google.common.base.Function;
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Iterables;
-import org.qubership.atp.adapter.keyworddriven.configuration.KdtProperties;
-import org.qubership.atp.adapter.keyworddriven.executable.Executable;
-import org.qubership.atp.adapter.keyworddriven.executable.FileTestCase;
-import org.qubership.atp.adapter.keyworddriven.resources.ResourceFactory;
-import org.qubership.atp.adapter.keyworddriven.resources.Resources;
-import org.qubership.atp.adapter.report.Report;
-import org.qubership.atp.adapter.testcase.Config;
-import org.qubership.atp.adapter.utils.ExceptionUtils;
-import org.qubership.atp.adapter.utils.ReportUtils;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -37,10 +25,24 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import javax.annotation.Nullable;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
+import org.qubership.atp.adapter.keyworddriven.configuration.KdtProperties;
+import org.qubership.atp.adapter.keyworddriven.executable.Executable;
+import org.qubership.atp.adapter.keyworddriven.executable.FileTestCase;
+import org.qubership.atp.adapter.keyworddriven.resources.ResourceFactory;
+import org.qubership.atp.adapter.keyworddriven.resources.Resources;
+import org.qubership.atp.adapter.report.Report;
+import org.qubership.atp.adapter.testcase.Config;
+import org.qubership.atp.adapter.utils.ExceptionUtils;
+import org.qubership.atp.adapter.utils.ReportUtils;
+
+import com.google.common.base.Function;
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Iterables;
+import jakarta.annotation.Nullable;
 
 public class PooledTestSuiteExecutor extends SectionExecutor {
     private static final Logger log = Logger.getLogger(PooledTestSuiteExecutor.class);
@@ -100,8 +102,7 @@ public class PooledTestSuiteExecutor extends SectionExecutor {
         while(true) {
             while(var4.hasNext()) {
                 Executable child = (Executable)var4.next();
-                if (child instanceof FileTestCase) {
-                    FileTestCase ftc = (FileTestCase)child;
+                if (child instanceof FileTestCase ftc) {
                     if (StringUtils.isNotBlank(ftc.getThreadName())) {
                         if (threadNameMap.get(ftc.getThreadName()) != null) {
                             ((List)threadNameMap.get(ftc.getThreadName())).add(ftc);

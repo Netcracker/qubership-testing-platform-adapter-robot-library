@@ -1,5 +1,5 @@
 /*
- *  Copyright 2024-2025 NetCracker Technology Corporation
+ *  Copyright 2024-2026 NetCracker Technology Corporation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 
 package org.qubership.atp.adapter.testcase;
 
-import org.qubership.atp.adapter.utils.Utils;
 import java.io.BufferedReader;
 import java.io.Closeable;
 import java.io.File;
@@ -32,12 +31,15 @@ import java.util.Set;
 import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.custommonkey.xmlunit.XMLUnit;
+import org.qubership.atp.adapter.utils.Utils;
 
 public class Config {
     private static final Log log = LogFactory.getLog(Config.class);
@@ -85,7 +87,7 @@ public class Config {
                 return Integer.parseInt(getString(key));
             } catch (NumberFormatException var3) {
                 NumberFormatException e = var3;
-                log.warn(String.format("'%s' value should be a number. Actual value is '%s'", key, getString(key)), e);
+                log.warn("'%s' value should be a number. Actual value is '%s'".formatted(key, getString(key)), e);
                 return defaultValue;
             }
         } else {

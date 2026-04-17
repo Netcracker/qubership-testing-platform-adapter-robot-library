@@ -103,8 +103,8 @@ public abstract class ExecutableImpl implements Executable {
     }
 
     public TestCase getTestCase() {
-        if (this instanceof TestCase) {
-            return (TestCase)this;
+        if (this instanceof TestCase case1) {
+            return case1;
         } else {
             return this.getParent() == null ? null : this.getParent().getTestCase();
         }

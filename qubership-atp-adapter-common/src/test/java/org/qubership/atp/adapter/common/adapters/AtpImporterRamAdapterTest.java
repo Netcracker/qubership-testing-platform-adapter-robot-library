@@ -1,5 +1,5 @@
 /*
- *  Copyright 2024-2025 NetCracker Technology Corporation
+ *  Copyright 2024-2026 NetCracker Technology Corporation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -17,8 +17,9 @@
 package org.qubership.atp.adapter.common.adapters;
 
 import static java.util.Arrays.asList;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
@@ -33,17 +34,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
-
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.qubership.atp.adapter.common.RamConstants;
 import org.qubership.atp.adapter.common.adapters.error.FailedToCreateRamEntity;
 import org.qubership.atp.adapter.common.context.TestRunContext;
@@ -69,7 +69,11 @@ import org.qubership.atp.ram.models.logrecords.SshLogRecord;
 import org.qubership.atp.ram.models.logrecords.UiLogRecord;
 import org.qubership.atp.ram.models.logrecords.parts.ContextVariable;
 
-@RunWith(MockitoJUnitRunner.class)
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class AtpImporterRamAdapterTest {
 
     private final TestRunContext testRunContext = new TestRunContext();
@@ -100,7 +104,7 @@ public class AtpImporterRamAdapterTest {
     @Mock
     private BulkLogRecordSender mockBulkLogRecordSender;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         testRunContext.setTestRunId(testRunId.toString());
         testRunContext.setProjectId(projectId.toString());
@@ -218,21 +222,23 @@ public class AtpImporterRamAdapterTest {
                 .postRequest(eq(urlToBeInvoked), eq(startRunRequest), eq(StartRunResponse.class));
     }
 
-    @Test(expected = FailedToCreateRamEntity.class)
+    @Test
     public void testStartAtpRun_RamInvocationFails_FailedToCreateRamEntityIsThrown()
             throws IOException {
-        StartRunRequest startRunRequest = StartRunRequest.getRequestBuilder()
-                .setProjectName("Project")
-                .setTestPlanName("Test Plan")
-                .setTestCaseName("TestCase")
-                .setTestRunId(testRunId.toString())
-                .build();
-        StartRunResponse response = new StartRunResponse();
-        response.setTestRunId(UUID.randomUUID());
-        response.setExecutionRequestId(UUID.randomUUID());
-        when(requestUtils.postRequest(any(), any(), any()))
-                .thenThrow(new IOException("Failed to start TR in RAM"));
-        atpImporterRamAdapter.startAtpRun(startRunRequest, atpImporterRamAdapter.context);
+        assertThrows(FailedToCreateRamEntity.class, () -> {
+            StartRunRequest startRunRequest = StartRunRequest.getRequestBuilder()
+                    .setProjectName("Project")
+                    .setTestPlanName("Test Plan")
+                    .setTestCaseName("TestCase")
+                    .setTestRunId(testRunId.toString())
+                    .build();
+            StartRunResponse response = new StartRunResponse();
+            response.setTestRunId(UUID.randomUUID());
+            response.setExecutionRequestId(UUID.randomUUID());
+            when(requestUtils.postRequest(any(), any(), any()))
+                    .thenThrow(new IOException("Failed to start TR in RAM"));
+            atpImporterRamAdapter.startAtpRun(startRunRequest, atpImporterRamAdapter.context);
+        });
     }
 
     @Test
@@ -246,18 +252,14 @@ public class AtpImporterRamAdapterTest {
         ExecutionStatuses newTrStatus = ExecutionStatuses.FINISHED;
         atpImporterRamAdapter.updateTestRunStatus(newTrStatus, trId.toString());
         verify(requestUtils, times(1))
-                .patchRequest(eq(urlToBeInvoked),
-                        argThat(testRunPatch -> {
-                            if (testRunPatch instanceof TestRun) {
-                                TestRun testRun = (TestRun) testRunPatch;
-                                return testRun.getExecutionStatus().equals(newTrStatus)
-                                        && testRun.getUuid().equals(trId)
-                                        && testRun.getTestingStatus() == null;
-                            } else {
-                                return false;
-                            }
-                        }),
-                        eq(null));
+                .patchRequest(eq(urlToBeInvoked), argThat(testRunPatch -> {
+                    if (testRunPatch instanceof TestRun testRun) {
+                        return testRun.getExecutionStatus().equals(newTrStatus)
+                                && testRun.getUuid().equals(trId) && testRun.getTestingStatus() == null;
+                    } else {
+                      return false;
+                    }
+                }), eq(null));
     }
 
     @Test
@@ -277,10 +279,7 @@ public class AtpImporterRamAdapterTest {
                 .postRequest(
                         eq(urlToBeInvoked),
                         argThat(trIds ->
-                                trIds instanceof List
-                                        && ((List<?>) trIds).size() == 2
-                                        && ((List<?>) trIds).contains(trId1)
-                                        && ((List<?>) trIds).contains(trId2)),
+                                trIds instanceof List<?> l && l.size() == 2 && l.contains(trId1) && l.contains(trId2)),
                         eq(null));
     }
 
@@ -401,9 +400,7 @@ public class AtpImporterRamAdapterTest {
         LogRecordDto lrDto = atpImporterRamAdapter.createLogRecordDto(logRecord);
         verify(requestUtils, times(1))
                 .postRequest(eq(urlToSendLr),
-                        argThat(batch -> (batch instanceof List
-                                && ((List<?>) batch).size() == 1
-                                && ((List<?>) batch).contains(lrDto))),
+                        argThat(batch -> (batch instanceof List<?> l && l.size() == 1 && l.contains(lrDto))),
                         eq(null));
     }
 
@@ -422,9 +419,7 @@ public class AtpImporterRamAdapterTest {
         LogRecordDto lrDto = atpImporterRamAdapter.createLogRecordDto(logRecord);
         verify(requestUtils, times(1))
                 .postRequest(eq(urlToSendLr),
-                        argThat(batch -> (batch instanceof List
-                                && ((List<?>) batch).size() == 1
-                                && ((List<?>) batch).contains(lrDto))),
+                        argThat(batch -> (batch instanceof List<?> l && l.size() == 1 && l.contains(lrDto))),
                         eq(null));
     }
 
@@ -443,11 +438,9 @@ public class AtpImporterRamAdapterTest {
         LogRecordDto lrDto = atpImporterRamAdapter.createLogRecordDto(logRecord);
         verify(requestUtils, times(1))
                 .postRequest(eq(urlToSendLr),
-                        argThat(batch -> (batch instanceof List
-                                && ((List<?>) batch).size() == 1
-                                && ((List<?>) batch).contains(lrDto))),
+                        argThat(batch -> (batch instanceof List<?> l && l.size() == 1 && l.contains(lrDto))),
                         eq(null));
-        Assert.assertEquals(logRecord.getClass(), lrDto.getLogRecordType());
+        Assertions.assertEquals(logRecord.getClass(), lrDto.getLogRecordType());
     }
 
     @Test
@@ -465,11 +458,9 @@ public class AtpImporterRamAdapterTest {
         LogRecordDto lrDto = atpImporterRamAdapter.createLogRecordDto(logRecord);
         verify(requestUtils, times(1))
                 .postRequest(eq(urlToSendLr),
-                        argThat(batch -> (batch instanceof List
-                                && ((List<?>) batch).size() == 1
-                                && ((List<?>) batch).contains(lrDto))),
+                        argThat(batch -> (batch instanceof List<?> l && l.size() == 1 && l.contains(lrDto))),
                         eq(null));
-        Assert.assertEquals(logRecord.getClass(), lrDto.getLogRecordType());
+        Assertions.assertEquals(logRecord.getClass(), lrDto.getLogRecordType());
     }
 
     @Test
@@ -487,11 +478,9 @@ public class AtpImporterRamAdapterTest {
         LogRecordDto lrDto = atpImporterRamAdapter.createLogRecordDto(logRecord);
         verify(requestUtils, times(1))
                 .postRequest(eq(urlToSendLr),
-                        argThat(batch -> (batch instanceof List
-                                && ((List<?>) batch).size() == 1
-                                && ((List<?>) batch).contains(lrDto))),
+                        argThat(batch -> (batch instanceof List<?> l && l.size() == 1 && l.contains(lrDto))),
                         eq(null));
-        Assert.assertEquals(logRecord.getClass(), lrDto.getLogRecordType());
+        Assertions.assertEquals(logRecord.getClass(), lrDto.getLogRecordType());
     }
 
     @Test
@@ -509,11 +498,9 @@ public class AtpImporterRamAdapterTest {
         LogRecordDto lrDto = atpImporterRamAdapter.createLogRecordDto(logRecord);
         verify(requestUtils, times(1))
                 .postRequest(eq(urlToSendLr),
-                        argThat(batch -> (batch instanceof List
-                                && ((List<?>) batch).size() == 1
-                                && ((List<?>) batch).contains(lrDto))),
+                        argThat(batch -> (batch instanceof List<?> l && l.size() == 1 && l.contains(lrDto))),
                         eq(null));
-        Assert.assertEquals(logRecord.getClass(), lrDto.getLogRecordType());
+        Assertions.assertEquals(logRecord.getClass(), lrDto.getLogRecordType());
     }
 
     @Test
@@ -531,11 +518,9 @@ public class AtpImporterRamAdapterTest {
         LogRecordDto lrDto = atpImporterRamAdapter.createLogRecordDto(logRecord);
         verify(requestUtils, times(1))
                 .postRequest(eq(urlToSendLr),
-                        argThat(batch -> (batch instanceof List
-                                && ((List<?>) batch).size() == 1
-                                && ((List<?>) batch).contains(lrDto))),
+                        argThat(batch -> (batch instanceof List<?> l && l.size() == 1 && l.contains(lrDto))),
                         eq(null));
-        Assert.assertEquals(logRecord.getClass(), lrDto.getLogRecordType());
+        Assertions.assertEquals(logRecord.getClass(), lrDto.getLogRecordType());
     }
 
     @Test
@@ -553,11 +538,9 @@ public class AtpImporterRamAdapterTest {
         LogRecordDto lrDto = atpImporterRamAdapter.createLogRecordDto(logRecord);
         verify(requestUtils, times(1))
                 .postRequest(eq(urlToSendLr),
-                        argThat(batch -> (batch instanceof List
-                                && ((List<?>) batch).size() == 1
-                                && ((List<?>) batch).contains(lrDto))),
+                        argThat(batch -> (batch instanceof List<?> l && l.size() == 1 && l.contains(lrDto))),
                         eq(null));
-        Assert.assertEquals(logRecord.getClass(), lrDto.getLogRecordType());
+        Assertions.assertEquals(logRecord.getClass(), lrDto.getLogRecordType());
     }
 
     @Test
@@ -575,9 +558,7 @@ public class AtpImporterRamAdapterTest {
         bulkLogRecordSender.stopBatchSendingTask(erId);
         verify(requestUtils, times(1))
                 .postRequest(eq(urlToSendLr),
-                        argThat(batch -> (batch instanceof List
-                                && ((List<?>) batch).size() == 1
-                                && ((List<?>) batch)
+            argThat(batch -> (batch instanceof List<?> l && l.size() == 1 && l
                                 .stream()
                                 .map(lrDto -> (LogRecordDto) lrDto)
                                 .map(this::extractLrFromDto)
@@ -597,12 +578,11 @@ public class AtpImporterRamAdapterTest {
     }
 
     private boolean isProperDetailsMessage_erIdStatusProjectIdAndMessageAreSet(Object erDetails) {
-        return erDetails instanceof ExecutionRequestDetails
-                && ((ExecutionRequestDetails) erDetails).getExecutionRequestId().equals(erId)
-                && ((ExecutionRequestDetails) erDetails).getStatus().equals(TestingStatuses.FAILED)
-                && ((ExecutionRequestDetails) erDetails).getMessage()
-                .contains(ramInteractionFailureMessage)
-                && ((ExecutionRequestDetails) erDetails).getProjectId().equals(projectId);
+    return erDetails instanceof ExecutionRequestDetails erd
+            && erd.getExecutionRequestId().equals(erId)
+            && erd.getStatus().equals(TestingStatuses.FAILED)
+            && erd.getMessage().contains(ramInteractionFailureMessage)
+            && erd.getProjectId().equals(projectId);
     }
 
     @Test
@@ -622,9 +602,9 @@ public class AtpImporterRamAdapterTest {
         String result = atpImporterRamAdapter.getUploadFileUrl(attribute, message);
 
         // Assert
-        assertFalse("Result String with URL contains space ' ' character but should be encoded.",
-                result.contains(" "));
-        assertTrue("Result String with URL doesnt contain correct fileName param",
-                result.contains("&contentType=screenshotNameKey+withSpaceCharacter&"));
+        assertFalse(result.contains(" "),
+                "Result String with URL contains space ' ' character but should be encoded.");
+        assertTrue(result.contains("&contentType=screenshotNameKey+withSpaceCharacter&"),
+                "Result String with URL doesnt contain correct fileName param");
     }
 }

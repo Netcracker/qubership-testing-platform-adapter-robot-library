@@ -1,5 +1,5 @@
 /*
- *  Copyright 2024-2025 NetCracker Technology Corporation
+ *  Copyright 2024-2026 NetCracker Technology Corporation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -18,9 +18,9 @@ package org.qubership.atp.adapter.common.adapters;
 
 import static java.util.Arrays.asList;
 import static net.sf.ezmorph.test.ArrayAssertions.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -28,10 +28,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-
 import org.qubership.atp.adapter.common.context.TestRunContext;
 import org.qubership.atp.adapter.common.protos.KafkaLogRecord;
 import org.qubership.atp.adapter.common.utils.ActionParametersTrimmer;
@@ -47,7 +46,7 @@ public class AtpKafkaRamAdapterTest {
 
     private AtpKafkaRamAdapter atpKafkaRamAdapter;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         atpKafkaRamAdapter = Mockito.mock(AtpKafkaRamAdapter.class, Mockito.CALLS_REAL_METHODS);
         atpKafkaRamAdapter.actionParametersTrimmer = new ActionParametersTrimmer(256);

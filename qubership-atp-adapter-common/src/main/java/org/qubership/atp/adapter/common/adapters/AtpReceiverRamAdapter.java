@@ -61,9 +61,9 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.hc.core5.http.ContentType;
 import org.apache.http.client.fluent.Content;
 import org.apache.http.client.fluent.Request;
-import org.apache.http.entity.ContentType;
 import org.qubership.atp.adapter.common.RamConstants;
 import org.qubership.atp.adapter.common.context.TestRunContext;
 import org.qubership.atp.adapter.common.context.TestRunContextHolder;

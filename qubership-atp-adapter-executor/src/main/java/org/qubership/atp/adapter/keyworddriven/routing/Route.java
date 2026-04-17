@@ -1,5 +1,5 @@
 /*
- *  Copyright 2024-2025 NetCracker Technology Corporation
+ *  Copyright 2024-2026 NetCracker Technology Corporation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -16,16 +16,18 @@
 
 package org.qubership.atp.adapter.keyworddriven.routing;
 
-import org.qubership.atp.adapter.keyworddriven.handlers.ActionExecutor;
-import org.qubership.atp.adapter.testcase.Config;
-import dk.brics.automaton.Automaton;
-import dk.brics.automaton.RegExp;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.qubership.atp.adapter.keyworddriven.handlers.ActionExecutor;
+import org.qubership.atp.adapter.testcase.Config;
+
+import dk.brics.automaton.Automaton;
+import dk.brics.automaton.RegExp;
 
 public abstract class Route {
     private static final Log log = LogFactory.getLog(Route.class);
@@ -59,14 +61,14 @@ public abstract class Route {
             this.routeMask = this.getRouteMask(routeItems);
         } catch (PatternSyntaxException var7) {
             PatternSyntaxException e = var7;
-            throw new IllegalArgumentException(String.format("Route '%s' has wrong format of '%s'. Error: %s", description, routeItems.toString(), e.getMessage()), e);
+            throw new IllegalArgumentException("Route '%s' has wrong format of '%s'. Error: %s".formatted(description, routeItems.toString(), e.getMessage()), e);
         }
 
         try {
             this.maskAutomaton = (new RegExp(PatternConverter.convert(this.routeMask))).toAutomaton(true);
         } catch (IllegalArgumentException var6) {
             IllegalArgumentException e = var6;
-            throw new IllegalArgumentException(String.format("Route '%s' has wrong format of pattern '%s'. Error: %s", routeItems.toString(), this.routeMask.pattern(), e.getMessage()), e);
+            throw new IllegalArgumentException("Route '%s' has wrong format of pattern '%s'. Error: %s".formatted(routeItems.toString(), this.routeMask.pattern(), e.getMessage()), e);
         }
     }
 

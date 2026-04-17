@@ -1,5 +1,5 @@
 /*
- *  Copyright 2024-2025 NetCracker Technology Corporation
+ *  Copyright 2024-2026 NetCracker Technology Corporation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -35,8 +35,8 @@ import org.apache.kafka.clients.admin.NewPartitions;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.admin.TopicDescription;
 import org.apache.kafka.common.KafkaFuture;
-
 import org.qubership.atp.adapter.common.kafka.error.AtpKafkaAdminClientException;
+
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -67,7 +67,7 @@ public class KafkaAdminClientService {
             Set<String> existingTopics = getTopicNames().get();
             return existingTopics.contains(topicName);
         } catch (InterruptedException | ExecutionException exc) {
-            String message = String.format(KAFKA_TOPIC_EXISTENCE_CHECK_ERROR_MESSAGE_TEMPLATE, topicName);
+            String message = KAFKA_TOPIC_EXISTENCE_CHECK_ERROR_MESSAGE_TEMPLATE.formatted(topicName);
             log.error(message, exc);
             throw new AtpKafkaAdminClientException(exc, message);
         }
@@ -86,7 +86,7 @@ public class KafkaAdminClientService {
                     .all();
             future.get();
         } catch (InterruptedException | ExecutionException exc) {
-            String message = String.format(KAFKA_TOPIC_CREATION_ERROR_MESSAGE_TEMPLATE, topicName);
+            String message = KAFKA_TOPIC_CREATION_ERROR_MESSAGE_TEMPLATE.formatted(topicName);
             log.error(message, exc);
             throw new AtpKafkaAdminClientException(exc, message);
         }
@@ -103,7 +103,7 @@ public class KafkaAdminClientService {
             Map<String, TopicDescription> topicDescription = topicDescriptionFuture.get();
             return topicDescription.get(topicName);
         } catch (InterruptedException | ExecutionException exc) {
-            String message = String.format(KAFKA_TOPIC_DESCRIPTION_ERROR_MESSAGE_TEMPLATE, topicName);
+            String message = KAFKA_TOPIC_DESCRIPTION_ERROR_MESSAGE_TEMPLATE.formatted(topicName);
             log.error(message, exc);
             throw new AtpKafkaAdminClientException(exc, message);
         }
@@ -118,7 +118,7 @@ public class KafkaAdminClientService {
         try {
             future.get();
         } catch (InterruptedException | ExecutionException exc) {
-            String message = String.format(KAFKA_TOPIC_DELETE_ERROR_MESSAGE_TEMPLATE, topicName);
+            String message = KAFKA_TOPIC_DELETE_ERROR_MESSAGE_TEMPLATE.formatted(topicName);
             log.error(message, exc);
             throw new AtpKafkaAdminClientException(exc, message);
         }
@@ -135,7 +135,7 @@ public class KafkaAdminClientService {
             KafkaFuture<Void> future = client.createPartitions(newPartitionSet).all();
             future.get();
         } catch (InterruptedException | ExecutionException exc) {
-            String message = String.format(KAFKA_TOPIC_INCREASE_PARTITIONS_ERROR_MESSAGE_TEMPLATE, topicName);
+            String message = KAFKA_TOPIC_INCREASE_PARTITIONS_ERROR_MESSAGE_TEMPLATE.formatted(topicName);
             log.error(message, exc);
             throw new AtpKafkaAdminClientException(exc, message);
         }

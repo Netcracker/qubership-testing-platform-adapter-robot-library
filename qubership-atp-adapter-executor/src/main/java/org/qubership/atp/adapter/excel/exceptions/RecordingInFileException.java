@@ -1,5 +1,5 @@
 /*
- *  Copyright 2024-2025 NetCracker Technology Corporation
+ *  Copyright 2024-2026 NetCracker Technology Corporation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -17,9 +17,11 @@
 package org.qubership.atp.adapter.excel.exceptions;
 
 import java.io.IOException;
+import java.io.Serial;
 
 public class RecordingInFileException extends IOException {
-    private static final long serialVersionUID = 4514727182318431839L;
+  @Serial
+  private static final long serialVersionUID = 4514727182318431839L;
 
     public RecordingInFileException(String message, Throwable cause) {
         super(message, cause);

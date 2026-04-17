@@ -255,7 +255,7 @@ public class GeneralReportWriter implements ReportWriter {
         StringBuilder headerPart = new StringBuilder();
         long execTime = (System.currentTimeMillis() - this.startTime) / 1000L;
         headerPart.append("<b>Report Time: </b>").append("date=\"").append(dateFormat.format(new Date())).append("\" t=\"").append(timeFormat.format(new Date())).append("\"").append("<br/>");
-        headerPart.append("<b>Duration: </b>").append(String.format("%02d hours %02d minutes", execTime / 3600L, execTime % 3600L / 60L)).append("<br/>");
+        headerPart.append("<b>Duration: </b>").append("%02d hours %02d minutes".formatted(execTime / 3600L, execTime % 3600L / 60L)).append("<br/>");
         if (Integer.parseInt(getEnvValue(Config.getString(SERVER_ALIAS_KEY) + ".threads", "1")) > 1) {
             headerPart.append("<b>Threads: </b>").append(getEnvValue(Config.getString(SERVER_ALIAS_KEY) + ".threads", "1")).append("<br/>");
         }
@@ -305,9 +305,9 @@ public class GeneralReportWriter implements ReportWriter {
         for(Iterator i$ = this.scenariosOrdered.iterator(); i$.hasNext(); sb.append("</testcase>")) {
             ScenarioInfo si = (ScenarioInfo)i$.next();
             ++testCount;
-            sb.append(String.format("<testcase classname=\"%s\" name=\"%s\">",
-                    StringEscapeUtils.escapeXml("Test Scope"),
-                    StringEscapeUtils.escapeXml(si.name)));
+            sb.append("<testcase classname=\"%s\" name=\"%s\">".formatted(
+                StringEscapeUtils.escapeXml("Test Scope"),
+                StringEscapeUtils.escapeXml(si.name)));
             if (si.level == 40000) {
                 if ("true".equals(Config.getString("report.junit.ci.url"))) {
                     sb.append("<failure type=\"\"  message=\"" + Config.getString("report.detailed.path")
@@ -449,7 +449,7 @@ public class GeneralReportWriter implements ReportWriter {
 
         public String getExecutionTime() {
             long s = (this.end - this.start) / 1000L;
-            return String.format("%02d:%02d:%02d", s / 3600L, s % 3600L / 60L, s % 60L);
+            return "%02d:%02d:%02d".formatted(s / 3600L, s % 3600L / 60L, s % 60L);
         }
     }
 }

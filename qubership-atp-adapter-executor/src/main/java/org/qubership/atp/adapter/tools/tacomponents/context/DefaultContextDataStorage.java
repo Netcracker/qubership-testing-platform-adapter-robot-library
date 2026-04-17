@@ -1,5 +1,5 @@
 /*
- *  Copyright 2024-2025 NetCracker Technology Corporation
+ *  Copyright 2024-2026 NetCracker Technology Corporation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -16,24 +16,28 @@
 
 package org.qubership.atp.adapter.tools.tacomponents.context;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Maps;
-import com.google.common.eventbus.EventBus;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
+import java.io.Serial;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
 import org.qubership.atp.adapter.tools.tacomponents.context.events.ClearValuesEvent;
 import org.qubership.atp.adapter.tools.tacomponents.context.events.PutAllValuesEvent;
 import org.qubership.atp.adapter.tools.tacomponents.context.events.PutValueEvent;
 import org.qubership.atp.adapter.tools.tacomponents.context.events.RemoveValueEvent;
-import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectOutput;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+
+import com.google.common.base.Function;
+import com.google.common.collect.Maps;
+import com.google.common.eventbus.EventBus;
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 
 public class DefaultContextDataStorage implements ContextDataStorage {
-    private static final long serialVersionUID = 6784082206451114536L;
+  @Serial
+  private static final long serialVersionUID = 6784082206451114536L;
     private static final transient Function<ContextRecord<?>, Object> RECORD_TRANSFORMER = new Function<ContextRecord<?>, Object>() {
         @Nullable
         public Object apply(@Nonnull ContextRecord<?> input) {

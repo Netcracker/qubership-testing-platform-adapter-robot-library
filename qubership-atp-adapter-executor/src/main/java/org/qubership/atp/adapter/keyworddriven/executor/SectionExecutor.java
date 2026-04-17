@@ -1,5 +1,5 @@
 /*
- *  Copyright 2024-2025 NetCracker Technology Corporation
+ *  Copyright 2024-2026 NetCracker Technology Corporation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -16,6 +16,12 @@
 
 package org.qubership.atp.adapter.keyworddriven.executor;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.qubership.atp.adapter.keyworddriven.TestCaseException;
 import org.qubership.atp.adapter.keyworddriven.executable.BlockedExecutable;
 import org.qubership.atp.adapter.keyworddriven.executable.Executable;
@@ -24,11 +30,6 @@ import org.qubership.atp.adapter.report.Report;
 import org.qubership.atp.adapter.testcase.Config;
 import org.qubership.atp.adapter.utils.ExceptionUtils;
 import org.qubership.atp.adapter.utils.KDTUtils;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 public class SectionExecutor implements Executor {
     private static final Log log = LogFactory.getLog(SectionExecutor.class);
@@ -64,7 +65,7 @@ public class SectionExecutor implements Executor {
 
     public void addExecuteListener(ExecuteListener listener) {
         if (Config.getBoolean("kdt.check.listeners.are.already.registered", true) && this.executeListeners.contains(listener)) {
-            log.warn(String.format("Try to register already registered '%s' to '%s'", listener, this));
+            log.warn("Try to register already registered '%s' to '%s'".formatted(listener, this));
         } else {
             this.executeListeners.add(listener);
         }
@@ -93,7 +94,7 @@ public class SectionExecutor implements Executor {
     private boolean skip(Executable executable) {
         Section section = (Section)executable;
         if (section.getValidationLevel() > KeywordExecutor.validationLevel) {
-            section.log().debug(String.format("Section '%s' was skipped because validation level of it is bigger than execution level ( %s > %s )", section.getFullName(), section.getValidationLevel(), KeywordExecutor.validationLevel));
+            section.log().debug("Section '%s' was skipped because validation level of it is bigger than execution level ( %s > %s )".formatted(section.getFullName(), section.getValidationLevel(), KeywordExecutor.validationLevel));
             return true;
         } else {
             return false;

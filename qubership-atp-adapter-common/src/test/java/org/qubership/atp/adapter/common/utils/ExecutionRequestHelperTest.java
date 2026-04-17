@@ -1,5 +1,5 @@
 /*
- *  Copyright 2024-2025 NetCracker Technology Corporation
+ *  Copyright 2024-2026 NetCracker Technology Corporation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -17,8 +17,8 @@
 package org.qubership.atp.adapter.common.utils;
 
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -34,9 +34,8 @@ import java.util.concurrent.Future;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.junit.Assert;
-import org.junit.Test;
-
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.qubership.atp.adapter.common.RamConstants;
 
 public class ExecutionRequestHelperTest {
@@ -46,7 +45,7 @@ public class ExecutionRequestHelperTest {
         String requestName = ExecutionRequestHelper.generateRequestName();
         Pattern p = Pattern.compile("(Default)\\s(ER)\\s(\\d{1,2})\\.(\\d{1,2})\\.(\\d{4}) (\\d{1,2}):(\\d{2})");
         Matcher m = p.matcher(requestName);
-        Assert.assertTrue(m.matches());
+        Assertions.assertTrue(m.matches());
     }
 
 
@@ -74,8 +73,8 @@ public class ExecutionRequestHelperTest {
         Future<String> futureResult2 = executors.submit(callable2);
         String result2 = futureResult2.get();
 
-        Assert.assertEquals(result1, result2);
-        Assert.assertEquals("32_9.3.NC.ATP.CD91_rev13108", result1);
+        Assertions.assertEquals(result1, result2);
+        Assertions.assertEquals("32_9.3.NC.ATP.CD91_rev13108", result1);
         verify(getter2, times(0)).connectAndFetchPage(anyString());
     }
 
@@ -89,30 +88,29 @@ public class ExecutionRequestHelperTest {
 
         String result1 = getter1.getSolutionBuild("url");
 
-        Assert.assertEquals("Unknown solution build", result1);
+        Assertions.assertEquals("Unknown solution build", result1);
     }
 
     @Test
     public void parseResponse() {
-        String response = "<S:Envelope xmlns:S=\"http://schemas.xmlsoap.org/soap/envelope/\">\n" +
-                "   <S:Body>\n" +
-                "      <ns2:startRunResponse xmlns:ns2=\"http://server.ws.integration.atp.solutions.somedomain.com/\">\n"
-                +
-                "         <RunResponse>\n" +
-                "            <executionRequestInfo>\n" +
-                "               <reportLink>http://qaapp125.somedomain.com:6820/common/uobject.jsp?tab=_Test+Run+Tree+View&amp;object=9151562714613898495</reportLink>\n"
-                +
-                "            </executionRequestInfo>\n" +
-                "            <testRunId>9151562714613898494</testRunId>\n" +
-                "            <recordId>9151562714613898494</recordId>\n" +
-                "         </RunResponse>\n" +
-                "      </ns2:startRunResponse>\n" +
-                "   </S:Body>\n" +
-                "</S:Envelope>";
+        String response = """
+                <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+                   <S:Body>
+                      <ns2:startRunResponse xmlns:ns2="http://server.ws.integration.atp.solutions.somedomain.com/">
+                         <RunResponse>
+                            <executionRequestInfo>
+                               <reportLink>http://qaapp125.somedomain.com:6820/common/uobject.jsp?tab=_Test+Run+Tree+View&amp;object=9151562714613898495</reportLink>
+                            </executionRequestInfo>
+                            <testRunId>9151562714613898494</testRunId>
+                            <recordId>9151562714613898494</recordId>
+                         </RunResponse>
+                      </ns2:startRunResponse>
+                   </S:Body>
+                </S:Envelope>""";
         Map<String, String> result = ExecutionRequestHelper.parseResponse(response);
-        Assert.assertNotNull(result);
-        Assert.assertTrue(result.containsKey(RamConstants.TEST_RUN_ID_KEY));
-        Assert.assertTrue(result.containsKey(RamConstants.RECORD_ID_KEY));
+        Assertions.assertNotNull(result);
+        Assertions.assertTrue(result.containsKey(RamConstants.TEST_RUN_ID_KEY));
+        Assertions.assertTrue(result.containsKey(RamConstants.RECORD_ID_KEY));
     }
 
     @Test

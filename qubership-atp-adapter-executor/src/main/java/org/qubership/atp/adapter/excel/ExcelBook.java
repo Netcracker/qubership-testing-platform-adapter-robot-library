@@ -1,5 +1,5 @@
 /*
- *  Copyright 2024-2025 NetCracker Technology Corporation
+ *  Copyright 2024-2026 NetCracker Technology Corporation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -16,8 +16,6 @@
 
 package org.qubership.atp.adapter.excel;
 
-import org.qubership.atp.adapter.excel.exceptions.InvalidFormatOfSourceException;
-import org.qubership.atp.adapter.excel.exceptions.RecordingInFileException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -25,6 +23,7 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+
 import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.logging.Log;
@@ -35,6 +34,8 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.qubership.atp.adapter.excel.exceptions.InvalidFormatOfSourceException;
+import org.qubership.atp.adapter.excel.exceptions.RecordingInFileException;
 
 public class ExcelBook {
     private static Log log = LogFactory.getLog(ExcelBook.class);
@@ -68,8 +69,8 @@ public class ExcelBook {
 
             try {
                 Workbook wb = WorkbookFactory.create(fis = new FileInputStream(file));
-                if (wb instanceof XSSFWorkbook && isSXSSFWorkbook) {
-                    this.workbook = new SXSSFWorkbook((XSSFWorkbook)wb, 999999);
+                if (wb instanceof XSSFWorkbook fWorkbook && isSXSSFWorkbook) {
+                    this.workbook = new SXSSFWorkbook(fWorkbook, 999999);
                 } else {
                     this.workbook = wb;
                 }
@@ -77,10 +78,10 @@ public class ExcelBook {
                 this.currentFile = file;
             } catch (IOException var13) {
                 IOException ex = var13;
-                throw new InvalidFormatOfSourceException(String.format("Could not read '%s' file", file.getAbsolutePath()), ex);
+                throw new InvalidFormatOfSourceException("Could not read '%s' file".formatted(file.getAbsolutePath()), ex);
             } catch (InvalidFormatException var14) {
                 InvalidFormatException ex = var14;
-                throw new InvalidFormatOfSourceException(String.format("Invalid format of '%s' file : ", this.currentFile.getName()), ex);
+                throw new InvalidFormatOfSourceException("Invalid format of '%s' file : ".formatted(this.currentFile.getName()), ex);
             } finally {
                 if (fis != null) {
                     try {
@@ -122,7 +123,7 @@ public class ExcelBook {
 
     public ExcelSheet openSheet(String newSheetName, int headerRowIndex, String[] headerRowIdentifiers) throws InvalidFormatOfSourceException {
         if (!this.hasSheet(newSheetName)) {
-            throw new InvalidFormatOfSourceException(String.format("Sheet '%s' hasn't been found in the '%s' WB", newSheetName, this.currentFile.getName()));
+            throw new InvalidFormatOfSourceException("Sheet '%s' hasn't been found in the '%s' WB".formatted(newSheetName, this.currentFile.getName()));
         } else {
             if (this.sheet == null || !this.sheet.getSheetName().equalsIgnoreCase(newSheetName)) {
                 this.sheet = null;

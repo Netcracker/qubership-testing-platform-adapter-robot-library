@@ -112,7 +112,7 @@ public class WebReportWriterJoint extends AbstractWebReportWriter {
         this.log().description = description;
         String fileName;
         synchronized(this) {
-            fileName = "report" + String.format("%04d", ResourcesManager.getLogCounter()) + ".xml";
+            fileName = "report" + "%04d".formatted(ResourcesManager.getLogCounter()) + ".xml";
         }
 
         this.log().currentLogName = logName;
@@ -200,7 +200,7 @@ public class WebReportWriterJoint extends AbstractWebReportWriter {
     }
 
     private File createSnapshot(SourceProvider page) {
-        String pageFileName = "page" + String.format("%04d", ResourcesManager.getPageCounter());
+        String pageFileName = "page" + "%04d".formatted(ResourcesManager.getPageCounter());
         File pageFileHTML = new File(new File(this.reportDir, "pages"), pageFileName + "." + page.getExtension());
         if (this.logReportSnapshots) {
             snapshotFiles.add(pageFileHTML);

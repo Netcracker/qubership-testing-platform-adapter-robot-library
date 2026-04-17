@@ -1,5 +1,5 @@
 /*
- *  Copyright 2024-2025 NetCracker Technology Corporation
+ *  Copyright 2024-2026 NetCracker Technology Corporation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -16,7 +16,8 @@
 
 package org.qubership.atp.adapter.common.adapters;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
@@ -30,19 +31,22 @@ import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.qubership.atp.adapter.common.RamConstants;
 import org.qubership.atp.adapter.common.utils.RequestUtils;
 import org.qubership.atp.adapter.common.ws.LogRecordDto;
 import org.qubership.atp.ram.models.LogRecord;
 
-@RunWith(MockitoJUnitRunner.class)
+import com.fasterxml.jackson.core.JsonProcessingException;
+
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class BulkLogRecordSenderTest {
 
     private BulkLogRecordSender bulkLogRecordSender;
@@ -54,7 +58,7 @@ public class BulkLogRecordSenderTest {
     @Mock
     private RequestUtils requestUtils;
 
-    @Before
+  @BeforeEach
     public void setUp() {
         bulkLogRecordSender = BulkLogRecordSender.getInstance();
         bulkLogRecordSender.requestUtils = requestUtils;
@@ -71,10 +75,9 @@ public class BulkLogRecordSenderTest {
         Thread.sleep(RamConstants.DEFAULT_LOGRECORD_BATCHING_TIMEOUT * 2);
         verify(requestUtils, atLeast(1))
                 .postRequest(any(), argThat(batch ->
-                        (batch instanceof List
-                                && ((List<?>) batch).size() == 1
-                                && ((List<?>) batch).contains(lrDto))), eq(null));
-    }
+                                (batch instanceof List<?> l && l.size() == 1 && l.contains(lrDto))),
+                        eq(null));
+  }
 
     @Test
     public void startBatchSendingTask_scheduledTaskIsStarted_batchIsBoundedByBatchSizeParam() throws IOException,
@@ -89,9 +92,9 @@ public class BulkLogRecordSenderTest {
         Thread.sleep(RamConstants.DEFAULT_LOGRECORD_BATCHING_TIMEOUT * 2);
         verify(requestUtils, never())
                 .postRequest(any(), argThat(batch ->
-                        (batch instanceof List
-                                && ((List<?>) batch).size() > RamConstants.DEFAULT_LOGRECORD_BATCH_SIZE
-                                && ((List<?>) batch).contains(lrDto))), eq(null));
+            (batch instanceof List<?> l
+                && l.size() > RamConstants.DEFAULT_LOGRECORD_BATCH_SIZE
+                && l.contains(lrDto))), eq(null));
     }
 
     @Test
@@ -121,11 +124,12 @@ public class BulkLogRecordSenderTest {
         verify(requestUtils, atLeast(5))
                 .postRequest(any(),
                         argThat(batch -> {
-                            if (batch instanceof List) {
-                                lrCounter.getAndAdd(((List<?>) batch).size());
+                            if (batch instanceof List<?> list) {
+                                lrCounter.getAndAdd(list.size());
                                 return true;
-                            } else
+                            } else {
                                 return false;
+                            }
                         }),
                         eq(null));
         assertEquals(threadCount * RamConstants.DEFAULT_LOGRECORD_BATCH_SIZE, lrCounter.get());
@@ -143,27 +147,29 @@ public class BulkLogRecordSenderTest {
         Thread.sleep(RamConstants.DEFAULT_LOGRECORD_BATCHING_TIMEOUT * 2);
         verify(requestUtils, atLeast(1))
                 .postRequest(any(), argThat(batch ->
-                        (batch instanceof List
-                                && ((List<?>) batch).size() == 1
-                                && ((List<?>) batch).contains(lrDto))), eq(null));
+                        (batch instanceof List<?> l && l.size() == 1 && l.contains(lrDto))), eq(null));
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void offer_scheduledIsNotStarted_exceptionIsThrown() throws IOException{
-        LogRecord logRecord = new LogRecord();
-        logRecord.setUuid(UUID.randomUUID());
-        LogRecordDto lrDto = createLogRecordDto(logRecord);
-        bulkLogRecordSender.offer(lrDto, executionRequestId);
+    @Test
+    public void offer_scheduledIsNotStarted_exceptionIsThrown() throws IOException {
+        assertThrows(IllegalStateException.class, () -> {
+            LogRecord logRecord = new LogRecord();
+            logRecord.setUuid(UUID.randomUUID());
+            LogRecordDto lrDto = createLogRecordDto(logRecord);
+            bulkLogRecordSender.offer(lrDto, executionRequestId);
+        });
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void offer_scheduledTaskIsStopped_exceptionIsThrown() throws IOException{
-        bulkLogRecordSender.startBatchSendingTask(executionRequestId, projectId);
-        bulkLogRecordSender.stopBatchSendingTask(executionRequestId);
-        LogRecord logRecord = new LogRecord();
-        logRecord.setUuid(UUID.randomUUID());
-        LogRecordDto lrDto = createLogRecordDto(logRecord);
-        bulkLogRecordSender.offer(lrDto, executionRequestId);
+    @Test
+    public void offer_scheduledTaskIsStopped_exceptionIsThrown() throws IOException {
+        assertThrows(IllegalStateException.class, () -> {
+            bulkLogRecordSender.startBatchSendingTask(executionRequestId, projectId);
+            bulkLogRecordSender.stopBatchSendingTask(executionRequestId);
+            LogRecord logRecord = new LogRecord();
+            logRecord.setUuid(UUID.randomUUID());
+            LogRecordDto lrDto = createLogRecordDto(logRecord);
+            bulkLogRecordSender.offer(lrDto, executionRequestId);
+        });
     }
 
     private LogRecordDto createLogRecordDto(LogRecord logRecordRequest) throws JsonProcessingException {
