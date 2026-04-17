@@ -17,7 +17,6 @@
 package org.qubership.atp.adapter.testcase;
 
 import java.io.BufferedReader;
-import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -85,8 +84,7 @@ public class Config {
         if (!getString(key).trim().isEmpty()) {
             try {
                 return Integer.parseInt(getString(key));
-            } catch (NumberFormatException var3) {
-                NumberFormatException e = var3;
+            } catch (NumberFormatException e) {
                 log.warn("'%s' value should be a number. Actual value is '%s'".formatted(key, getString(key)), e);
                 return defaultValue;
             }
@@ -169,9 +167,9 @@ public class Config {
                 String line;
                 while((line = lines.readLine()) != null) {
                     line = line.trim();
-                    if (!line.startsWith("#") && line.length() != 0) {
+                    if (!line.startsWith("#") && !line.isEmpty()) {
                         Matcher m = PARAMETRIZATION_PATTERN.matcher(line);
-                        StringBuffer resultLine = new StringBuffer();
+                        StringBuilder resultLine = new StringBuilder();
 
                         while(m.find()) {
                             String key = m.group(1);
@@ -199,12 +197,11 @@ public class Config {
                         }
                     }
                 }
-            } catch (IOException var11) {
-                IOException e = var11;
+            } catch (IOException e) {
                 log.fatal("Failed to read properties file: " + propertiesFile.getName(), e);
                 throw new RuntimeException("IOException", e);
             } finally {
-                Utils.close(new Closeable[]{lines});
+                Utils.close(lines);
             }
 
             return p;
@@ -234,8 +231,7 @@ public class Config {
             factory.setAttribute("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
             factory.setNamespaceAware(true);
             builder = factory.newDocumentBuilder();
-        } catch (ParserConfigurationException var2) {
-            ParserConfigurationException e = var2;
+        } catch (ParserConfigurationException e) {
             log.fatal("ParserConfigurationException", e);
             throw new RuntimeException("ParserConfigurationException", e);
         }
@@ -250,7 +246,7 @@ public class Config {
         }
 
         String timeZoneId = getString("nc.timezone");
-        serverTimeZone = timeZoneId.length() == 0 ? TimeZone.getDefault() : TimeZone.getTimeZone(timeZoneId);
+        serverTimeZone = timeZoneId.isEmpty() ? TimeZone.getDefault() : TimeZone.getTimeZone(timeZoneId);
     }
 }
 

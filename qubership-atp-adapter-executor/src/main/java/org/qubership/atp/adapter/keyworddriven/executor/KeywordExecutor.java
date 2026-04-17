@@ -36,7 +36,7 @@ import org.qubership.atp.adapter.testcase.Config;
 import org.qubership.atp.adapter.utils.KDTUtils;
 
 public class KeywordExecutor extends SectionExecutor {
-    private static final ThreadLocal<Keyword> currentKeyword = new ThreadLocal();
+    private static final ThreadLocal<Keyword> currentKeyword = new ThreadLocal<>();
     public static final boolean VALIDATE_SCENARIO = Boolean.parseBoolean(Config.getString("kdt.validate.scenarios"));
     public static final int SEVERITY_LEVEL = Integer.parseInt(Config.getString("kdt.severity.level", "0"));
     public static int validationLevel = ValidationLevel.parseValidationLevel(Config.getString("kdt.validation.level"));
@@ -92,18 +92,16 @@ public class KeywordExecutor extends SectionExecutor {
         } else {
             try {
                 keyword.getRoute().getActionExecutor().execute(keyword);
-            } catch (InvocationTargetException var3) {
-                InvocationTargetException e = var3;
+            } catch (InvocationTargetException e) {
                 this.throwTCE(keyword, e.getTargetException());
             } catch (Exception e) {
-                Report.getReport().error((String)null, "Error during keyword execution: " + keyword + ":" + e.getMessage(), new KDTUtils.StringSource(ExceptionUtils.getStackTrace(e)));
+                Report.getReport().error(null, "Error during keyword execution: " + keyword + ":" + e.getMessage(), new KDTUtils.StringSource(ExceptionUtils.getStackTrace(e)));
                 this.throwTCE(keyword, e);
             }
 
-            if (keyword.getChildren().size() > 0) {
+            if (!keyword.getChildren().isEmpty()) {
                 super.execute(keyword);
             }
-
         }
     }
 
@@ -111,15 +109,11 @@ public class KeywordExecutor extends SectionExecutor {
         LinkedList<DataItem> dataItems = keyword.getDataItems();
 
         for(int i = 0; i < dataItems.size(); ++i) {
-            DataItem item = (DataItem)dataItems.get(i);
-            Iterator var5 = ProcessorStorage.getStorage().getProcessors().iterator();
-
-            while(var5.hasNext()) {
-                Processor dataItemProcessor = (Processor)var5.next();
+            DataItem item = dataItems.get(i);
+            for (Processor dataItemProcessor : ProcessorStorage.getStorage().getProcessors()) {
                 dataItems.set(i, dataItemProcessor.process(item));
             }
         }
-
     }
 
     protected void throwTCE(Keyword keyword, Throwable e) throws TestCaseException {
@@ -134,14 +128,10 @@ public class KeywordExecutor extends SectionExecutor {
     }
 
     protected static void replaceParametersInKeyword(Keyword keyword) {
-        Iterator var1 = keyword.getDataItems().iterator();
-
-        while(var1.hasNext()) {
-            DataItem item = (DataItem)var1.next();
+        for (DataItem item : keyword.getDataItems()) {
             String value = KDTUtils.replaceParametersInString(keyword, item.getData());
             item.setData(value);
         }
-
     }
 
     protected static void routeNotFound(Keyword keyword) {
@@ -163,7 +153,7 @@ public class KeywordExecutor extends SectionExecutor {
     }
 
     public static Keyword getKeyword() {
-        return (Keyword)currentKeyword.get();
+        return currentKeyword.get();
     }
 
     public static void removeInstance() {

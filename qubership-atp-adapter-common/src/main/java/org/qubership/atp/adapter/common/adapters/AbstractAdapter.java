@@ -28,6 +28,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -920,9 +921,9 @@ public abstract class AbstractAdapter implements AtpRamAdapter {
         try {
             String url = uploadUrlTemplate.formatted(
                 logRecordId,
-                URLEncoder.encode(fileName, RamConstants.UTF8_CHARSET),
+                URLEncoder.encode(fileName, StandardCharsets.UTF_8),
                 "text/html",
-                URLEncoder.encode(fileName, RamConstants.UTF8_CHARSET),
+                URLEncoder.encode(fileName, StandardCharsets.UTF_8),
                 "");
             UploadScreenshotResponse response = requestUtils.postRequestStream(
                     url, fileContent, UploadScreenshotResponse.class);
@@ -943,10 +944,10 @@ public abstract class AbstractAdapter implements AtpRamAdapter {
         String snapshotExternalSource = (String) attribute.get(RamConstants.SCREENSHOT_EXTERNAL_SOURCE_KEY);
         return uploadUrlTemplate.formatted(
             message.getUuid(),
-            URLEncoder.encode(fileName, RamConstants.UTF8_CHARSET),
+            URLEncoder.encode(fileName, StandardCharsets.UTF_8),
             contentType,
-            URLEncoder.encode(StringUtils.defaultIfEmpty(snapshotSource, ""), RamConstants.UTF8_CHARSET),
-            URLEncoder.encode(StringUtils.defaultIfEmpty(snapshotExternalSource, ""), RamConstants.UTF8_CHARSET));
+            URLEncoder.encode(StringUtils.defaultIfEmpty(snapshotSource, ""), StandardCharsets.UTF_8),
+            URLEncoder.encode(StringUtils.defaultIfEmpty(snapshotExternalSource, ""), StandardCharsets.UTF_8));
     }
 
     /**
@@ -955,7 +956,7 @@ public abstract class AbstractAdapter implements AtpRamAdapter {
      * @param message Message with attributes.
      */
     protected void uploadFirstFile(Message message) {
-        Map<String, Object> attributes = message.getAttributes().get(0);
+        Map<String, Object> attributes = message.getAttributes().getFirst();
         UploadScreenshotResponse response = uploadFile(attributes, message);
 
         String contentType = (String) attributes.get(RamConstants.SCREENSHOT_TYPE_KEY);

@@ -140,7 +140,7 @@ public class GeneralReportWriter implements ReportWriter {
         StringBuilder returnBuild = new StringBuilder();
 
         while(true) {
-            int ch = ((Reader)reader).read();
+            int ch = reader.read();
             if (ch == -1) {
                 return returnBuild.toString();
             }
@@ -180,8 +180,8 @@ public class GeneralReportWriter implements ReportWriter {
     public synchronized void report(WebReportItem.Message message, Thread thread) {
         synchronized(this.scenarios) {
             if (!this.scenarios.isEmpty()) {
-                List<ScenarioInfo> scenarioList = (List)this.scenarios.get(thread);
-                scenarioList.get(scenarioList.size() - 1).setLevel(message.getLevel().toInt());
+                List<ScenarioInfo> scenarioList = this.scenarios.get(thread);
+                scenarioList.getLast().setLevel(message.getLevel().toInt());
                 Throwable throwable = message.getThrowable();
                 String cause;
                 if (throwable == null) {
@@ -194,8 +194,8 @@ public class GeneralReportWriter implements ReportWriter {
                     cause = "<pre>" + Utils.getStackTrace(throwable) + "</pre>";
                 }
 
-                scenarioList.get(scenarioList.size() - 1).setCause(cause);
-                scenarioList.get(scenarioList.size() - 1).setEndTime(System.currentTimeMillis());
+                scenarioList.getLast().setCause(cause);
+                scenarioList.getLast().setEndTime(System.currentTimeMillis());
             } else {
                 this.newScenario(new WebReportItem.OpenLog(message.getTitle(), message.getMessage()), thread);
                 this.report(message, thread);
@@ -206,16 +206,16 @@ public class GeneralReportWriter implements ReportWriter {
 
     public synchronized void newScenario(WebReportItem.OpenLog message, Thread thread) {
         synchronized(this.scenarios) {
-            List<ScenarioInfo> scenarioList = (List)this.scenarios.get(thread);
+            List<ScenarioInfo> scenarioList = this.scenarios.get(thread);
             if (scenarioList == null) {
-                scenarioList = new ArrayList();
+                scenarioList = new ArrayList<>();
                 this.scenarios.put(thread, scenarioList);
             } else {
                 ((ScenarioInfo)((List)scenarioList).get(scenarioList.size() - 1)).setEndTime(System.currentTimeMillis());
             }
 
             ScenarioInfo soinfo = new ScenarioInfo(message.getLogName(), message.getDescription());
-            ((List)scenarioList).add(soinfo);
+            scenarioList.add(soinfo);
             this.scenariosOrdered.add(soinfo);
         }
     }
@@ -310,10 +310,14 @@ public class GeneralReportWriter implements ReportWriter {
                 StringEscapeUtils.escapeXml(si.name)));
             if (si.level == 40000) {
                 if ("true".equals(Config.getString("report.junit.ci.url"))) {
-                    sb.append("<failure type=\"\"  message=\"" + Config.getString("report.detailed.path")
-                            + this.getFolderByScenarioName(si.getName()) + "/report.html\"/>");
+                    sb.append("<failure type=\"\"  message=\"")
+                            .append(Config.getString("report.detailed.path"))
+                            .append(this.getFolderByScenarioName(si.getName()))
+                            .append("/report.html\"/>");
                 } else {
-                    sb.append("<failure type=\"\">" + StringEscapeUtils.escapeXml(si.getCause()) + "</failure>");
+                    sb.append("<failure type=\"\">")
+                            .append(StringEscapeUtils.escapeXml(si.getCause()))
+                            .append("</failure>");
                 }
             }
         }
@@ -323,10 +327,7 @@ public class GeneralReportWriter implements ReportWriter {
 
     public String getFolderByScenarioName(String name) {
         String[] arr$ = getWebReportDir().list();
-        int len$ = arr$.length;
-
-        for(int i$ = 0; i$ < len$; ++i$) {
-            String folder = arr$[i$];
+        for (String folder : arr$) {
             if (folder.contains(name)) {
                 return folder;
             }

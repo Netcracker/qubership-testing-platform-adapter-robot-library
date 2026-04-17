@@ -159,7 +159,7 @@ public class AtpImporterRamAdapterTest {
     }
 
     @Test
-    public void finishAllTestRuns_cancelBatchSendingIsInvoked() throws IOException, FailedToCreateRamEntity {
+    public void finishAllTestRuns_cancelBatchSendingIsInvoked() throws FailedToCreateRamEntity {
         List<UUID> uuids = asList(UUID.randomUUID(), UUID.randomUUID());
         atpBulkImporterRamAdapter.finishAllTestRuns(uuids, true);
         verify(mockBulkLogRecordSender, times(1))
@@ -223,8 +223,7 @@ public class AtpImporterRamAdapterTest {
     }
 
     @Test
-    public void testStartAtpRun_RamInvocationFails_FailedToCreateRamEntityIsThrown()
-            throws IOException {
+    public void testStartAtpRun_RamInvocationFails_FailedToCreateRamEntityIsThrown() {
         assertThrows(FailedToCreateRamEntity.class, () -> {
             StartRunRequest startRunRequest = StartRunRequest.getRequestBuilder()
                     .setProjectName("Project")
@@ -292,7 +291,7 @@ public class AtpImporterRamAdapterTest {
                 + RamConstants.ER_PATH
                 + "/" + erId
                 + RamConstants.UPDATE_EXECUTION_STATUS_PATH
-                + "/" + newErStatus.toString()
+                + "/" + newErStatus
                 + "?projectId=" + projectId;
         atpImporterRamAdapter.updateExecutionRequestStatus(newErStatus, erId.toString());
         verify(requestUtils, times(1))
@@ -370,7 +369,7 @@ public class AtpImporterRamAdapterTest {
                 + RamConstants.ER_PATH
                 + "/" + erId
                 + RamConstants.UPDATE_EXECUTION_STATUS_PATH
-                + "/" + newErStatus.toString()
+                + "/" + newErStatus
                 + "?projectId=" + projectId;
         atpImporterRamAdapter.getContext().setExecutionRequestId(erId.toString());
         when(requestUtils.putRequest(eq(urlToUpdateErStatus), eq(null), eq(null)))

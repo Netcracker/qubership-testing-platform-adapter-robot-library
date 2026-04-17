@@ -18,6 +18,7 @@ package org.qubership.atp.adapter.common.adapters;
 
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -378,9 +379,9 @@ public class AtpImporterRamAdapter extends AbstractAdapter {
         return uploadUrlTemplate.formatted(
             message.getUuid(),
             context.getProjectId(),
-            URLEncoder.encode(fileName, RamConstants.UTF8_CHARSET),
+            URLEncoder.encode(fileName, StandardCharsets.UTF_8),
             contentType,
-            URLEncoder.encode(StringUtils.defaultIfEmpty(attachmentSource, ""), RamConstants.UTF8_CHARSET));
+            URLEncoder.encode(StringUtils.defaultIfEmpty(attachmentSource, ""), StandardCharsets.UTF_8));
     }
 
     @Override

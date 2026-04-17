@@ -21,7 +21,6 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.io.Serial;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import org.qubership.atp.adapter.tools.tacomponents.context.events.ClearValuesEvent;
@@ -36,9 +35,9 @@ import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 
 public class DefaultContextDataStorage implements ContextDataStorage {
-  @Serial
-  private static final long serialVersionUID = 6784082206451114536L;
-    private static final transient Function<ContextRecord<?>, Object> RECORD_TRANSFORMER = new Function<ContextRecord<?>, Object>() {
+    @Serial
+    private static final long serialVersionUID = 6784082206451114536L;
+    private static final Function<ContextRecord<?>, Object> RECORD_TRANSFORMER = new Function<>() {
         @Nullable
         public Object apply(@Nonnull ContextRecord<?> input) {
             return input.getValue();
@@ -79,12 +78,11 @@ public class DefaultContextDataStorage implements ContextDataStorage {
     }
 
     public <T> void putValues(@Nonnull Map<String, T> rawMap) {
-        Iterator var2 = rawMap.entrySet().iterator();
 
-        while(var2.hasNext()) {
-            Map.Entry<String, T> entry = (Map.Entry)var2.next();
+        for (Map.Entry<String, T> stringTEntry : rawMap.entrySet()) {
+            Map.Entry<String, T> entry = (Map.Entry) stringTEntry;
             if (entry.getKey() != null) {
-                this.putValue((String)entry.getKey(), entry.getValue());
+                this.putValue(entry.getKey(), entry.getValue());
             }
         }
 
@@ -98,7 +96,7 @@ public class DefaultContextDataStorage implements ContextDataStorage {
 
     @Nullable
     public <T> T getValue(@Nonnull String key, @Nonnull T defaultValue) {
-        ContextRecord record = (ContextRecord)this.records.get(key);
+        ContextRecord record = this.records.get(key);
         return record == null ? defaultValue : (T) record.getValue();
     }
 
@@ -127,7 +125,7 @@ public class DefaultContextDataStorage implements ContextDataStorage {
 
     @Nonnull
     public <T> ContextRecord<T> getRecord(@Nonnull String key, @Nonnull ContextRecord<T> defaultRecord) {
-        ContextRecord record = (ContextRecord)this.records.get(key);
+        ContextRecord record = this.records.get(key);
         return record == null ? defaultRecord : record;
     }
 

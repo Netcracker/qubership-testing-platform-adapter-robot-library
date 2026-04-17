@@ -19,6 +19,7 @@ package org.qubership.atp.adapter.common.adapters;
 import static java.util.Arrays.asList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -161,8 +162,7 @@ public class AbstractAdapterTest {
     }
 
     @Test
-    public void startExecutionRequest_FailedToCreateEntityIsThrownInCaseOfBadResponse() throws
-            IOException {
+    public void startExecutionRequest_FailedToCreateEntityIsThrownInCaseOfBadResponse() {
       assertThrows(FailedToCreateRamEntity.class, () -> {
         ExecutionRequest createdRequest = createExecutionRequest();
         when(requestUtils.postRequest(any(String.class), any(ExecutionRequest.class), any()))
@@ -294,7 +294,7 @@ public class AbstractAdapterTest {
     }
 
     @Test
-    public void reportDetails_FailedToCreateRamEntityIsThrownInCaseOfRamResponseError() throws IOException {
+    public void reportDetails_FailedToCreateRamEntityIsThrownInCaseOfRamResponseError() {
       assertThrows(FailedToCreateRamEntity.class, () -> {
         when(requestUtils.postRequest(any(String.class), any(), any()))
             .thenThrow(new IOException("RAM error"));
@@ -433,7 +433,7 @@ public class AbstractAdapterTest {
     public void createBvLogRecordTest() {
         Message message = ModelMocks.generateMessage(TypeAction.BV.toString());
         LogRecord logRecord = abstractAdapter.createLogRecord(message, false, false);
-        assertTrue(logRecord instanceof BvLogRecord);
+        assertInstanceOf(BvLogRecord.class, logRecord);
     }
 
     @Test
@@ -441,56 +441,56 @@ public class AbstractAdapterTest {
         Message message = ModelMocks.generateMessage(TypeAction.MIA.toString());
         message.setIsGroup(true);
         LogRecord logRecord = abstractAdapter.createLogRecord(message, false, false);
-        assertTrue(logRecord instanceof MiaLogRecord);
+        assertInstanceOf(MiaLogRecord.class, logRecord);
     }
 
     @Test
     public void createUiLogRecordTest() {
         Message message = ModelMocks.generateMessage(TypeAction.UI.toString());
         LogRecord logRecord = abstractAdapter.createLogRecord(message, false, false);
-        assertTrue(logRecord instanceof UiLogRecord);
+        assertInstanceOf(UiLogRecord.class, logRecord);
     }
 
     @Test
     public void createItfLogRecordTest() {
         Message message = ModelMocks.generateMessage(TypeAction.ITF.toString());
         LogRecord logRecord = abstractAdapter.createLogRecord(message, true, false);
-        assertTrue(logRecord instanceof ItfLogRecord);
+        assertInstanceOf(ItfLogRecord.class, logRecord);
     }
 
     @Test
     public void createRestLogRecordTest() {
         Message message = ModelMocks.generateMessage(TypeAction.REST.toString());
         LogRecord logRecord = abstractAdapter.createLogRecord(message, false, false);
-        assertTrue(logRecord instanceof RestLogRecord);
+        assertInstanceOf(RestLogRecord.class, logRecord);
     }
 
     @Test
     public void createSqlLogRecordTest() {
         Message message = ModelMocks.generateMessage(TypeAction.SQL.toString());
         LogRecord logRecord = abstractAdapter.createLogRecord(message, false, false);
-        assertTrue(logRecord instanceof SqlLogRecord);
+        assertInstanceOf(SqlLogRecord.class, logRecord);
     }
 
     @Test
     public void createSshLogRecordTest() {
         Message message = ModelMocks.generateMessage(TypeAction.SSH.toString());
         LogRecord logRecord = abstractAdapter.createLogRecord(message, false, false);
-        assertTrue(logRecord instanceof SshLogRecord);
+        assertInstanceOf(SshLogRecord.class, logRecord);
     }
 
     @Test
     public void createCompoundLogRecordTest() {
         Message message = ModelMocks.generateMessage(TypeAction.COMPOUND.toString());
         LogRecord logRecord = abstractAdapter.createLogRecord(message, true, false);
-        assertTrue(logRecord instanceof CompoundLogRecord);
+        assertInstanceOf(CompoundLogRecord.class, logRecord);
     }
 
     @Test
     public void createTechnicalLogRecordTest() {
         Message message = ModelMocks.generateMessage(TypeAction.TECHNICAL.toString());
         LogRecord logRecord = abstractAdapter.createLogRecord(message, false, false);
-        assertTrue(logRecord instanceof TechnicalLogRecord);
+        assertInstanceOf(TechnicalLogRecord.class, logRecord);
 
     }
 
@@ -558,7 +558,7 @@ public class AbstractAdapterTest {
         List<CustomLink> resCustomLinks = logRecord.getCustomLinks();
         assertNotNull(resCustomLinks);
         Assertions.assertEquals(2, resCustomLinks.size());
-        CustomLink customLink = resCustomLinks.get(0);
+        CustomLink customLink = resCustomLinks.getFirst();
         Assertions.assertEquals("name1", customLink.getName());
         Assertions.assertEquals("http://url1", customLink.getUrl());
         Assertions.assertEquals(OpenMode.NEW_TAB, customLink.getOpenMode());

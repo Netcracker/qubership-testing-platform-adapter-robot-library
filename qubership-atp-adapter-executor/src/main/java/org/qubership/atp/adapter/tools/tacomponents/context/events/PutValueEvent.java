@@ -23,8 +23,8 @@ import jakarta.annotation.Nullable;
 
 public final class PutValueEvent<T> extends DataStorageEvent {
     @Nonnull
-    private String key;
-    private T value;
+    private final String key;
+    private final T value;
 
     public PutValueEvent(@Nonnull String key, @Nullable T value, @Nonnull ContextDataStorage dataStorage) {
         super(dataStorage);

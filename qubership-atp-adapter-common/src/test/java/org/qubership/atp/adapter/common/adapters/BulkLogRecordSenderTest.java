@@ -58,7 +58,7 @@ public class BulkLogRecordSenderTest {
     @Mock
     private RequestUtils requestUtils;
 
-  @BeforeEach
+    @BeforeEach
     public void setUp() {
         bulkLogRecordSender = BulkLogRecordSender.getInstance();
         bulkLogRecordSender.requestUtils = requestUtils;
@@ -77,7 +77,7 @@ public class BulkLogRecordSenderTest {
                 .postRequest(any(), argThat(batch ->
                                 (batch instanceof List<?> l && l.size() == 1 && l.contains(lrDto))),
                         eq(null));
-  }
+    }
 
     @Test
     public void startBatchSendingTask_scheduledTaskIsStarted_batchIsBoundedByBatchSizeParam() throws IOException,
@@ -151,7 +151,7 @@ public class BulkLogRecordSenderTest {
     }
 
     @Test
-    public void offer_scheduledIsNotStarted_exceptionIsThrown() throws IOException {
+    public void offer_scheduledIsNotStarted_exceptionIsThrown() {
         assertThrows(IllegalStateException.class, () -> {
             LogRecord logRecord = new LogRecord();
             logRecord.setUuid(UUID.randomUUID());
@@ -161,7 +161,7 @@ public class BulkLogRecordSenderTest {
     }
 
     @Test
-    public void offer_scheduledTaskIsStopped_exceptionIsThrown() throws IOException {
+    public void offer_scheduledTaskIsStopped_exceptionIsThrown() {
         assertThrows(IllegalStateException.class, () -> {
             bulkLogRecordSender.startBatchSendingTask(executionRequestId, projectId);
             bulkLogRecordSender.stopBatchSendingTask(executionRequestId);

@@ -28,23 +28,19 @@ public abstract class Filter<T> {
     public static <T> Filter or(final Filter<T>... filters) {
         return new Filter<T>() {
             public boolean match(T object) {
-                Filter[] var2 = filters;
-                int var3 = var2.length;
-
-                for(int var4 = 0; var4 < var3; ++var4) {
-                    Filter<T> filter = var2[var4];
+                for(int var4 = 0; var4 < filters.length; ++var4) {
+                    Filter<T> filter = ((Filter[]) filters)[var4];
                     if (filter.match(object)) {
                         return true;
                     }
                 }
-
                 return false;
             }
         };
     }
 
     public static <T extends Executable> Filter<T> executableByName(final String... names) {
-        return new Filter<T>() {
+        return new Filter<>() {
             public boolean match(T executable) {
                 return ArrayUtils.contains(names, executable.getName());
             }
@@ -52,7 +48,7 @@ public abstract class Filter<T> {
     }
 
     public static <T> Filter<T> noFilter() {
-        return new Filter<T>() {
+        return new Filter<>() {
             public boolean match(T o) {
                 return true;
             }
@@ -60,7 +56,7 @@ public abstract class Filter<T> {
     }
 
     public static <T extends Section> Filter<T> filterSectionByValidationLevel() {
-        return new Filter<T>() {
+        return new Filter<>() {
             public boolean match(T section) {
                 int level = section.getValidationLevel();
                 if (level > KeywordExecutor.validationLevel) {

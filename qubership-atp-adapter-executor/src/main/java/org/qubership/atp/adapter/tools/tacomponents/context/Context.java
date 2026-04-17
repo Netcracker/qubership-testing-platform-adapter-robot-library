@@ -22,8 +22,8 @@ import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 
 public final class Context {
-    private static ContextType defaultContextType;
-    private static ContextType globalContextType;
+    private static final ContextType defaultContextType;
+    private static final ContextType globalContextType;
 
     public Context() {
     }
@@ -92,4 +92,3 @@ public final class Context {
         globalContextType = ContextType.GLOBAL;
     }
 }
-

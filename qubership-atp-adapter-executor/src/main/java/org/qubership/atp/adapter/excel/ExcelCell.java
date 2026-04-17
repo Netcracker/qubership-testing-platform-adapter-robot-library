@@ -35,11 +35,11 @@ import org.qubership.atp.adapter.excel.exceptions.InvalidFormatOfSourceException
 import org.qubership.atp.adapter.excel.style.ExcelCellStyle;
 
 public class ExcelCell {
-    private static Log log = LogFactory.getLog(ExcelCell.class);
+    private static final Log log = LogFactory.getLog(ExcelCell.class);
     private Cell cell;
     private String value;
     private boolean isChanged = false;
-    private CellPosition position;
+    private final CellPosition position;
 
     public ExcelCell(Cell cell) {
         this.cell = cell;
@@ -82,8 +82,7 @@ public class ExcelCell {
                     } else {
                         result = form.formatCellValue(this.cell, evaluator);
                     }
-                } catch (Exception var6) {
-                    Exception e = var6;
+                } catch (Exception e) {
                     if (this.cell.getCellType() == 5) {
                         if (this.cell instanceof XSSFCell fCell) {
                             result = fCell.getErrorCellString();
@@ -91,11 +90,11 @@ public class ExcelCell {
                             result = "####";
                         }
                     }
-
-                    throw new InvalidFormatOfSourceException("Cell parsing error\tSheet: " + this.cell.getSheet().getSheetName() + ", " + "\tRow: " + (this.cell.getRowIndex() + 1) + ", " + "\tCell: " + (this.cell.getColumnIndex() + 1) + ", " + "\tValue: " + result, e);
+                    throw new InvalidFormatOfSourceException("Cell parsing error\tSheet: "
+                            + this.cell.getSheet().getSheetName() + ", " + "\tRow: " + (this.cell.getRowIndex() + 1)
+                            + ", " + "\tCell: " + (this.cell.getColumnIndex() + 1) + ", " + "\tValue: " + result, e);
                 }
             }
-
             return result;
         }
     }
@@ -134,17 +133,9 @@ public class ExcelCell {
             Method getCellFormatType = CellFormatPart.class.getDeclaredMethod("getCellFormatType", (Class[])null);
             getCellFormatType.setAccessible(true);
             return (CellFormatType)getCellFormatType.invoke(new CellFormatPart(dataFormatString.replaceAll(";", "")));
-        } catch (InvocationTargetException var3) {
-            InvocationTargetException e = var3;
-            e.printStackTrace();
-        } catch (IllegalAccessException var4) {
-            IllegalAccessException e = var4;
-            e.printStackTrace();
-        } catch (NoSuchMethodException var5) {
-            NoSuchMethodException e = var5;
-            e.printStackTrace();
+        } catch (InvocationTargetException | IllegalAccessException | NoSuchMethodException e) {
+            log.error(e);
         }
-
         log.error("CellFormatType can't be taken. General value will be returned.");
         return CellFormatType.GENERAL;
     }

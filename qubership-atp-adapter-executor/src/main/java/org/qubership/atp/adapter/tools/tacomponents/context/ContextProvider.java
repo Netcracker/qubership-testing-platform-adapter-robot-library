@@ -24,7 +24,7 @@ import jakarta.annotation.Nullable;
 
 abstract class ContextProvider implements ContextDataStorageProvider {
     @Nonnull
-    private ScopeModel scopeModel;
+    private final ScopeModel scopeModel;
 
     public ContextProvider(@Nonnull ScopeModel scopeModel) {
         Preconditions.checkNotNull(scopeModel, "Scope model cannot be null");
@@ -47,14 +47,11 @@ abstract class ContextProvider implements ContextDataStorageProvider {
 
     @Nonnull
     public ContextDataStorage getContextDataStorage() {
-        switch (this.getScopeModel()) {
-            case SINGLE:
-                return this.getForSingleScopeMode();
-            case MULTI:
-                return this.getForMultiScopeMode();
-            default:
-                return this.getForPrimitive();
-        }
+        return switch (this.getScopeModel()) {
+            case SINGLE -> this.getForSingleScopeMode();
+            case MULTI -> this.getForMultiScopeMode();
+            default -> this.getForPrimitive();
+        };
     }
 
     @Nullable
@@ -62,7 +59,6 @@ abstract class ContextProvider implements ContextDataStorageProvider {
         ThreadGroup threadGroup;
         for(threadGroup = Thread.currentThread().getThreadGroup(); !targetProviderClass.isAssignableFrom(threadGroup.getClass()) && threadGroup.getParent() != null; threadGroup = threadGroup.getParent()) {
         }
-
         return targetProviderClass.isAssignableFrom(threadGroup.getClass()) ? ((ContextDataStorageProvider)threadGroup).getContextDataStorage() : null;
     }
 }

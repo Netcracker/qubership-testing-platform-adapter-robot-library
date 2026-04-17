@@ -26,8 +26,8 @@ import org.apache.commons.logging.LogFactory;
 public class RouteGroup extends LinkedList<Route> {
     private static final Log log = LogFactory.getLog(RouteGroup.class);
     private final String name;
-  @Serial
-  private static final long serialVersionUID = -5456796519418419700L;
+    @Serial
+    private static final long serialVersionUID = -5456796519418419700L;
 
     public RouteGroup(String name) {
         this.name = name;
@@ -49,12 +49,12 @@ public class RouteGroup extends LinkedList<Route> {
     }
 
     public boolean addAll(Collection<? extends Route> c) {
-        this.logRouteAdding((Route[])c.toArray(new Route[c.size()]));
+        this.logRouteAdding(c.toArray(new Route[0]));
         return super.addAll(c);
     }
 
     public boolean addAll(int index, Collection<? extends Route> c) {
-        this.logRouteAdding((Route[])c.toArray(new Route[c.size()]));
+        this.logRouteAdding(c.toArray(new Route[0]));
         return super.addAll(index, c);
     }
 
@@ -65,19 +65,13 @@ public class RouteGroup extends LinkedList<Route> {
 
     protected void logRouteAdding(Route... c) {
         if (log.isTraceEnabled()) {
-            Route[] var2 = c;
-            int var3 = c.length;
-
-            for(int var4 = 0; var4 < var3; ++var4) {
-                Route e = var2[var4];
+            for (Route e : c) {
                 log.trace("Route added into " + this.getName() + " group:" + e);
             }
         }
-
     }
 
     public String getName() {
         return this.name;
     }
 }
-

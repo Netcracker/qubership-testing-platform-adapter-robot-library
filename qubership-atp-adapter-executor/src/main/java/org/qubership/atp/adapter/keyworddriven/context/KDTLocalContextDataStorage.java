@@ -16,7 +16,6 @@
 
 package org.qubership.atp.adapter.keyworddriven.context;
 
-import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.util.Collections;
@@ -37,7 +36,7 @@ import jakarta.annotation.Nullable;
 
 public class KDTLocalContextDataStorage implements ContextDataStorage {
     protected static final Map<Executable, ContextDataStorage> map = Collections.synchronizedMap(new WeakHashMap());
-    private EventBus eventBus = new EventBus();
+    private final EventBus eventBus = new EventBus();
 
     public KDTLocalContextDataStorage() {
     }
@@ -48,7 +47,7 @@ public class KDTLocalContextDataStorage implements ContextDataStorage {
 
     protected ContextDataStorage getStorage(Executable keyword) {
         synchronized(map) {
-            return (ContextDataStorage)map.computeIfAbsent(keyword, (k) -> {
+            return map.computeIfAbsent(keyword, (k) -> {
                 return new DefaultContextDataStorage();
             });
         }
@@ -68,7 +67,7 @@ public class KDTLocalContextDataStorage implements ContextDataStorage {
     }
 
     public <T> ContextRecord<T> putValue(@Nonnull final String key, @Nullable final T value) {
-        return (ContextRecord)this.get(KDTContextDataStorageProvider.get(), new com.google.common.base.Function<ContextDataStorage, ContextRecord<T>>() {
+        return this.get(KDTContextDataStorageProvider.get(), new com.google.common.base.Function<ContextDataStorage, ContextRecord<T>>() {
             @Nullable
             public ContextRecord<T> apply(@Nullable ContextDataStorage contextDataStorage) {
                 return contextDataStorage.putValue(key, value);
@@ -82,7 +81,7 @@ public class KDTLocalContextDataStorage implements ContextDataStorage {
 
     @Nullable
     public <T> T getValue(@Nonnull final String key) {
-        return this.get(KDTContextDataStorageProvider.get(), new com.google.common.base.Function<ContextDataStorage, T>() {
+        return this.get(KDTContextDataStorageProvider.get(), new com.google.common.base.Function<>() {
             @Nullable
             public T apply(@Nullable ContextDataStorage contextDataStorage) {
                 return contextDataStorage.getValue(key);
@@ -103,7 +102,7 @@ public class KDTLocalContextDataStorage implements ContextDataStorage {
 
     @Nonnull
     public Map<String, Object> getValues() {
-        return (Map)this.get(KDTContextDataStorageProvider.get(), new com.google.common.base.Function<ContextDataStorage, Map<String, Object>>() {
+        return this.get(KDTContextDataStorageProvider.get(), new com.google.common.base.Function<ContextDataStorage, Map<String, Object>>() {
             @Nullable
             public Map<String, Object> apply(@Nullable ContextDataStorage contextDataStorage) {
                 return contextDataStorage.getValues();
@@ -112,7 +111,7 @@ public class KDTLocalContextDataStorage implements ContextDataStorage {
     }
 
     public <T> ContextRecord<T> putRecord(@Nonnull final String key, @Nonnull final ContextRecord<T> record) {
-        return (ContextRecord)this.get(KDTContextDataStorageProvider.get(), new Function<ContextDataStorage, ContextRecord<T>>() {
+        return this.get(KDTContextDataStorageProvider.get(), new Function<ContextDataStorage, ContextRecord<T>>() {
             @Nullable
             public ContextRecord<T> apply(@Nullable ContextDataStorage contextDataStorage) {
                 return contextDataStorage.putRecord(key, record);
@@ -136,7 +135,7 @@ public class KDTLocalContextDataStorage implements ContextDataStorage {
 
     @Nonnull
     public <T> ContextRecord<T> getRecord(@Nonnull final String key, @Nonnull final ContextRecord<T> defaultRecord) {
-        return (ContextRecord)this.get(KDTContextDataStorageProvider.get(), new com.google.common.base.Function<ContextDataStorage, ContextRecord<T>>() {
+        return this.get(KDTContextDataStorageProvider.get(), new com.google.common.base.Function<ContextDataStorage, ContextRecord<T>>() {
             @Nullable
             public ContextRecord<T> apply(@Nullable ContextDataStorage contextDataStorage) {
                 return contextDataStorage.getRecord(key, defaultRecord);
@@ -146,7 +145,7 @@ public class KDTLocalContextDataStorage implements ContextDataStorage {
 
     @Nonnull
     public Map<String, ContextRecord<?>> getRecords() {
-        return (Map)this.get(KDTContextDataStorageProvider.get(), new com.google.common.base.Function<ContextDataStorage, Map<String, ContextRecord<?>>>() {
+        return this.get(KDTContextDataStorageProvider.get(), new com.google.common.base.Function<ContextDataStorage, Map<String, ContextRecord<?>>>() {
             @Nullable
             public Map<String, ContextRecord<?>> apply(@Nullable ContextDataStorage contextDataStorage) {
                 return contextDataStorage.getRecords();
@@ -167,11 +166,11 @@ public class KDTLocalContextDataStorage implements ContextDataStorage {
         return this.eventBus;
     }
 
-    public void writeExternal(ObjectOutput out) throws IOException {
+    public void writeExternal(ObjectOutput out) {
         throw new UnsupportedOperationException("writeExternal does not supported in KDT because no ATP integration here");
     }
 
-    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+    public void readExternal(ObjectInput in) {
         throw new UnsupportedOperationException("readExternal does not supported in KDT because no ATP integration here");
     }
 }

@@ -17,8 +17,8 @@
 package org.qubership.atp.adapter.excel;
 
 public class CellPosition implements Comparable {
-    private int rowNum;
-    private int colNum;
+    private final int rowNum;
+    private final int colNum;
 
     public CellPosition(int rowNum, int colNum) {
         this.rowNum = rowNum;

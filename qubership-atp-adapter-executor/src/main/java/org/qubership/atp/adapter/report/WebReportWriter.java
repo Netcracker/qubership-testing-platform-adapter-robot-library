@@ -16,7 +16,6 @@
 
 package org.qubership.atp.adapter.report;
 
-import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -25,7 +24,6 @@ import java.nio.channels.FileChannel;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -54,28 +52,28 @@ public class WebReportWriter extends AbstractWebReportWriter {
     private static final String LOG_REPORT_SNAPSHOTS = "report.log.snapshots";
     private static final String SPLIT_REPORT = "report.split.enable";
     private static final boolean SHOW_PAGE_SOURCES;
-    private static ReportThreadLocal report;
-    private static ArrayList<File> snapshotFiles;
-    private static ThreadLocal<String> reportFiles;
+    private static final ReportThreadLocal report;
+    private static final ArrayList<File> snapshotFiles;
+    private static final ThreadLocal<String> reportFiles;
     private String reportEncoding;
-    private Stack<String> currentLogCallStack = new Stack();
+    private final Stack<String> currentLogCallStack = new Stack<>();
     private String currentLogName = null;
     private int msgId = 0;
     private int maxPriorityReported = 20000;
-    private Stack<Long> timeStack = new Stack();
+    private final Stack<Long> timeStack = new Stack<>();
     private File reportFile;
     private long reportFileLength;
     private long indexPosition;
     private File reportDir;
     private boolean logReportSnapshots = false;
     private String description = "";
-    private List<Logger> customLoggers;
+    private final List<Logger> customLoggers;
     private int logId = 0;
     private int pageId = 0;
     private int reportCounter = 0;
     private boolean isInit = false;
-    private static String reportJarDir;
-    private String threadName = Thread.currentThread().getName();
+    private static final String reportJarDir;
+    private final String threadName = Thread.currentThread().getName();
 
     public String getThreadName() {
         return this.threadName;
@@ -127,7 +125,7 @@ public class WebReportWriter extends AbstractWebReportWriter {
     }
 
     private static WebReportWriter reportToThreadlocal(WebReportWriter report) {
-        report = new WebReportWriter((Properties)null);
+        report = new WebReportWriter(null);
         WebReportWriter.report.set(report);
         return report;
     }
@@ -149,7 +147,7 @@ public class WebReportWriter extends AbstractWebReportWriter {
 
     public synchronized void openLog(String logName, String description) {
         if (Boolean.parseBoolean(Config.getString("report.split.enable"))) {
-            this.createReportDir((Properties)null);
+            this.createReportDir(null);
         }
 
         if (!this.isInit || Boolean.parseBoolean(Config.getString("report.split.enable"))) {
@@ -190,7 +188,7 @@ public class WebReportWriter extends AbstractWebReportWriter {
                 this.appendReportFile(this.formatMessageClose());
             }
 
-            this.appendReportFile(this.formatMessageTime((Long)this.timeStack.lastElement(), System.currentTimeMillis()) + "</LOG>");
+            this.appendReportFile(this.formatMessageTime(this.timeStack.lastElement(), System.currentTimeMillis()) + "</LOG>");
             FileChannel indexFileChannel = null;
 
             try {
@@ -201,7 +199,7 @@ public class WebReportWriter extends AbstractWebReportWriter {
             } catch (IOException var6) {
                 log.error("Unable to write to index file", var6);
             } finally {
-                Utils.close(new Closeable[]{indexFileChannel});
+                Utils.close(indexFileChannel);
             }
 
         }
@@ -209,12 +207,10 @@ public class WebReportWriter extends AbstractWebReportWriter {
 
     public synchronized void openSection(String sectionName, String message, SourceProvider page, LinkedHashMap<Object, Object> addValues) {
         this.currentLogCallStack.push(sectionName);
-        this.appendReportFile(this.formatMessageOpen(sectionName, (Level)null, message, page, addValues), this.reportFileLength);
-        Iterator i$ = this.customLoggers.iterator();
+        this.appendReportFile(this.formatMessageOpen(sectionName, null, message, page, addValues), this.reportFileLength);
 
-        while(i$.hasNext()) {
-            Logger logger = (Logger)i$.next();
-            logger.info(this.currentLogCallStack.toString() + " Section - " + sectionName);
+        for (Logger logger : this.customLoggers) {
+            logger.info(this.currentLogCallStack + " Section - " + sectionName);
         }
 
         this.timeStack.push(System.currentTimeMillis());
@@ -224,23 +220,21 @@ public class WebReportWriter extends AbstractWebReportWriter {
     public synchronized void closeSection() {
         if (!this.currentLogCallStack.isEmpty()) {
             this.currentLogCallStack.pop();
-            this.appendReportFile(this.formatMessageTime((Long)this.timeStack.pop(), System.currentTimeMillis()) + this.formatMessageClose(), this.reportFileLength);
+            this.appendReportFile(this.formatMessageTime(this.timeStack.pop(), System.currentTimeMillis()) + this.formatMessageClose(), this.reportFileLength);
             this.appendTail();
         }
     }
 
     public synchronized void message(String title, Level level, String message, SourceProvider page) {
-        this.message(title, level, message, page, (LinkedHashMap)null);
+        this.message(title, level, message, page, null);
     }
 
     public synchronized void message(String title, Level level, String message, SourceProvider page, LinkedHashMap<Object, Object> addValues) {
         this.maxPriorityReported = Math.max(this.maxPriorityReported, level.toInt());
         this.appendReportFile(this.formatMessageOpen(title, level, message, page, addValues) + this.formatMessageClose(), this.reportFileLength);
-        String msg = this.currentLogCallStack.toString() + " Title: " + (title == null ? "" : title) + ", Message: " + (message == null ? "" : message);
-        Iterator i$ = this.customLoggers.iterator();
+        String msg = this.currentLogCallStack + " Title: " + (title == null ? "" : title) + ", Message: " + (message == null ? "" : message);
 
-        while(i$.hasNext()) {
-            Logger customerLogger = (Logger)i$.next();
+        for (Logger customerLogger : this.customLoggers) {
             customerLogger.log(level, msg);
         }
 
@@ -287,10 +281,8 @@ public class WebReportWriter extends AbstractWebReportWriter {
 
         if (addValues != null) {
             Pattern NON_ALPHANUMERIC = Pattern.compile("[^a-zA-Z0-9_]*");
-            Iterator i$ = addValues.keySet().iterator();
 
-            while(i$.hasNext()) {
-                Object keyO = i$.next();
+            for (Object keyO : addValues.keySet()) {
                 String key;
                 if (!(key = NON_ALPHANUMERIC.matcher(keyO.toString()).replaceAll("")).isEmpty()) {
                     result.append(" %s=\"%s\"".formatted(key, addValues.get(keyO).toString()));
@@ -299,7 +291,7 @@ public class WebReportWriter extends AbstractWebReportWriter {
         }
 
         result.append(">");
-        result.append("<title><![CDATA[").append(title != null && title.length() > 0 ? title : "[message]").append("]]></title>");
+        result.append("<title><![CDATA[").append(title != null && !title.isEmpty() ? title : "[message]").append("]]></title>");
         result.append("<message><![CDATA[").append(message).append("]]></message>");
         return result.toString();
     }
@@ -323,11 +315,11 @@ public class WebReportWriter extends AbstractWebReportWriter {
             int seconds = remainder % 60;
             StringBuilder result = new StringBuilder();
             if (hours > 0) {
-                result.append((hours < 10 ? "0" : "") + hours).append(":");
+                result.append(hours < 10 ? "0" : "").append(hours).append(":");
             }
 
             if (minutes > 0 || hours > 0) {
-                result.append((minutes < 10 ? "0" : "") + minutes).append(":");
+                result.append(minutes < 10 ? "0" : "").append(minutes).append(":");
             }
 
             if (hours <= 0 && minutes <= 0) {
@@ -338,7 +330,7 @@ public class WebReportWriter extends AbstractWebReportWriter {
                     result.append(" seconds");
                 }
             } else {
-                result.append((seconds < 10 ? "0" : "") + seconds);
+                result.append(seconds < 10 ? "0" : "").append(seconds);
             }
 
             return result.toString();
@@ -366,19 +358,16 @@ public class WebReportWriter extends AbstractWebReportWriter {
                 } else {
                     fileChannel.write(ByteBuffer.wrap(dataBytes), fileChannel.size());
                 }
-            } catch (IOException var15) {
-                IOException e = var15;
+            } catch (IOException e) {
                 log.error("Unable to write to " + this.reportFile.getName(), e);
             } finally {
                 try {
                     if (fileChannel != null) {
                         fileChannel.close();
                     }
-                } catch (IOException var14) {
-                    IOException e = var14;
+                } catch (IOException e) {
                     log.error("Unable to close " + this.reportFile.getName(), e);
                 }
-
             }
 
         }
@@ -394,7 +383,7 @@ public class WebReportWriter extends AbstractWebReportWriter {
             return "";
         } else {
             getWebReportWriter();
-            return ((String)reportFiles.get()).replaceAll("report[0-9]*.xml", "report.html");
+            return reportFiles.get().replaceAll("report[0-9]*.xml", "report.html");
         }
     }
 
@@ -409,14 +398,14 @@ public class WebReportWriter extends AbstractWebReportWriter {
     }
 
     private static class ReportThreadLocal extends ThreadLocal<WebReportWriter> {
-        private static boolean isReportThreadLocal = Config.getBoolean("report.thread.local", true);
+        private static final boolean isReportThreadLocal = Config.getBoolean("report.thread.local", true);
         private WebReportWriter report;
 
         private ReportThreadLocal() {
         }
 
         public WebReportWriter get() {
-            return isReportThreadLocal ? (WebReportWriter)super.get() : this.report;
+            return isReportThreadLocal ? super.get() : this.report;
         }
 
         public void set(WebReportWriter value) {

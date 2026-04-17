@@ -22,7 +22,7 @@ import jakarta.annotation.Nonnull;
 
 public final class RemoveValueEvent extends DataStorageEvent {
     @Nonnull
-    private String key;
+    private final String key;
 
     public RemoveValueEvent(@Nonnull String key, @Nonnull ContextDataStorage dataStorage) {
         super(dataStorage);

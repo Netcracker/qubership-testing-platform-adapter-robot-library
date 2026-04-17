@@ -41,7 +41,7 @@ abstract class ContextThreadGroup extends ThreadGroup implements ContextDataStor
     }
 
     public void setContextDataStorage(@Nullable ContextDataStorage contextDataStorage) {
-        this.contextDataStorage = (ContextDataStorage)(contextDataStorage == null ? new DefaultContextDataStorage() : contextDataStorage);
+        this.contextDataStorage = contextDataStorage == null ? new DefaultContextDataStorage() : contextDataStorage;
     }
 }
 

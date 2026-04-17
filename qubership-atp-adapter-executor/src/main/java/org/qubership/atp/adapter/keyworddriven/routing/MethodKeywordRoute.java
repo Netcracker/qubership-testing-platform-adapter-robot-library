@@ -16,7 +16,6 @@
 
 package org.qubership.atp.adapter.keyworddriven.routing;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -32,35 +31,35 @@ public class MethodKeywordRoute extends Route {
     private static final Log log = LogFactory.getLog(MethodKeywordRoute.class);
 
     public MethodKeywordRoute(String[] keywordMask, Class<?> actionClass, String methodName, Class<?>... signature) {
-        this((String)null, keywordMask, (Class)null, actionClass, methodName, signature, (Object[])null);
+        this(null, keywordMask, null, actionClass, methodName, signature, null);
     }
 
     public MethodKeywordRoute(String description, String[] keywordMask, Class<?> actionClass, String methodName, Class<?>... signature) {
-        this(description, keywordMask, (Class)null, actionClass, methodName, signature, (Object[])null);
+        this(description, keywordMask, null, actionClass, methodName, signature, null);
     }
 
     public MethodKeywordRoute(String[] keywordMask, Class<?> actionClass, String methodName, Class<?>[] signature, Object[] defaultValues) {
-        this((String)null, keywordMask, (Class)null, actionClass, methodName, signature, defaultValues);
+        this((String)null, keywordMask, null, actionClass, methodName, signature, defaultValues);
     }
 
     public MethodKeywordRoute(String description, String[] keywordMask, Class<?> actionClass, String methodName, Class<?>[] signature, Object[] defaultValues) {
-        this(description, keywordMask, (Class)null, actionClass, methodName, signature, defaultValues);
+        this(description, keywordMask, null, actionClass, methodName, signature, defaultValues);
     }
 
     public MethodKeywordRoute(boolean isDeprecated, String description, String[] keywordMask, Class<?> actionClass, String methodName, Class<?>[] signature, Object[] defaultValues) {
-        this(isDeprecated, description, keywordMask, (Class)null, actionClass, methodName, signature, defaultValues);
+        this(isDeprecated, description, keywordMask, null, actionClass, methodName, signature, defaultValues);
     }
 
     public MethodKeywordRoute(String[] keywordMask, Class<? extends ActionMethodExecutor> handler, Class<?> actionClass, String methodName, Class<?>[] signature, Object[] defaultValues) {
-        this((String)null, keywordMask, handler, actionClass, methodName, signature, defaultValues);
+        this(null, keywordMask, handler, actionClass, methodName, signature, defaultValues);
     }
 
     public MethodKeywordRoute(String[] keywordMask, Class<? extends ActionMethodExecutor> handler, Class<?> actionClass, String methodName, Class<?>[] signature) {
-        this((String)null, keywordMask, handler, actionClass, methodName, signature, (Object[])null);
+        this(null, keywordMask, handler, actionClass, methodName, signature, null);
     }
 
     public MethodKeywordRoute(String description, String[] keywordMask, Class<? extends ActionMethodExecutor> handler, Class<?> actionClass, String methodName, Class<?>[] signature, Object[] defaultValues) {
-        this(false, (String)null, keywordMask, handler, actionClass, methodName, signature, (Object[])null);
+        this(false, null, keywordMask, handler, actionClass, methodName, signature, null);
     }
 
     public MethodKeywordRoute(boolean deprecated, String description, String[] keywordMask, Class<? extends ActionMethodExecutor> handler, Class<?> actionClass, String methodName, Class<?>[] signature, Object[] defaultValues) {
@@ -92,8 +91,8 @@ public class MethodKeywordRoute extends Route {
         }
     }
 
-    protected static ActionMethodExecutor getExecutor(Class<? extends ActionMethodExecutor> clazz, Method method, Collection<RouteItem> defaultValues) throws IllegalArgumentException, SecurityException, InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
-        ActionMethodExecutor res = (ActionMethodExecutor)clazz.newInstance();
+    protected static ActionMethodExecutor getExecutor(Class<? extends ActionMethodExecutor> clazz, Method method, Collection<RouteItem> defaultValues) throws IllegalArgumentException, SecurityException, InstantiationException, IllegalAccessException {
+        ActionMethodExecutor res = clazz.newInstance();
         res.setMethod(method);
         res.setDefaultValues(defaultValues);
         return res;
@@ -118,18 +117,14 @@ public class MethodKeywordRoute extends Route {
 
     private static String toString(Class<?>... classes) {
         StringBuilder sb = new StringBuilder();
-        Class[] var2 = classes;
-        int var3 = classes.length;
-
-        for(int var4 = 0; var4 < var3; ++var4) {
-            Class clazz = var2[var4];
+        for(int var4 = 0; var4 < classes.length; ++var4) {
+            Class clazz = ((Class[]) classes)[var4];
             sb.append(clazz.getCanonicalName()).append(", ");
         }
 
-        if (sb.length() > 0) {
+        if (!sb.isEmpty()) {
             sb.delete(sb.length() - 2, sb.length());
         }
-
         return sb.toString();
     }
 

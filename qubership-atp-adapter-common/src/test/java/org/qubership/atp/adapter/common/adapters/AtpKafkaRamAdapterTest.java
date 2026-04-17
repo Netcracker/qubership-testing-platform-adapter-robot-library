@@ -17,7 +17,6 @@
 package org.qubership.atp.adapter.common.adapters;
 
 import static java.util.Arrays.asList;
-import static net.sf.ezmorph.test.ArrayAssertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -28,6 +27,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -70,14 +70,14 @@ public class AtpKafkaRamAdapterTest {
         Table.Row row = new Table.Row();
         row.setCells(new LinkedList<>(asList(cell1, cell2)));
         Table table = new Table();
-        table.setRows(new LinkedList<>(asList(row)));
+        table.setRows(new LinkedList<>(List.of(row)));
         logRecord.setTable(table);
         KafkaLogRecord.LogRecord.Builder builder = atpKafkaRamAdapter.createKafkaLogRecord(logRecord);
         assertTrue(builder.hasTable());
-        assertEquals(1, builder.getTable().getRowsCount());
-        assertEquals(2, builder.getTable().getRowsList().get(0).getCellsCount());
-        assertEquals("value1", builder.getTable().getRowsList().get(0).getCellsList().get(0).getValue());
-        assertEquals("value2", builder.getTable().getRowsList().get(0).getCellsList().get(1).getValue());
+        Assertions.assertEquals(1, builder.getTable().getRowsCount());
+        Assertions.assertEquals(2, builder.getTable().getRowsList().getFirst().getCellsCount());
+        Assertions.assertEquals("value1", builder.getTable().getRowsList().getFirst().getCellsList().get(0).getValue());
+        Assertions.assertEquals("value2", builder.getTable().getRowsList().getFirst().getCellsList().get(1).getValue());
     }
 
     @Test
@@ -91,15 +91,15 @@ public class AtpKafkaRamAdapterTest {
         KafkaLogRecord.LogRecord.Builder builder = atpKafkaRamAdapter.createKafkaLogRecord(logRecord);
         List<KafkaLogRecord.CustomLink> resCustomLinks = builder.getCustomLinksList();
         assertNotNull(resCustomLinks);
-        assertEquals(2, resCustomLinks.size());
-        KafkaLogRecord.CustomLink customLink = resCustomLinks.get(0);
-        assertEquals("name1", customLink.getName());
-        assertEquals("http://url1", customLink.getUrl());
-        assertEquals("NEW_TAB", customLink.getOpenMode());
+        Assertions.assertEquals(2, resCustomLinks.size());
+        KafkaLogRecord.CustomLink customLink = resCustomLinks.getFirst();
+        Assertions.assertEquals("name1", customLink.getName());
+        Assertions.assertEquals("http://url1", customLink.getUrl());
+        Assertions.assertEquals("NEW_TAB", customLink.getOpenMode());
         customLink = resCustomLinks.get(1);
-        assertEquals("name2", customLink.getName());
-        assertEquals("http://url2", customLink.getUrl());
-        assertEquals("CURRENT_TAB", customLink.getOpenMode());
+        Assertions.assertEquals("name2", customLink.getName());
+        Assertions.assertEquals("http://url2", customLink.getUrl());
+        Assertions.assertEquals("CURRENT_TAB", customLink.getOpenMode());
     }
 
     public static LogRecord prepareLogRecord() {

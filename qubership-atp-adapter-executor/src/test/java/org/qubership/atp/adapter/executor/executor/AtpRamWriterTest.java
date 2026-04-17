@@ -40,8 +40,8 @@ import org.qubership.atp.ram.enums.TypeAction;
 
 public class AtpRamWriterTest {
     private MockedStatic<TestRunContextHolder> mockedTestRunContextHolder;
-    private org.qubership.atp.adapter.executor.executor.AtpRamWriter writer = Mockito.spy(new AtpRamWriter());
-    private AtpReceiverRamAdapter atpReceiverRamAdapter = Mockito.mock(AtpReceiverRamAdapter.class);
+    private final org.qubership.atp.adapter.executor.executor.AtpRamWriter writer = Mockito.spy(new AtpRamWriter());
+    private final AtpReceiverRamAdapter atpReceiverRamAdapter = Mockito.mock(AtpReceiverRamAdapter.class);
 
     @BeforeEach
     public void setUp() {

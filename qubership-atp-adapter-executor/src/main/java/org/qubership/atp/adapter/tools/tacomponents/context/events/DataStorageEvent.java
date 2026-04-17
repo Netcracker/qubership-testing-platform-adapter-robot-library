@@ -22,7 +22,7 @@ import jakarta.annotation.Nonnull;
 
 abstract class DataStorageEvent {
     @Nonnull
-    private ContextDataStorage dataStorage;
+    private final ContextDataStorage dataStorage;
 
     DataStorageEvent(@Nonnull ContextDataStorage dataStorage) {
         this.dataStorage = dataStorage;

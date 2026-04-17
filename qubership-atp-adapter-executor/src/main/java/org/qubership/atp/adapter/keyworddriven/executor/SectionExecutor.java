@@ -33,7 +33,7 @@ import org.qubership.atp.adapter.utils.KDTUtils;
 
 public class SectionExecutor implements Executor {
     private static final Log log = LogFactory.getLog(SectionExecutor.class);
-    private List<ExecuteListener> executeListeners = new ArrayList();
+    private final List<ExecuteListener> executeListeners = new ArrayList<>();
 
     public SectionExecutor() {
     }
@@ -54,13 +54,9 @@ public class SectionExecutor implements Executor {
     }
 
     public void prepare(Executable executable) {
-        Iterator var2 = executable.getChildren().iterator();
-
-        while(var2.hasNext()) {
-            Executable child = (Executable)var2.next();
+        for (Executable child : executable.getChildren()) {
             child.prepare();
         }
-
     }
 
     public void addExecuteListener(ExecuteListener listener) {
@@ -72,23 +68,15 @@ public class SectionExecutor implements Executor {
     }
 
     public void executeBefore(Executable executable) {
-        Iterator var2 = this.executeListeners.iterator();
-
-        while(var2.hasNext()) {
-            ExecuteListener listener = (ExecuteListener)var2.next();
+        for (ExecuteListener listener : this.executeListeners) {
             listener.beforeExecute(executable);
         }
-
     }
 
     public void executeAfter(Executable executable) {
-        Iterator var2 = this.executeListeners.iterator();
-
-        while(var2.hasNext()) {
-            ExecuteListener listener = (ExecuteListener)var2.next();
+        for (ExecuteListener listener : this.executeListeners) {
             listener.afterExecute(executable);
         }
-
     }
 
     private boolean skip(Executable executable) {
@@ -102,30 +90,25 @@ public class SectionExecutor implements Executor {
     }
 
     protected void executeChildren(Section section) throws Exception {
-        Iterator<Executable> childen = section.getChildren().iterator();
+        Iterator<Executable> children = section.getChildren().iterator();
         Executable current = null;
-
         try {
-            while(childen.hasNext()) {
-                current = (Executable)childen.next();
+            while(children.hasNext()) {
+                current = children.next();
                 current.execute();
             }
-        } catch (Exception var9) {
-            Exception e = var9;
+        } catch (Exception e) {
             if (!ExceptionUtils.isHandled(e)) {
                 TestCaseException handledException = ExceptionUtils.handle(e, "Error occurred during execution section: " + current + ".\n Error: " + e.getMessage());
                 Report.getReport().message(handledException);
                 throw handledException;
             }
-
             throw e;
         } finally {
-            while(childen.hasNext()) {
-                Report.getReport().message(new BlockedExecutable((Executable)childen.next()));
+            while(children.hasNext()) {
+                Report.getReport().message(new BlockedExecutable(children.next()));
             }
-
         }
-
     }
 }
 

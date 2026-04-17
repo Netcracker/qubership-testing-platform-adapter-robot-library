@@ -169,7 +169,7 @@ public class WebReportWriterJoint extends AbstractWebReportWriter {
 
     public synchronized void openSection(String sectionName, String message, SourceProvider page) {
         this.log().currentLogCallStack.push(sectionName);
-        this.appendReportFile(this.formatMessageOpen(sectionName, (Level)null, message, page), this.log().reportFileLength);
+        this.appendReportFile(this.formatMessageOpen(sectionName, null, message, page), this.log().reportFileLength);
 
         for (Logger logger : this.customLoggers) {
             logger.info(this.log().currentLogCallStack.toString() + " Section - " + sectionName);

@@ -25,7 +25,6 @@ import java.util.LinkedHashMap;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
-import org.qubership.atp.adapter.keyworddriven.ActionExecutionException;
 import org.qubership.atp.adapter.keyworddriven.ActionsFactory;
 import org.qubership.atp.adapter.keyworddriven.ParametersHandlerException;
 import org.qubership.atp.adapter.keyworddriven.databinder.Calculators;
@@ -73,7 +72,7 @@ public abstract class ActionMethodExecutor implements ActionExecutor {
         return sb.toString();
     }
 
-    protected abstract void execute(Object var1, Method var2, Object[] var3) throws ActionExecutionException, Exception;
+    protected abstract void execute(Object var1, Method var2, Object[] var3) throws Exception;
 
     protected Object[] getActionArguments(Keyword keyword) throws ParametersHandlerException {
         LinkedHashMap<String, KeywordParameter> keywordParameters = keyword.getKeywordParameters();
@@ -83,15 +82,15 @@ public abstract class ActionMethodExecutor implements ActionExecutor {
 
         for(int i = 0; i < signature.length; ++i) {
             Type paramType = signature[i];
-            if (Calculators.getCalculator((Type)paramType) == null) {
+            if (Calculators.getCalculator(paramType) == null) {
                 paramType = this.method.getParameterTypes()[i];
             }
 
             Object param;
-            if (this.defaultValues != null && this.defaultValues.size() != 0) {
-                param = getParam(keywordParameters, this.defaultValues, (Type)paramType, numberParam);
+            if (this.defaultValues != null && !this.defaultValues.isEmpty()) {
+                param = getParam(keywordParameters, this.defaultValues, paramType, numberParam);
             } else {
-                param = getParam(keywordParameters, (Type)paramType, numberParam);
+                param = getParam(keywordParameters, paramType, numberParam);
             }
 
             arglist[numberParam] = param;
@@ -102,9 +101,9 @@ public abstract class ActionMethodExecutor implements ActionExecutor {
     }
 
     protected static Object getParam(LinkedHashMap<String, KeywordParameter> routeParameters, Collection<RouteItem> defaultValues, Type paramType, int numberParam) throws ParametersHandlerException {
-        RouteItem item = ((RouteItem[])defaultValues.toArray(new RouteItem[defaultValues.size()]))[numberParam];
+        RouteItem item = ((RouteItem[])defaultValues.toArray(new RouteItem[0]))[numberParam];
         if (item.isParameter()) {
-            KeywordParameter par = (KeywordParameter)routeParameters.get(item.getParamName());
+            KeywordParameter par = routeParameters.get(item.getParamName());
             return getCalc(paramType).calculate(par);
         } else {
             return item.getSource();

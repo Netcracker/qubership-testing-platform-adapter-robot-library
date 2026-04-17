@@ -25,7 +25,6 @@ import org.qubership.atp.adapter.keyworddriven.resources.ResourceFactory;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
-import jakarta.annotation.Nullable;
 
 public class BeforeAfterTestSuiteExecutor extends PooledTestSuiteExecutor {
     private static final Logger log = Logger.getLogger(PooledTestSuiteExecutor.class);
@@ -55,11 +54,7 @@ public class BeforeAfterTestSuiteExecutor extends PooledTestSuiteExecutor {
     }
 
     protected static Predicate<Executable> by(final TestCaseType testCaseType) {
-        return new Predicate<Executable>() {
-            public boolean apply(@Nullable Executable input) {
-                return testCaseType == TestCaseType.matches(input);
-            }
-        };
+        return input -> testCaseType == TestCaseType.matches(input);
     }
 }
 

@@ -33,9 +33,9 @@ import org.qubership.atp.adapter.testcase.Config;
 
 public class Report {
     private static Report instance;
-    private Queue<ReportWriter> reportWriters = new ConcurrentLinkedQueue();
-    private Queue<ReportAdapter> reportAdapters = new ConcurrentLinkedQueue();
-    private static ThreadLocal<Boolean> init = new ThreadLocal();
+    private final Queue<ReportWriter> reportWriters = new ConcurrentLinkedQueue<>();
+    private final Queue<ReportAdapter> reportAdapters = new ConcurrentLinkedQueue<>();
+    private static final ThreadLocal<Boolean> init = new ThreadLocal<>();
 
     private Report() {
     }
@@ -100,74 +100,67 @@ public class Report {
     }
 
     public void message(Object item) {
-        Iterator reportAdapterIterator = this.reportAdapters.iterator();
-
-        while(reportAdapterIterator.hasNext()) {
-            ReportAdapter adapter = (ReportAdapter)reportAdapterIterator.next();
-            Iterator reportWriterIterator = this.reportWriters.iterator();
-
-            while(reportWriterIterator.hasNext()) {
-                ReportWriter report = (ReportWriter)reportWriterIterator.next();
+        for (ReportAdapter adapter : this.reportAdapters) {
+            for (ReportWriter report : this.reportWriters) {
                 adapter.write(report, item);
             }
         }
-
     }
 
     public void info(String title) {
-        this.info(title, title, (SourceProvider)null);
+        this.info(title, title, null);
     }
 
     public void info(String title, String message) {
-        this.info(title, message, (SourceProvider)null);
+        this.info(title, message, null);
     }
 
     public void info(String title, String message, SourceProvider page) {
-        this.info(title, message, (LinkedHashMap)null, page);
+        this.info(title, message, null, page);
     }
 
     public void info(String title, String message, LinkedHashMap<Object, Object> addValues, SourceProvider page) {
-        this.message(title, Level.INFO, message, addValues, (Throwable)null, page);
+        this.message(title, Level.INFO, message, addValues, null, page);
     }
 
     public void warn(String title) {
-        this.warn(title, title, (SourceProvider)null);
+        this.warn(title, title, null);
     }
 
     public void warn(String title, String message) {
-        this.warn(title, message, (SourceProvider)null);
+        this.warn(title, message, null);
     }
 
     public void warn(String title, String message, SourceProvider page) {
-        this.warn(title, message, (LinkedHashMap)null, page);
+        this.warn(title, message, null, page);
     }
 
     public void warn(String title, String message, LinkedHashMap<Object, Object> addValues, SourceProvider page) {
-        this.message(title, Level.WARN, message, addValues, (Throwable)null, page);
+        this.message(title, Level.WARN, message, addValues, null, page);
     }
 
     public void error(String title) {
-        this.error(title, (String)title, (SourceProvider)null);
+        this.error(title, title, null);
     }
 
     public void error(String title, String message) {
-        this.error(title, (String)message, (SourceProvider)null);
+        this.error(title, message, null);
     }
 
     public void error(String title, Throwable t) {
-        this.error(title, (Throwable)t, (SourceProvider)null);
+        this.error(title, t, null);
     }
 
     public void error(String title, Throwable t, SourceProvider page) {
-        this.error(title, "", (LinkedHashMap)null, t, page);
+        this.error(title, "", null, t, page);
     }
 
     public void error(String title, String message, SourceProvider page) {
-        this.error(title, message, (LinkedHashMap)null, (Throwable)null, page);
+        this.error(title, message, null, null, page);
     }
 
     public void error(String title, String message, LinkedHashMap<Object, Object> addValues, SourceProvider page) {
-        this.error(title, message, addValues, (Throwable)null, page);
+        this.error(title, message, addValues, null, page);
     }
 
     public void error(String title, String message, LinkedHashMap<Object, Object> addValues, Throwable t, SourceProvider page) {
@@ -175,7 +168,7 @@ public class Report {
     }
 
     private void message(String title, Level level, String message, Throwable throwable, SourceProvider page) {
-        this.message(title, level, message, (LinkedHashMap)null, throwable, page);
+        this.message(title, level, message, null, throwable, page);
     }
 
     private void message(String title, Level level, String message, LinkedHashMap<Object, Object> addValues, Throwable throwable, SourceProvider page) {
@@ -199,7 +192,7 @@ public class Report {
     }
 
     public void openSection(String sectionName, String message, SourceProvider page) {
-        this.openSection(sectionName, message, (LinkedHashMap)null, page);
+        this.openSection(sectionName, message, null, page);
     }
 
     public void openSection(String sectionName, String message, LinkedHashMap<Object, Object> addValues, SourceProvider page) {
@@ -212,18 +205,14 @@ public class Report {
 
     public File getReportDir() {
         AbstractWebReportWriter abstractWebReportWriter = null;
-        Iterator i$ = this.reportWriters.iterator();
-
-        while(i$.hasNext()) {
-            ReportWriter reportWriter = (ReportWriter)i$.next();
+        for (ReportWriter reportWriter : this.reportWriters) {
             if (reportWriter instanceof WebReportWriterWraper webReportWriterWraper) {
                 abstractWebReportWriter = webReportWriterWraper.getWebReportWriter();
             } else if (reportWriter instanceof AbstractWebReportWriter writer) {
                 abstractWebReportWriter = writer;
             }
         }
-
-        return abstractWebReportWriter == null ? null : ((AbstractWebReportWriter)abstractWebReportWriter).getReportDir();
+        return abstractWebReportWriter == null ? null : abstractWebReportWriter.getReportDir();
     }
 
     static {
@@ -242,7 +231,6 @@ public class Report {
             getReport().addWriter(new GeneralReportWriter());
             getReport().addAdapter(new GeneralReportWriterAdapter());
         }
-
     }
 }
 

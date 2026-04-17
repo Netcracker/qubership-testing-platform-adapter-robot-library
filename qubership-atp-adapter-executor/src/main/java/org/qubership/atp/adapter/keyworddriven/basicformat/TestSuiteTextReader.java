@@ -34,14 +34,14 @@ import org.qubership.atp.adapter.testcase.Config;
 import org.qubership.atp.adapter.utils.KDTUtils;
 
 public class TestSuiteTextReader implements TestSuiteReader {
-    private static Log log = LogFactory.getLog(TestSuiteTextReader.class);
-    private static String TEST_SUITE_WORD = Config.getString("user.testsuite.name", "Test Suite:");
-    private static String TEST_CASE_WORD = Config.getString("user.testcase.name", "Test Case:");
-    private static String TEST_PARAMETERS_WORD = Config.getString("user.parameters.name", "Parameters:");
-    private static String TEST_KEYWORD_WORD = Config.getString("user.keyword.name", "Keyword:");
-    private static String TEST_DATA_SET_WORD = Config.getString("user.dataset.name", "Data Set:");
-    private List<String> lst = new ArrayList();
-    private List<TestCase> listTestCases = new ArrayList();
+    private static final Log log = LogFactory.getLog(TestSuiteTextReader.class);
+    private static final String TEST_SUITE_WORD = Config.getString("user.testsuite.name", "Test Suite:");
+    private static final String TEST_CASE_WORD = Config.getString("user.testcase.name", "Test Case:");
+    private static final String TEST_PARAMETERS_WORD = Config.getString("user.parameters.name", "Parameters:");
+    private static final String TEST_KEYWORD_WORD = Config.getString("user.keyword.name", "Keyword:");
+    private static final String TEST_DATA_SET_WORD = Config.getString("user.dataset.name", "Data Set:");
+    private List<String> lst = new ArrayList<>();
+    private List<TestCase> listTestCases = new ArrayList<>();
     private String fileLocation = "";
     private String fileName = "";
 
@@ -129,12 +129,12 @@ public class TestSuiteTextReader implements TestSuiteReader {
             List<TestCase> listCases = new ArrayList();
 
             for(int i = 0; i < this.lst.size(); ++i) {
-                String currentLine = ((String)this.lst.get(i)).trim();
+                String currentLine = this.lst.get(i).trim();
                 if (currentLine.startsWith(TEST_SUITE_WORD)) {
                     String testSuiteName = currentLine.substring(currentLine.indexOf(":") + 1).trim();
                     parent.setName(testSuiteName);
                 } else if (currentLine.startsWith(TEST_CASE_WORD)) {
-                    List<String> tmpTC = new ArrayList();
+                    List<String> tmpTC = new ArrayList<>();
                     String tcName = currentLine.substring(currentLine.indexOf(":") + 1).trim();
                     FileTestCase testCase = new FileTestCase(tcName, "", this.fileLocation);
                     this.fillParameter(testCase);
@@ -142,7 +142,7 @@ public class TestSuiteTextReader implements TestSuiteReader {
                     String nameOfBlock = "";
 
                     for(int j = i; j < this.lst.size(); ++j) {
-                        String currentScenarioLine = ((String)this.lst.get(j)).trim();
+                        String currentScenarioLine = this.lst.get(j).trim();
                         if (currentScenarioLine.startsWith(TEST_DATA_SET_WORD)) {
                             isSpecialBlock = true;
                         } else if (currentScenarioLine.startsWith(TEST_PARAMETERS_WORD)) {
@@ -156,8 +156,8 @@ public class TestSuiteTextReader implements TestSuiteReader {
                             nameOfBlock = currentScenarioLine.substring(currentScenarioLine.indexOf(":") + 1).trim();
                         }
 
-                        if (currentScenarioLine.length() > 0) {
-                            if (currentScenarioLine.startsWith(TEST_CASE_WORD) && tmpTC.size() > 0 || j == this.lst.size() - 1) {
+                        if (!currentScenarioLine.isEmpty()) {
+                            if (currentScenarioLine.startsWith(TEST_CASE_WORD) && !tmpTC.isEmpty() || j == this.lst.size() - 1) {
                                 if (StringUtils.isNotBlank(currentScenarioLine) && !isSpecialBlock && nameOfBlock.equals(testCase.getName()) && !currentScenarioLine.startsWith(TEST_CASE_WORD)) {
                                     tmpTC.add(currentScenarioLine);
                                 }

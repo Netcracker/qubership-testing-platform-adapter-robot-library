@@ -30,7 +30,7 @@ public enum ContextType {
     @Nonnull
     private static ScopeModel scopeModel = ScopeModel.PRIMITIVE;
 
-    private ContextType(@Nonnull ContextDataStorageProvider contextProvider) {
+    ContextType(@Nonnull ContextDataStorageProvider contextProvider) {
         this.contextProvider = contextProvider;
     }
 
@@ -61,7 +61,7 @@ public enum ContextType {
 
     @Nonnull
     public static ContextProvider produceContextProvider(@Nonnull ContextType contextType, @Nonnull ScopeModel model) {
-        return (ContextProvider)(contextType == GLOBAL ? new GlobalContextProvider(model) : new LocalContextProvider(model));
+        return contextType == GLOBAL ? new GlobalContextProvider(model) : new LocalContextProvider(model);
     }
 }
 

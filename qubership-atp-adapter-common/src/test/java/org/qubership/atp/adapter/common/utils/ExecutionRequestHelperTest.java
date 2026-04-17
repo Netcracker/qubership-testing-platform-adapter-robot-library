@@ -79,8 +79,7 @@ public class ExecutionRequestHelperTest {
     }
 
     @Test
-    public void getSolutionBuild_whenGetSolutionBuildNotEnabled_resultIsDefault()
-            throws IOException, ExecutionException, InterruptedException {
+    public void getSolutionBuild_whenGetSolutionBuildNotEnabled_resultIsDefault() throws IOException {
         SolutionBuildGetter getter1 = mock(SolutionBuildGetter.class);
         when(getter1.connectAndFetchPage(anyString()))
                 .thenReturn("9.3.NC.ATP.CD91\nbuild_number:32_9.3.NC.ATP.CD91_rev13108");
@@ -115,10 +114,9 @@ public class ExecutionRequestHelperTest {
 
     @Test
     public void testEqualsString() {
-        String a1 = new String("TEST");
-        String a2 = new String("TEST");
+        String a1 = "TEST";
+        String a2 = "TEST";
         System.out.println(a1 == a2);
         System.out.println(a1.equals(a2));
-
     }
 }

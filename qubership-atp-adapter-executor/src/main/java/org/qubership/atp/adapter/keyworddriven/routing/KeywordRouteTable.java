@@ -111,7 +111,7 @@ public class KeywordRouteTable {
                 log.error("No one route is found for keyword '{}'", keyword);
                 return null;
             } else if (result.size() == 1) {
-                return result.get(0);
+                return result.getFirst();
             } else {
                 log.error("More than one route is found for keyword '{}'. Matched routes: {}", keyword, result);
                 return null;
@@ -121,52 +121,34 @@ public class KeywordRouteTable {
 
     public static void calculateRoutesRating() {
         log.info("Routes calculation started");
-        Iterator var0 = routeGroups.values().iterator();
-
-        while(var0.hasNext()) {
-            List<Route> routeGroup = (List)var0.next();
-            Iterator var2 = routeGroup.iterator();
-
-            while(var2.hasNext()) {
-                Route route = (Route)var2.next();
+        for (RouteGroup routes : routeGroups.values()) {
+            List<Route> routeGroup = (List) routes;
+            for (Route route : routeGroup) {
                 int rating = 0;
-                Iterator var5 = routeGroups.values().iterator();
-
-                while(var5.hasNext()) {
-                    List<Route> routeGroup2 = (List)var5.next();
-                    Iterator var7 = routeGroup2.iterator();
-
-                    while(var7.hasNext()) {
-                        Route route2 = (Route)var7.next();
+                for (RouteGroup group : routeGroups.values()) {
+                    List<Route> routeGroup2 = (List) group;
+                    for (Route route2 : routeGroup2) {
                         if (route != route2 && route.isSubsetOf(route2)) {
                             ++rating;
                         }
                     }
                 }
-
                 route.setRating(rating);
             }
         }
-
         log.info("Routes calculation completed");
     }
 
     public static ArrayList<Route> getRoutesByName(String name) {
         ArrayList<Route> list = new ArrayList<>();
-        Iterator var2 = routeGroups.values().iterator();
-
-        while(var2.hasNext()) {
-            List<Route> routeGroup = (List)var2.next();
-            Iterator var4 = routeGroup.iterator();
-
-            while(var4.hasNext()) {
-                Route route = (Route)var4.next();
+        for (RouteGroup routes : routeGroups.values()) {
+            List<Route> routeGroup = (List) routes;
+            for (Route route : routeGroup) {
                 if (route.getName().equalsIgnoreCase(name)) {
                     list.add(route);
                 }
             }
         }
-
         return list;
     }
 
@@ -174,22 +156,17 @@ public class KeywordRouteTable {
         if (mapper == null) {
             KDTUtils.criticalMessAndExit("KeywordMapper is not specified. Default implementation is activated by adding parameter 'library.actions.*' with value = '" + DefaultConfiguration.class + "'");
         }
-
         mapper.assignData(keyword, route);
         checkAssignRouteAndExit(keyword);
     }
 
     private static void checkAssignRouteAndExit(Keyword keyword) {
         Route route = keyword.getRoute();
-        Iterator var2 = keyword.getDataItems().iterator();
-
-        while(var2.hasNext()) {
-            DataItem dataItem = (DataItem)var2.next();
+        for (DataItem dataItem : keyword.getDataItems()) {
             if (dataItem.getRouteItem() == null) {
                 KDTUtils.criticalMessAndExit("Fatal error in assigning route to keyword.\nRoute: " + route.toString() + "\nRoute Mask: " + route.getRouteMask() + "\nKeyword: " + keyword + "\nKeyword Compare String: " + keyword.getStringToCompare());
             }
         }
-
     }
 
     public static boolean matches(Keyword keyword, Route route) {
@@ -217,12 +194,11 @@ public class KeywordRouteTable {
         if (groupName == null || groupName.isEmpty()) {
             groupName = "Other";
         }
-
         if (!routeGroups.containsKey(groupName)) {
             routeGroups.put(groupName, new RouteGroup(groupName));
         }
 
-        return (List)routeGroups.get(groupName);
+        return routeGroups.get(groupName);
     }
 
     public static LinkedHashMap<String, RouteGroup> getRouteGroups() {

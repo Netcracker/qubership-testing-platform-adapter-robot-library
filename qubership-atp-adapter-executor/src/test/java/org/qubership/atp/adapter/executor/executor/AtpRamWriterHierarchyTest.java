@@ -62,7 +62,7 @@ public class AtpRamWriterHierarchyTest {
     @Mock
     private KafkaConfigurator kafkaConfigurator;
     private AtpKafkaRamAdapter adapter;
-    private Stack<LogRecord> expectedHierarchyLogRecords = new Stack<>();
+    private final Stack<LogRecord> expectedHierarchyLogRecords = new Stack<>();
 
     private static final UUID rootSectionId = UUID.randomUUID();
     private static final String rootSectionName = "Root Section";
@@ -83,7 +83,7 @@ public class AtpRamWriterHierarchyTest {
     private static final UUID rootLogRecordId = UUID.randomUUID();
     private static final String rootLogRecordName = "Root LogRecord";
 
-    private TestRunContext setUp(boolean stepIsLast) throws Exception {
+    private TestRunContext setUp(boolean stepIsLast) {
         try (MockedConstruction<KafkaConfigurator> mockKafkaConfigurator = Mockito.mockConstruction(KafkaConfigurator.class)) {
             try (MockedConstruction<KafkaProducer> mockKafkaProducer = Mockito.mockConstruction(KafkaProducer.class)) {
                 TestRunContext testRunContext = Utils.createTestRunContext(false);

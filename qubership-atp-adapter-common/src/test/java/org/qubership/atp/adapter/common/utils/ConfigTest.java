@@ -23,7 +23,7 @@ import org.junit.jupiter.api.Test;
 public class ConfigTest {
 
     @BeforeEach
-    public void setUp() throws Exception {
+    public void setUp() {
         System.clearProperty("atp.url");
     }
 
@@ -69,9 +69,9 @@ public class ConfigTest {
     public void systemPropertyShouldBePriority() {
         String value = "http://localhost:8081";
         String newValue = "http://localhost:8181";
-        Assertions.assertEquals(Config.getConfig().getProperty("atp.url"), value);
+        Assertions.assertEquals(value, Config.getConfig().getProperty("atp.url"));
         System.setProperty("atp.url", newValue);
-        System.out.println(Config.getConfig().getProperty("atp.url"));
+        //System.out.println(Config.getConfig().getProperty("atp.url"));
         Assertions.assertEquals(newValue, Config.getConfig().getProperty("atp.url"));
     }
 }

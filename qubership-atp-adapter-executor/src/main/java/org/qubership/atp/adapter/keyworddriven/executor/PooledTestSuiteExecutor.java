@@ -56,7 +56,7 @@ public class PooledTestSuiteExecutor extends SectionExecutor {
         log.info("[START] test suite execution: " + suite);
 
         try {
-            this.execute((Collection)suite.getChildren());
+            this.execute(suite.getChildren());
         } finally {
             ResourceFactory.getInstance().releaseResourcesAll();
             log.info("[END] test suite execution: " + suite.getName());
@@ -70,19 +70,15 @@ public class PooledTestSuiteExecutor extends SectionExecutor {
             public String apply(@Nullable Executable input) {
                 return input.getName();
             }
-        }).toString());
-        if (testCases.size() == 0) {
+        }));
+        if (testCases.isEmpty()) {
             log.warn("No one test case is specified for execution!");
         } else {
             ExecutorService threadPool = Executors.newFixedThreadPool(threadLimit);
-            List<Runnable> threads = this.prepareThreadList((Iterable)testCases);
-            Iterator var4 = threads.iterator();
-
-            while(var4.hasNext()) {
-                Runnable thread = (Runnable)var4.next();
+            List<Runnable> threads = this.prepareThreadList(testCases);
+            for (Runnable thread : threads) {
                 threadPool.execute(thread);
             }
-
             threadPool.shutdown();
             threadPool.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
         }
@@ -91,12 +87,12 @@ public class PooledTestSuiteExecutor extends SectionExecutor {
     /** @deprecated */
     @Deprecated
     protected List<Runnable> prepareThreadList(Executable executable) {
-        return this.prepareThreadList((Iterable)executable.getChildren());
+        return this.prepareThreadList(executable.getChildren());
     }
 
     protected List<Runnable> prepareThreadList(Iterable<Executable> testCases) {
-        List<Runnable> threads = new ArrayList();
-        Map<String, List<Executable>> threadNameMap = new LinkedHashMap();
+        List<Runnable> threads = new ArrayList<>();
+        Map<String, List<Executable>> threadNameMap = new LinkedHashMap<>();
         Iterator var4 = testCases.iterator();
 
         while(true) {
@@ -107,7 +103,7 @@ public class PooledTestSuiteExecutor extends SectionExecutor {
                         if (threadNameMap.get(ftc.getThreadName()) != null) {
                             ((List)threadNameMap.get(ftc.getThreadName())).add(ftc);
                         } else {
-                            ArrayList<Executable> list = new ArrayList();
+                            ArrayList<Executable> list = new ArrayList<>();
                             list.add(ftc);
                             threadNameMap.put(ftc.getThreadName(), list);
                         }
@@ -122,7 +118,7 @@ public class PooledTestSuiteExecutor extends SectionExecutor {
 
             while(var4.hasNext()) {
                 List<Executable> list = (List)var4.next();
-                threads.add(new ExecutableRunnable((Executable[])list.toArray(new Executable[0])));
+                threads.add(new ExecutableRunnable(list.toArray(new Executable[0])));
             }
 
             return threads;
@@ -138,7 +134,7 @@ public class PooledTestSuiteExecutor extends SectionExecutor {
     }
 
     public static class ExecutableRunnable implements Runnable {
-        private Executable[] executables;
+        private final Executable[] executables;
 
         public ExecutableRunnable(Executable... executables) {
             this.executables = executables;
@@ -149,23 +145,16 @@ public class PooledTestSuiteExecutor extends SectionExecutor {
         }
 
         public void run() {
-            Executable[] var1 = this.executables;
-            int var2 = var1.length;
-
-            for(int var3 = 0; var3 < var2; ++var3) {
-                Executable executable = var1[var3];
-
+            for (Executable executable : this.executables) {
                 try {
                     ReportUtils.setReportFolderName(executable.getName());
                     executable.execute();
-                } catch (Throwable var9) {
-                    Throwable e = var9;
+                } catch (Throwable e) {
                     PooledTestSuiteExecutor.handleException(executable, e);
                 } finally {
                     this.releaseResources();
                 }
             }
-
             Resources.releaseResourcesForCurrentThreadSilently();
         }
 
@@ -176,11 +165,7 @@ public class PooledTestSuiteExecutor extends SectionExecutor {
 
             Throwable e;
             try {
-                Executable[] var7 = this.executables;
-                int var2 = var7.length;
-
-                for(int var3 = 0; var3 < var2; ++var3) {
-                    Executable executable = var7[var3];
+                for (Executable executable : this.executables) {
                     if (executable.getParent() != null) {
                         executable.getParent().getChildren().remove(executable);
                     }

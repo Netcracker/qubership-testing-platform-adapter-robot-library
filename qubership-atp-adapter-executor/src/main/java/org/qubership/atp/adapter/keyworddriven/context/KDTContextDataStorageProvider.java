@@ -24,8 +24,8 @@ import org.qubership.atp.adapter.tools.tacomponents.context.ContextDataStoragePr
 import jakarta.annotation.Nullable;
 
 public class KDTContextDataStorageProvider implements ContextDataStorageProvider {
-    private static ThreadLocal<Executable> executable = new ThreadLocal();
-    private static KDTLocalContextDataStorage storage = new KDTLocalContextDataStorage();
+    private static final ThreadLocal<Executable> executable = new ThreadLocal<>();
+    private static final KDTLocalContextDataStorage storage = new KDTLocalContextDataStorage();
 
     public KDTContextDataStorageProvider() {
     }
@@ -35,7 +35,7 @@ public class KDTContextDataStorageProvider implements ContextDataStorageProvider
     }
 
     static Executable get() {
-        Executable e = (Executable)executable.get();
+        Executable e = executable.get();
         if (e == null) {
             e = KeywordExecutor.getKeyword();
         }
@@ -43,7 +43,7 @@ public class KDTContextDataStorageProvider implements ContextDataStorageProvider
         if (e == null) {
             throw new NullPointerException("Executable context is unknown. Executable should be defined in KeywordExecutor or in KDTContextDataStorageProvider.");
         } else {
-            return (Executable)e;
+            return e;
         }
     }
 

@@ -24,7 +24,7 @@ import jakarta.annotation.Nonnull;
 
 public final class PutAllValuesEvent<T> extends DataStorageEvent {
     @Nonnull
-    private Map<String, T> map;
+    private final Map<String, T> map;
 
     public PutAllValuesEvent(@Nonnull Map<String, T> rawValues, @Nonnull ContextDataStorage dataStorage) {
         super(dataStorage);

@@ -163,8 +163,8 @@ public class ExcelSheet {
     public ExcelCell getCellByHeaderName(int rowNumber, String headerName, int startIndex) {
         this.validateRowIndex(rowNumber, true);
         List<Integer> indexes = this.getHeaderIndexesByName(headerName, startIndex);
-        if (!indexes.isEmpty() && indexes.get(0) != -1) {
-            return this.getRow(rowNumber).getCell(indexes.get(0));
+        if (!indexes.isEmpty() && indexes.getFirst() != -1) {
+            return this.getRow(rowNumber).getCell(indexes.getFirst());
         } else {
             String basicMessage = "Error during operation with headers. Excel file name is '%s', excel sheet name is '%s'. Header row index = %s".formatted(this.getExcelBookName(), this.getSheetName(), this.headerRowIndex);
             if (this.getHeaderRowIndex() <= -1) {
@@ -203,8 +203,7 @@ public class ExcelSheet {
                 ExcelCell cell = (ExcelCell) o;
                 String cellValue = cell.getValue();
 
-                for (int i = 0; i < content.length; ++i) {
-                    String contentVal = content[i];
+                for (String contentVal : content) {
                     if (StringUtils.equalsIgnoreCase(cellValue, contentVal)) {
                         if (StringUtils.isNotEmpty(cellValue)) {
                             ++valuesCount;
@@ -284,7 +283,7 @@ public class ExcelSheet {
     }
 
     public Iterator<ExcelRow> iterator() {
-        return new Iterator<ExcelRow>() {
+        return new Iterator<>() {
             int index = 1;
             final int endIndex = ExcelSheet.this.getMaxRowNum();
 

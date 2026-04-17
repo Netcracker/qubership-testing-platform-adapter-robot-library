@@ -38,7 +38,7 @@ import org.qubership.atp.adapter.excel.exceptions.InvalidFormatOfSourceException
 import org.qubership.atp.adapter.excel.exceptions.RecordingInFileException;
 
 public class ExcelBook {
-    private static Log log = LogFactory.getLog(ExcelBook.class);
+    private static final Log log = LogFactory.getLog(ExcelBook.class);
     private Workbook workbook;
     private File currentFile;
     private ExcelSheet sheet;
@@ -76,18 +76,15 @@ public class ExcelBook {
                 }
 
                 this.currentFile = file;
-            } catch (IOException var13) {
-                IOException ex = var13;
+            } catch (IOException ex) {
                 throw new InvalidFormatOfSourceException("Could not read '%s' file".formatted(file.getAbsolutePath()), ex);
-            } catch (InvalidFormatException var14) {
-                InvalidFormatException ex = var14;
+            } catch (InvalidFormatException ex) {
                 throw new InvalidFormatOfSourceException("Invalid format of '%s' file : ".formatted(this.currentFile.getName()), ex);
             } finally {
                 if (fis != null) {
                     try {
                         fis.close();
-                    } catch (IOException var12) {
-                        IOException e = var12;
+                    } catch (IOException e) {
                         log.error(e.getMessage());
                     }
                 }
@@ -145,21 +142,17 @@ public class ExcelBook {
         try {
             fileOut = new FileOutputStream(this.getCurrentFile());
             this.workbook.write(fileOut);
-        } catch (IOException var6) {
-            IOException ex = var6;
+        } catch (IOException ex) {
             if (this.workbook instanceof SXSSFWorkbook) {
                 log.error("XSSFWorkbook saving exception. You can use it only once. Otherwise - you should open file again", ex);
             }
-
             throw new RecordingInFileException("Recording has been attempted in open file. File: " + this.getCurrentFile().getName() + " being used by another process.", ex);
         } finally {
             if (fileOut != null) {
                 fileOut.flush();
                 fileOut.close();
             }
-
         }
-
     }
 
     public Workbook getWorkbook() {
@@ -223,7 +216,7 @@ public class ExcelBook {
 
     public ExcelSheet cloneSheet(int sheetIndex) throws InvalidFormatOfSourceException {
         this.validateSheetIndex(sheetIndex);
-        return this.cloneSheet(sheetIndex, (String)null);
+        return this.cloneSheet(sheetIndex, null);
     }
 
     public ExcelSheet cloneSheet(int sheetIndex, String newSheetName) throws InvalidFormatOfSourceException {
@@ -242,9 +235,9 @@ public class ExcelBook {
     }
 
     public Iterator<ExcelSheet> iterator() {
-        return new Iterator<ExcelSheet>() {
+        return new Iterator<>() {
             int index = 1;
-            int endIndex = ExcelBook.this.getMaxSheetNum();
+            final int endIndex = ExcelBook.this.getMaxSheetNum();
 
             public boolean hasNext() {
                 return this.index <= this.endIndex;
@@ -290,23 +283,18 @@ public class ExcelBook {
 
             out = new FileOutputStream(file);
             ((Workbook)wb).write(out);
-        } catch (IOException var14) {
-            IOException ex = var14;
-            ex.printStackTrace();
+        } catch (IOException ex) {
+            log.error(ex);
         } finally {
             if (out != null) {
                 try {
                     out.flush();
                     out.close();
-                } catch (IOException var13) {
-                    IOException e = var13;
-                    e.printStackTrace();
+                } catch (IOException e) {
                     log.fatal("Error during reading ExcelBook: " + e.getMessage());
                 }
             }
-
         }
-
     }
 
     private void validateSheetIndex(int sheetIndex) {
@@ -316,7 +304,7 @@ public class ExcelBook {
     }
 
     public boolean equals(Object object) {
-        return !(object instanceof ExcelBook) ? false : this.toString().equals(((ExcelBook)object).toString());
+        return !(object instanceof ExcelBook) ? false : this.toString().equals(object.toString());
     }
 
     public void close() throws IOException {

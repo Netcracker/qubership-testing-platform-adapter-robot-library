@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.TimeZone;
@@ -53,7 +52,7 @@ public class BasicFormatTestCaseReader implements TestCaseReader {
     @Deprecated
     public static final String DEFAULT_DATE_FORMAT = Config.getString("var.format.date.mask", "yyyy-MM-dd HH:mm:ss");
     public static final TimeZone DATE_FORMAT_TIMEZONE;
-    private static Log log;
+    private static final Log log;
     public static final String TEST_CASE_BASIC_FOLDER;
     public static final String TEST_CASE_MAIN_SHEET;
     public static final String YES;
@@ -69,8 +68,8 @@ public class BasicFormatTestCaseReader implements TestCaseReader {
     private static final DateFormat dateFormat;
     private static final PatternLayout appenderLayout;
     private static final String LOG_NAME = "logs/%s-%s.log";
-    private ExcelSheet excelSheet;
-    private List<Integer> sectionHeaderIndexes;
+    private final ExcelSheet excelSheet;
+    private final List<Integer> sectionHeaderIndexes;
 
     public BasicFormatTestCaseReader(String fileName) throws InvalidFormatOfSourceException {
         this(KDTUtils.checkCriticalFileExistAndExit(TEST_CASE_BASIC_FOLDER, fileName));
@@ -81,23 +80,21 @@ public class BasicFormatTestCaseReader implements TestCaseReader {
     }
 
     public BasicFormatTestCaseReader(ExcelSheet excelSheet) {
-        this.sectionHeaderIndexes = new ArrayList();
+        this.sectionHeaderIndexes = new ArrayList<>();
         this.excelSheet = excelSheet;
     }
 
     public BasicFormatTestCaseReader(ExcelBook excelBook) throws InvalidFormatOfSourceException {
-        this.sectionHeaderIndexes = new ArrayList();
+        this.sectionHeaderIndexes = new ArrayList<>();
         if (!excelBook.hasSheet(TEST_CASE_MAIN_SHEET)) {
             throw new InvalidFormatOfSourceException("Sheet '%s' hasn't been found in the '%s' WB. Available sheets are: %s".formatted(TEST_CASE_MAIN_SHEET, excelBook.getCurrentFile(), excelBook.getAllSheets()));
         } else {
             try {
                 this.excelSheet = new ExcelSheet(excelBook, TEST_CASE_MAIN_SHEET, 1, this.getHeaders());
                 ExcelUtils.checkHeaders(this.excelSheet, this.getHeaders());
-            } catch (org.qubership.atp.adapter.excel.exceptions.InvalidFormatOfSourceException var3) {
-                org.qubership.atp.adapter.excel.exceptions.InvalidFormatOfSourceException e = var3;
+            } catch (org.qubership.atp.adapter.excel.exceptions.InvalidFormatOfSourceException e) {
                 throw new InvalidFormatOfSourceException(e.getMessage(), e);
             }
-
             this.sectionHeaderIndexes.addAll(this.excelSheet.getHeaderIndexesByName(SECTION_COLUMN_NAME));
         }
     }
@@ -107,10 +104,7 @@ public class BasicFormatTestCaseReader implements TestCaseReader {
         FileTestCase testCase = (FileTestCase)tc;
         this.setLogger(testCase);
         if (!testCase.getExecutableSectionName().isEmpty()) {
-            Iterator var3 = testCase.getExecutableSectionName().iterator();
-
-            while(var3.hasNext()) {
-                String sectionName = (String)var3.next();
+            for (String sectionName : testCase.getExecutableSectionName()) {
                 this.loadSection(testCase, this.excelSheet, sectionName);
             }
         } else {
@@ -139,55 +133,51 @@ public class BasicFormatTestCaseReader implements TestCaseReader {
             int firstIndex = 0;
             int lastIndex = 0;
             int rowsCount = excelSheet.getRowList().size();
-            Iterator var7 = this.sectionHeaderIndexes.iterator();
-
-            while(var7.hasNext()) {
-                Integer sectionIndex = (Integer)var7.next();
-
-                for(int currentRowNum = excelSheet.getHeaderRowIndex() + 1; currentRowNum <= rowsCount && excelSheet.getRow(currentRowNum) != null; ++currentRowNum) {
+            for (Integer sectionIndex : this.sectionHeaderIndexes) {
+                for (int currentRowNum = excelSheet.getHeaderRowIndex() + 1; currentRowNum <= rowsCount && excelSheet.getRow(currentRowNum) != null; ++currentRowNum) {
                     boolean isCurrentRowMatches = excelSheet.getCurrentRow().getCell(sectionIndex).getValue().equalsIgnoreCase(sectionName);
                     if (isCurrentRowMatches) {
                         if (firstIndex == 0) {
                             firstIndex = excelSheet.getCurrentRow().getRowNum();
                             lastIndex = firstIndex - 1;
                         }
-
                         ++lastIndex;
                     }
-
                     if (firstIndex != 0 && !isCurrentRowMatches || isCurrentRowMatches && excelSheet.getCurrentRow().getRowNum() == excelSheet.getMaxRowNum()) {
                         this.loadSubSection(testCase, firstIndex, -1, excelSheet, lastIndex + 1);
                         return;
                     }
                 }
             }
-
             log.error("Section '%s' not found".formatted(sectionName));
         }
     }
 
     private boolean hasSubSections(int headerIndex, int rowNum) {
         if (headerIndex + 1 < this.sectionHeaderIndexes.size()) {
-            return this.excelSheet.getRow(rowNum).getCell((Integer)this.sectionHeaderIndexes.get(headerIndex + 1)).getValue().length() > 0;
+            return !this.excelSheet.getRow(rowNum).getCell(this.sectionHeaderIndexes.get(headerIndex + 1)).getValue().isEmpty();
         } else {
             return false;
         }
     }
 
     private boolean hasRunnable(int headerIndex, int rowNum) {
-        String sectionName = this.excelSheet.getRow(rowNum).getCell((Integer)this.sectionHeaderIndexes.get(headerIndex)).getValue();
+        String sectionName = this.excelSheet.getRow(rowNum).getCell(this.sectionHeaderIndexes.get(headerIndex)).getValue();
 
         ExcelRow row;
-        for(String currentSectionName = sectionName; rowNum <= this.excelSheet.getMaxRowNum() && StringUtils.isNotBlank(currentSectionName) && sectionName.equalsIgnoreCase(currentSectionName); currentSectionName = row == null ? null : row.getCell((Integer)this.sectionHeaderIndexes.get(headerIndex)).getValue()) {
-            String runValue = this.excelSheet.getRow(rowNum).getCell((Integer)this.excelSheet.getHeaderIndexesByName(RUN_COLUMN_NAME).get(0)).getValue();
+        for(String currentSectionName = sectionName;
+            rowNum <= this.excelSheet.getMaxRowNum()
+                    && StringUtils.isNotBlank(currentSectionName)
+                    && sectionName.equalsIgnoreCase(currentSectionName);
+            currentSectionName = row == null
+                    ? null : row.getCell(this.sectionHeaderIndexes.get(headerIndex)).getValue()) {
+            String runValue = this.excelSheet.getRow(rowNum).getCell(this.excelSheet.getHeaderIndexesByName(RUN_COLUMN_NAME).getFirst()).getValue();
             if (YES.equalsIgnoreCase(runValue)) {
                 return true;
             }
-
             ++rowNum;
             row = rowNum <= this.excelSheet.getMaxRowNum() ? this.excelSheet.getRow(rowNum) : null;
         }
-
         return false;
     }
 
@@ -199,9 +189,11 @@ public class BasicFormatTestCaseReader implements TestCaseReader {
             for(int currentRowNum = rowNum; currentRowNum < endRow; ++currentRowNum) {
                 subSheet.setCurrentRow(subSheet.getRow(currentRowNum));
                 int nextHeaderIndex = headerIndex + 1;
-                String parentName = headerIndex == -1 ? parent.getName() : subSheet.getCurrentRow().getCell((Integer)this.sectionHeaderIndexes.get(headerIndex)).getValue();
-                String name = subSheet.getCurrentRow().getCell((Integer)this.sectionHeaderIndexes.get(nextHeaderIndex)).getValue();
-                if (parentName.equals(parent.getName()) && name.length() > 0) {
+                String parentName = headerIndex == -1
+                        ? parent.getName()
+                        : subSheet.getCurrentRow().getCell(this.sectionHeaderIndexes.get(headerIndex)).getValue();
+                String name = subSheet.getCurrentRow().getCell(this.sectionHeaderIndexes.get(nextHeaderIndex)).getValue();
+                if (parentName.equals(parent.getName()) && !name.isEmpty()) {
                     isChildrenFound = true;
                     boolean hasChildren = this.hasSubSections(nextHeaderIndex, currentRowNum);
                     boolean hasRunnables = this.hasRunnable(nextHeaderIndex, currentRowNum);
@@ -218,7 +210,12 @@ public class BasicFormatTestCaseReader implements TestCaseReader {
                         if (hasChildren) {
                             this.loadSubSection(section, currentRowNum, nextHeaderIndex, subSheet, endRow);
                         } else {
-                            section.setDescription((Integer)subSheet.getHeaderIndexesByName(DESCRIPTION_COLUMN_NAME).get(0) >= 0 ? subSheet.getCellByHeaderName(subSheet.getCurrentRow().getRowNum(), DESCRIPTION_COLUMN_NAME, (Integer)this.sectionHeaderIndexes.get(nextHeaderIndex)).getValue() : name);
+                            section.setDescription(
+                                    subSheet.getHeaderIndexesByName(DESCRIPTION_COLUMN_NAME).getFirst() >= 0
+                                            ? subSheet.getCellByHeaderName(subSheet.getCurrentRow().getRowNum(),
+                                            DESCRIPTION_COLUMN_NAME,
+                                            this.sectionHeaderIndexes.get(nextHeaderIndex)).getValue()
+                                            : name);
                             this.loadKeywords(section, subSheet);
                         }
                     }
@@ -232,7 +229,7 @@ public class BasicFormatTestCaseReader implements TestCaseReader {
 
     protected void loadKeywords(SectionImpl parent, ExcelSheet sheet) throws InvalidFormatOfSourceException {
         String keywordsSheet = ExcelUtils.getCellValue(sheet, KEYWORDS_COLUMN_NAME);
-        if (keywordsSheet.length() != 0) {
+        if (!keywordsSheet.isEmpty()) {
             BasicFormatReaderFactory.getInstance().newKeywordsReader(sheet.getExcelBook(), keywordsSheet).readKeywords(parent);
         }
     }
@@ -244,7 +241,7 @@ public class BasicFormatTestCaseReader implements TestCaseReader {
     }
 
     protected void loadParametersFromAllTabs(Section section, ExcelSheet testCaseSheet) throws InvalidFormatOfSourceException {
-        Set<String> processedTabs = new HashSet();
+        Set<String> processedTabs = new HashSet<>();
 
         for(int index = this.excelSheet.getHeaderRowIndex() + 1; index < this.excelSheet.getMaxRowNum() + 1; ++index) {
             testCaseSheet.setCurrentRow(testCaseSheet.getRow(index));
@@ -272,7 +269,7 @@ public class BasicFormatTestCaseReader implements TestCaseReader {
 
     static {
         String timeZoneId = Config.getString("var.format.date.timezone");
-        DATE_FORMAT_TIMEZONE = timeZoneId.length() == 0 ? TimeZone.getDefault() : TimeZone.getTimeZone(timeZoneId);
+        DATE_FORMAT_TIMEZONE = timeZoneId.isEmpty() ? TimeZone.getDefault() : TimeZone.getTimeZone(timeZoneId);
         log = LogFactory.getLog(BasicFormatTestCaseReader.class);
         TEST_CASE_BASIC_FOLDER = Config.getString("BasicFormatTestCaseReader.TEST_CASE_BASIC_FOLDER", BasicFormatTestSuiteReader.TEST_SUITE_BASIC_FOLDER);
         TEST_CASE_MAIN_SHEET = Config.getString("BasicFormatTestCaseReader.TEST_CASE_MAIN_SHEET", "Test Case");
