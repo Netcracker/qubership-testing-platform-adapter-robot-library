@@ -31,6 +31,9 @@
         <mapstruct.version>1.5.5.Final</mapstruct.version>
         <crypt.version>1.0.0-SNAPSHOT</crypt.version>
         <ram.model.version>2.2.204</ram.model.version>
+
+        <httpclient5.version>5.4.4</httpclient5.version>
+        <httpcore5.version>5.3.4</httpcore5.version>
     </properties>
 
     <description>Qubership Testing Platform Adapter Robot library</description>
@@ -312,6 +315,26 @@
                 <artifactId>jakarta.annotation-api</artifactId>
                 <version>2.1.1</version>
                 <scope>compile</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents.client5</groupId>
+                <artifactId>httpclient5</artifactId>
+                <version>${httpclient5.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents.client5</groupId>
+                <artifactId>httpclient5-fluent</artifactId>
+                <version>${httpclient5.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents.core5</groupId>
+                <artifactId>httpcore5</artifactId>
+                <version>${httpcore5.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents.core5</groupId>
+                <artifactId>httpcore5-h2</artifactId>
+                <version>${httpcore5.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

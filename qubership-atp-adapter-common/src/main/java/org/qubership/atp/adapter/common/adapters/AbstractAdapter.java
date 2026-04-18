@@ -46,9 +46,9 @@ import java.util.UUID;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.hc.client5.http.fluent.Content;
+import org.apache.hc.client5.http.fluent.Request;
 import org.apache.hc.core5.http.ContentType;
-import org.apache.http.client.fluent.Content;
-import org.apache.http.client.fluent.Request;
 import org.qubership.atp.adapter.common.AtpRamAdapter;
 import org.qubership.atp.adapter.common.RamConstants;
 import org.qubership.atp.adapter.common.adapters.error.AdapterMethodIsNotSupported;
@@ -1289,21 +1289,21 @@ public abstract class AbstractAdapter implements AtpRamAdapter {
         String output;
         try {
             final Content postResult = RequestUtils.getHttpExecutor()
-                    .execute(Request.Post(atpRamUrl + "/api/mail/send/er/report")
+                    .execute(Request.post(atpRamUrl + "/api/mail/send/er/report")
                             .bodyString(params.toString(), ContentType.APPLICATION_JSON)).returnContent();
             output = postResult.asString();
             if (log.isDebugEnabled()) {
-                log.debug("Send report response: " + output);
+                log.debug("Send report response: {}", output);
             }
             final Content getResult = RequestUtils.getHttpExecutor()
-                    .execute(Request.Get(atpRamUrl
+                    .execute(Request.get(atpRamUrl
                             + RamConstants.RAM_EXECUTOR_PATH
                             + RamConstants.EXECUTION_REQUESTS_PATH
                             + "/" + executionRequestUuid
                             + RamConstants.STOP_PATH)).returnContent();
             output = getResult.asString();
             if (log.isDebugEnabled()) {
-                log.debug("Stop ER response: " + output);
+                log.debug("Stop ER response: {}", output);
             }
         } catch (Exception io) {
             log.error("Error due sending report: ", io);
@@ -1379,7 +1379,7 @@ public abstract class AbstractAdapter implements AtpRamAdapter {
 
         if (section.getTestingStatus().getId() < recordStatus.getId()) {
             section.setTestingStatus(recordStatus);
-            setCompaundStatus(context.getAtpCompaund(), recordStatus);
+            setCompoundStatus(context.getAtpCompaund(), recordStatus);
         }
     }
 
@@ -1406,14 +1406,14 @@ public abstract class AbstractAdapter implements AtpRamAdapter {
         updateSectionTestRunStatus(status);
     }
 
-    private void setCompaundStatus(AtpCompaund compaund, TestingStatuses recordStatus) {
+    private void setCompoundStatus(AtpCompaund compaund, TestingStatuses recordStatus) {
         if (Objects.nonNull(compaund)) {
             if (isNull(compaund.getTestingStatuses()) || compaund.getTestingStatuses().getId() < recordStatus.getId()) {
                 log.debug("Setting compaund with id {} to status {}", compaund.getSectionId(),
                         recordStatus);
                 compaund.setTestingStatuses(recordStatus);
             }
-            setCompaundStatus(compaund.getParentSection(), recordStatus);
+            setCompoundStatus(compaund.getParentSection(), recordStatus);
         }
     }
 

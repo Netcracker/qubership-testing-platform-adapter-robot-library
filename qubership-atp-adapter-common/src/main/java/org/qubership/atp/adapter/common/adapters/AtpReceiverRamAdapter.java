@@ -52,6 +52,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -62,8 +63,8 @@ import java.util.concurrent.Executors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hc.core5.http.ContentType;
-import org.apache.http.client.fluent.Content;
-import org.apache.http.client.fluent.Request;
+import org.apache.hc.client5.http.fluent.Content;
+import org.apache.hc.client5.http.fluent.Request;
 import org.qubership.atp.adapter.common.RamConstants;
 import org.qubership.atp.adapter.common.context.TestRunContext;
 import org.qubership.atp.adapter.common.context.TestRunContextHolder;
@@ -298,14 +299,14 @@ public class AtpReceiverRamAdapter extends AbstractAdapter {
         String output;
         try {
             final Content postResult = RequestUtils.getHttpExecutor()
-                    .execute(Request.Post(atpRamUrl + "/api/mail/send/er/report")
+                    .execute(Request.post(atpRamUrl + "/api/mail/send/er/report")
                             .bodyString(params.toString(), ContentType.APPLICATION_JSON)).returnContent();
             output = postResult.asString();
             if (log.isDebugEnabled()) {
                 log.debug("Send report response: " + output);
             }
             final Content getResult = RequestUtils.getHttpExecutor()
-                    .execute(Request.Get(atpLoggerUrl + "/er/" + executionRequestUuid + "/stop")).returnContent();
+                    .execute(Request.get(atpLoggerUrl + "/er/" + executionRequestUuid + "/stop")).returnContent();
             output = getResult.asString();
             if (log.isDebugEnabled()) {
                 log.debug("Stop ER response: " + output);
@@ -364,7 +365,7 @@ public class AtpReceiverRamAdapter extends AbstractAdapter {
         ObjectNode result = OBJECT_MAPPER.createObjectNode();
         try {
             final Content postResult = RequestUtils.getHttpExecutor()
-                    .execute(Request.Post(url)
+                    .execute(Request.post(url)
                             .bodyString(request, ContentType.APPLICATION_JSON)).returnContent();
             String output = postResult.asString();
             if (log.isDebugEnabled()) {
@@ -386,11 +387,13 @@ public class AtpReceiverRamAdapter extends AbstractAdapter {
         Runnable task = () -> {
             try (InputStream stream = new FileInputStream(file)) {
                 final Content postResult = RequestUtils.getHttpExecutor()
-                        .execute(Request.Post(atpLoggerUrl + "/lr/upload/" + uuid + "/stream?fileName="
+                        .execute(Request.post(atpLoggerUrl + "/lr/upload/" + uuid + "/stream?fileName="
                                 + fileName + "&contentType=" + contentType + "&snapshotSource="
-                                + URLEncoder.encode(StringUtils.defaultIfEmpty(snapshotSource, ""), "UTF-8")
+                                + URLEncoder.encode(StringUtils.defaultIfEmpty(snapshotSource, ""),
+                                        StandardCharsets.UTF_8)
                                 + "&snapshotExternalSource=" + URLEncoder.encode(
-                                StringUtils.defaultIfEmpty(snapshotExternalSource, ""), "UTF-8"))
+                                StringUtils.defaultIfEmpty(snapshotExternalSource, ""),
+                                        StandardCharsets.UTF_8))
                                 .bodyStream(stream, ContentType.APPLICATION_JSON)).returnContent();
                 String output = postResult.asString();
                 log.debug("GridFS FileId: {} ", output);
