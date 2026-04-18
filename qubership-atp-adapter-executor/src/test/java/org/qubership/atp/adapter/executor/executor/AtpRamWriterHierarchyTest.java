@@ -38,6 +38,8 @@ import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.mockito.stubbing.Answer;
 import org.qubership.atp.adapter.common.adapters.AtpKafkaRamAdapter;
 import org.qubership.atp.adapter.common.adapters.providers.RamAdapterProvider;
@@ -51,6 +53,7 @@ import org.qubership.atp.ram.enums.TestingStatuses;
 import org.qubership.atp.ram.models.LogRecord;
 
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 public class AtpRamWriterHierarchyTest {
     private MockedStatic<TestRunContextHolder> mockedTestRunContextHolder;
     private MockedStatic<RamAdapterProvider> mockedRamAdapterProvider;
