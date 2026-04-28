@@ -39,9 +39,9 @@
     <scm>
         <connection>scm:git:https//github.com/Netcracker/qubership-testing-platform-adapter-robot-library.git</connection>
         <developerConnection>scm:git:https://github.com/Netcracker/qubership-testing-platform-adapter-robot-library.git</developerConnection>
-        <url>scm:git:https://github.com/Netcracker/qubership-testing-platform-adapter-robot-library/tree/main</url>
-      <tag>HEAD</tag>
-  </scm>
+        <url>scm:git:https://github.com/Netcracker/qubership-testing-platform-adapter-robot-library.git</url>
+        <tag>HEAD</tag>
+    </scm>
 
     <build>
         <pluginManagement>
@@ -51,6 +51,8 @@
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>3.15.0</version>
                     <configuration>
+                        <release>${java.version}</release>
+                        <parameters>true</parameters>
                         <encoding>${project.build.sourceEncoding}</encoding>
                         <annotationProcessorPaths>
                             <path>
@@ -69,7 +71,6 @@
                                 <version>0.2.0</version>
                             </path>
                         </annotationProcessorPaths>
-                        <release>${java.version}</release>
                     </configuration>
                 </plugin>
                 <plugin>
