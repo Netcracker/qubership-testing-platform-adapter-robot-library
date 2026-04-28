@@ -4,7 +4,7 @@
 
     <groupId>org.qubership.atp.adapter.robot</groupId>
     <artifactId>qubership-atp-adapter-robot-parent-dependencies</artifactId>
-    <version>5.0.0-SNAPSHOT</version>
+    <version>5.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>parent-dependencies</name>
 
@@ -28,11 +28,11 @@
         <maven-pmd-plugin.version>3.8</maven-pmd-plugin.version>
         <lombok.version>1.18.46</lombok.version>
         <mapstruct.version>1.5.5.Final</mapstruct.version>
-        <crypt.version>1.0.0-SNAPSHOT</crypt.version>
-        <ram.model.version>2.2.204</ram.model.version>
-
         <httpclient5.version>5.4.4</httpclient5.version>
         <httpcore5.version>5.3.4</httpcore5.version>
+
+        <crypt.version>1.0.1-SNAPSHOT</crypt.version>
+        <ram.model.version>2.2.204</ram.model.version>
     </properties>
 
     <description>Qubership Testing Platform Adapter Robot library</description>
