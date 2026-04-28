@@ -150,7 +150,7 @@ public abstract class Route {
 
     protected static ActionExecutor getExecutor(Class<? extends ActionExecutor> clazz) {
         try {
-            return (ActionExecutor)clazz.newInstance();
+            return (ActionExecutor)clazz.getDeclaredConstructor().newInstance();
         } catch (Throwable e) {
             log.error("Error route instantiation:" + e);
             return null;
