@@ -4,7 +4,7 @@
 
     <groupId>org.qubership.atp.adapter.robot</groupId>
     <artifactId>qubership-atp-adapter-robot-parent-dependencies</artifactId>
-    <version>5.0.1-SNAPSHOT</version>
+    <version>5.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>parent-dependencies</name>
 

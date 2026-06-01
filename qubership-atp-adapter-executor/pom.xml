@@ -3,7 +3,7 @@
     <parent>
         <groupId>org.qubership.atp.adapter.robot</groupId>
         <artifactId>qubership-atp-adapter-robot-parent-java</artifactId>
-        <version>5.0.1-SNAPSHOT</version>
+        <version>5.0.0-SNAPSHOT</version>
         <relativePath>../parent/parent-java/pom.xml</relativePath>
     </parent>
 
