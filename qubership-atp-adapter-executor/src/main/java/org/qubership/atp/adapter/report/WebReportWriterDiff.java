@@ -254,7 +254,7 @@ public class WebReportWriterDiff extends AbstractWebReportWriter {
         int reportMaxLength = Config.getInt("report.title.max.size", 200);
         if (title != null && title.length() > reportMaxLength) {
             savedTitle = "Title: </br>" + StringEscapeUtils.escapeHtml4(title) + "</br>";
-            title = "Response is too big. Full text of respons in description";
+            title = "Response is too big. Full text of response is in description";
         }
 
         result.append("<title><![CDATA[").append(title != null && !title.isEmpty() ? title : "[message]").append("]]></title>");

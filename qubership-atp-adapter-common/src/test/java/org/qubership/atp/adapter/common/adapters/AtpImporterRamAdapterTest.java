@@ -604,6 +604,6 @@ public class AtpImporterRamAdapterTest {
         assertFalse(result.contains(" "),
                 "Result String with URL contains space ' ' character but should be encoded.");
         assertTrue(result.contains("&contentType=screenshotNameKey+withSpaceCharacter&"),
-                "Result String with URL doesnt contain correct fileName param");
+                "Result String with URL doesn't contain correct fileName param");
     }
 }

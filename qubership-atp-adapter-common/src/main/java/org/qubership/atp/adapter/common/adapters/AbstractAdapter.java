@@ -1396,7 +1396,7 @@ public abstract class AbstractAdapter implements AtpRamAdapter {
                         context.getTestingStatus());
                 updateTestRunTestingStatus(context.getTestingStatus(), context.getTestRunId());
             } catch (Exception e) {
-                log.error("Cant set log record status", e);
+                log.error("Can't set log record status", e);
             }
         }
     }
