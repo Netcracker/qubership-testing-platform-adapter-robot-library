@@ -1,5 +1,5 @@
 /*
- *  Copyright 2024-2025 NetCracker Technology Corporation
+ *  Copyright 2024-2026 NetCracker Technology Corporation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -16,47 +16,42 @@
 
 package org.qubership.atp.adapter.executor.executor;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doCallRealMethod;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.internal.verification.VerificationModeFactory.times;
 import static org.qubership.atp.adapter.executor.executor.Utils.createAtpCompaund;
 import static org.qubership.atp.adapter.executor.executor.Utils.createTestRunContext;
-import static org.junit.Assert.assertFalse;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
-import static org.mockito.Mockito.doCallRealMethod;
-import static org.mockito.internal.verification.VerificationModeFactory.times;
-import static org.powermock.api.mockito.PowerMockito.mockStatic;
-import static org.powermock.api.mockito.PowerMockito.when;
 
-//import org.qubership.atp.adapter.wd.shell.elements.common.Page;
-import org.apache.log4j.Level;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
-
 import org.qubership.atp.adapter.common.RamConstants;
 import org.qubership.atp.adapter.common.adapters.AtpReceiverRamAdapter;
 import org.qubership.atp.adapter.common.context.AtpCompaund;
 import org.qubership.atp.adapter.common.context.TestRunContext;
 import org.qubership.atp.adapter.common.context.TestRunContextHolder;
 import org.qubership.atp.adapter.common.entities.Message;
-
+import org.qubership.atp.adapter.report.WebReportItem;
 import org.qubership.atp.ram.enums.TestingStatuses;
 import org.qubership.atp.ram.enums.TypeAction;
-import org.qubership.atp.adapter.report.WebReportItem;
 
-import java.io.File;
-
-@RunWith(PowerMockRunner.class)
-@PrepareForTest({TestRunContextHolder.class})
 public class AtpRamWriterTest {
-    private org.qubership.atp.adapter.executor.executor.AtpRamWriter writer = Mockito.spy(new AtpRamWriter());
-    private AtpReceiverRamAdapter atpReceiverRamAdapter = Mockito.mock(AtpReceiverRamAdapter.class);
+    private MockedStatic<TestRunContextHolder> mockedTestRunContextHolder;
+    private final org.qubership.atp.adapter.executor.executor.AtpRamWriter writer = Mockito.spy(new AtpRamWriter());
+    private final AtpReceiverRamAdapter atpReceiverRamAdapter = Mockito.mock(AtpReceiverRamAdapter.class);
 
-    @Before
+    @BeforeEach
     public void setUp() {
+      mockedTestRunContextHolder = mockStatic(TestRunContextHolder.class);
         Mockito.when(writer.getAdapter()).thenReturn(atpReceiverRamAdapter);
+    }
+
+    @AfterEach
+    void tearDownStaticMocks() {
+        mockedTestRunContextHolder.closeOnDemand();
     }
 
     @Test
@@ -92,11 +87,8 @@ public class AtpRamWriterTest {
         section.setTestingStatus(TestingStatuses.UNKNOWN.toString());
         section.setSection(true);
 
-        /*Mockito.verify(atpReceiverRamAdapter)
-                .openSection("Step", "", "1", logRecordUuid.toString(), RamConstants.PASSED);*/
         Mockito.verify(atpReceiverRamAdapter).openSection(section);
     }
-
 
     @Test
     public void openSection_openSectionOnlyWithTitle_rootSectionIsOpened() {
@@ -116,34 +108,12 @@ public class AtpRamWriterTest {
         Mockito.verify(atpReceiverRamAdapter).openSection(section);
     }
 
-//    @Test
-//    public void deletingScreenshot_callDelete_screenshotDeleted() throws Exception {
-//        setMocks(createTestRunContext(true));
-//        File screenFile = new File("screen-thread-50-1660904215745.png");
-//        screenFile.createNewFile();
-//        Page mock = mockPage();
-//        writer.message("title", Level.INFO,"message",mock,null,null);
-//        assertFalse("Error during file deletion",screenFile.exists());
-//    }
-
-//    private Page mockPage() {
-//        String exampleSource = "<html><body><a href='http://127.0.0.1/main/homepage'>http://127.0.0.1/main/homepage</a><br/><img src='screen-thread-50-1660904215745.png' style='max-width:auto%; height:96%; min-height:500px;'></body></html>";
-//        Page mock = Mockito.mock(Page.class,RETURNS_DEEP_STUBS);
-//        when(mock.getReportType()).thenReturn("SCREENSHOT");
-//        when(mock.getExtension()).thenReturn("html");
-//        when(mock.getSource()).thenReturn(exampleSource);
-//        return mock;
-//    }
-
     private void setMocks(TestRunContext testRunContext) {
         Mockito.when(atpReceiverRamAdapter.startAtpRun(any(), any())).thenReturn(testRunContext);
-        mockStatic(TestRunContextHolder.class);
-        when(TestRunContextHolder.getContext(any())).thenReturn(testRunContext);
-        when(TestRunContextHolder.hasContext(any())).thenReturn(true);
+        mockedTestRunContextHolder.when(() -> TestRunContextHolder.getContext(any())).thenReturn(testRunContext);
+        mockedTestRunContextHolder.when(() -> TestRunContextHolder.hasContext(any())).thenReturn(true);
         writer.createContext(testRunContext.getTestRunId());
         doCallRealMethod().when(writer).openSection(any(WebReportItem.OpenSection.class));
         Mockito.when(atpReceiverRamAdapter.openSection(any(), any(), any(), any(), any())).thenReturn(testRunContext);
     }
-
-
 }

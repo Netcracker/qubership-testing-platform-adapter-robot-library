@@ -1,5 +1,5 @@
 /*
- *  Copyright 2024-2025 NetCracker Technology Corporation
+ *  Copyright 2024-2026 NetCracker Technology Corporation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -16,13 +16,15 @@
 
 package org.qubership.atp.adapter.tools.tacomponents.context.events;
 
-import org.qubership.atp.adapter.tools.tacomponents.context.ContextDataStorage;
 import java.util.Map;
-import javax.annotation.Nonnull;
+
+import org.qubership.atp.adapter.tools.tacomponents.context.ContextDataStorage;
+
+import jakarta.annotation.Nonnull;
 
 public final class PutAllValuesEvent<T> extends DataStorageEvent {
     @Nonnull
-    private Map<String, T> map;
+    private final Map<String, T> map;
 
     public PutAllValuesEvent(@Nonnull Map<String, T> rawValues, @Nonnull ContextDataStorage dataStorage) {
         super(dataStorage);

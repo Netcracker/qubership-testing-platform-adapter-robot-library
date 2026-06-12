@@ -18,6 +18,7 @@ package org.qubership.atp.adapter.common.adapters;
 
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -176,7 +177,7 @@ public class AtpImporterRamAdapter extends AbstractAdapter {
         } catch (Exception ioException) { //Here IOException can be thrown which is hidden.
             log.error("Failed to create TR for ER {}", request.getAtpExecutionRequestId(), ioException);
             throw new FailedToCreateRamEntity(
-                    String.format("Failed to create TR for ER %s", request.getAtpExecutionRequestId()),
+                "Failed to create TR for ER %s".formatted(request.getAtpExecutionRequestId()),
                     ioException);
         }
     }
@@ -375,13 +376,12 @@ public class AtpImporterRamAdapter extends AbstractAdapter {
         String fileName = (String) attribute.get(RamConstants.SCREENSHOT_NAME_KEY);
         String contentType = (String) attribute.get(RamConstants.SCREENSHOT_TYPE_KEY);
         String attachmentSource = (String) attribute.get(RamConstants.SCREENSHOT_SOURCE_KEY);
-        return String.format(
-                uploadUrlTemplate,
-                message.getUuid(),
-                context.getProjectId(),
-                URLEncoder.encode(fileName, RamConstants.UTF8_CHARSET),
-                contentType,
-                URLEncoder.encode(StringUtils.defaultIfEmpty(attachmentSource, ""), RamConstants.UTF8_CHARSET));
+        return uploadUrlTemplate.formatted(
+            message.getUuid(),
+            context.getProjectId(),
+            URLEncoder.encode(fileName, StandardCharsets.UTF_8),
+            contentType,
+            URLEncoder.encode(StringUtils.defaultIfEmpty(attachmentSource, ""), StandardCharsets.UTF_8));
     }
 
     @Override

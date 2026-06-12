@@ -51,10 +51,10 @@ public class WebReportWriterDiff extends AbstractWebReportWriter {
     public static final String REPORT_THREAD_LOCAL_KEY = "report.thread.local";
     private static final SimpleDateFormat DATE_FORMAT;
     private static final SimpleDateFormat TIME_FORMAT;
-    private static AtomicInteger PAGE_COUNTER;
-    private static AtomicInteger LOG_COUNTER;
-    private static ReportThreadLocal REPORT;
-    private static String REPORT_JAR_DIR;
+    private static final AtomicInteger PAGE_COUNTER;
+    private static final AtomicInteger LOG_COUNTER;
+    private static final ReportThreadLocal REPORT;
+    private static final String REPORT_JAR_DIR;
     private String reportEncoding;
     private File reportDir;
     private List<Logger> customLoggers;
@@ -119,7 +119,7 @@ public class WebReportWriterDiff extends AbstractWebReportWriter {
         this.log().description = description;
         String filename;
         synchronized(this) {
-            filename = String.format("report%04d", LOG_COUNTER.incrementAndGet()) + ".xml";
+            filename = "report%04d".formatted(LOG_COUNTER.incrementAndGet()) + ".xml";
         }
 
         this.log().currentLogName = logName;
@@ -176,7 +176,7 @@ public class WebReportWriterDiff extends AbstractWebReportWriter {
 
     public synchronized void openSection(String sectionName, String message, SourceProvider page) {
         this.log().currentLogCallStack.push(sectionName);
-        this.appendReportFile(this.formatMessageOpen(sectionName, (Level)null, message, page), this.log().reportFileLength);
+        this.appendReportFile(this.formatMessageOpen(sectionName, null, message, page), this.log().reportFileLength);
 
         for (Logger logger : this.customLoggers) {
             logger.info(this.log().currentLogCallStack.toString() + "Section - " + sectionName);
@@ -208,7 +208,7 @@ public class WebReportWriterDiff extends AbstractWebReportWriter {
 
     private String createSnapshot(SourceProvider page) {
         Long startTime = System.currentTimeMillis();
-        String pageFilename = "page" + String.format("%04d", PAGE_COUNTER.incrementAndGet());
+        String pageFilename = "page" + "%04d".formatted(PAGE_COUNTER.incrementAndGet());
         File pageFileHTML = new File(new File(this.reportDir, "pages"), pageFilename + "." + page.getExtension());
         if (this.originName == null) {
             this.originName = pageFileHTML.getName();

@@ -68,7 +68,7 @@ public class BasicFormatTestSuiteReader implements TestSuiteReader {
 
     public BasicFormatTestSuiteReader(ExcelBook excelBook) throws InvalidFormatOfSourceException {
         if (!excelBook.hasSheet(TEST_SUITE_MAIN_SHEET)) {
-            throw new InvalidFormatOfSourceException(String.format("Sheet '%s' hasn't been found in the '%s' WB. Available sheets are: %s", TEST_SUITE_MAIN_SHEET, excelBook.getCurrentFile(), excelBook.getAllSheets()));
+            throw new InvalidFormatOfSourceException("Sheet '%s' hasn't been found in the '%s' WB. Available sheets are: %s".formatted(TEST_SUITE_MAIN_SHEET, excelBook.getCurrentFile(), excelBook.getAllSheets()));
         } else {
             try {
                 this.excelSheet = new ExcelSheet(excelBook, TEST_SUITE_MAIN_SHEET, 1, this.getHeaders());

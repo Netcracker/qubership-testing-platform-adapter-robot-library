@@ -1,5 +1,5 @@
 /*
- *  Copyright 2024-2025 NetCracker Technology Corporation
+ *  Copyright 2024-2026 NetCracker Technology Corporation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -16,35 +16,37 @@
 
 package org.qubership.atp.adapter.keyworddriven.routing;
 
-import org.qubership.atp.adapter.keyworddriven.handlers.ActionExecutor;
-import org.qubership.atp.adapter.testcase.Config;
-import dk.brics.automaton.Automaton;
-import dk.brics.automaton.RegExp;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.qubership.atp.adapter.keyworddriven.handlers.ActionExecutor;
+import org.qubership.atp.adapter.testcase.Config;
+
+import dk.brics.automaton.Automaton;
+import dk.brics.automaton.RegExp;
 
 public abstract class Route {
     private static final Log log = LogFactory.getLog(Route.class);
     public static final boolean IS_SPACE_DELIM_ENABLED = Boolean.parseBoolean(Config.getString("kdt.enable.llk"));
     private final ArrayList<RouteItem> routeItems;
     private final ActionExecutor executor;
-    private Pattern routeMask;
-    private Automaton maskAutomaton;
+    private final Pattern routeMask;
+    private final Automaton maskAutomaton;
     private int rating;
     private final String description;
-    private String delim;
+    private final String delim;
     private final boolean deprecated;
 
     public Route(ArrayList<RouteItem> routeItems, Class<? extends ActionExecutor> executor) {
-        this((String)null, routeItems, executor);
+        this(null, routeItems, executor);
     }
 
     public Route(String description, ArrayList<RouteItem> routeItems, Class<? extends ActionExecutor> executor) {
-        this((String)null, routeItems, executor, false);
+        this(null, routeItems, executor, false);
     }
 
     public Route(String description, ArrayList<RouteItem> routeItems, Class<? extends ActionExecutor> executor, boolean deprecated) {
@@ -57,16 +59,14 @@ public abstract class Route {
 
         try {
             this.routeMask = this.getRouteMask(routeItems);
-        } catch (PatternSyntaxException var7) {
-            PatternSyntaxException e = var7;
-            throw new IllegalArgumentException(String.format("Route '%s' has wrong format of '%s'. Error: %s", description, routeItems.toString(), e.getMessage()), e);
+        } catch (PatternSyntaxException e) {
+            throw new IllegalArgumentException("Route '%s' has wrong format of '%s'. Error: %s".formatted(description, routeItems.toString(), e.getMessage()), e);
         }
 
         try {
             this.maskAutomaton = (new RegExp(PatternConverter.convert(this.routeMask))).toAutomaton(true);
-        } catch (IllegalArgumentException var6) {
-            IllegalArgumentException e = var6;
-            throw new IllegalArgumentException(String.format("Route '%s' has wrong format of pattern '%s'. Error: %s", routeItems.toString(), this.routeMask.pattern(), e.getMessage()), e);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Route '%s' has wrong format of pattern '%s'. Error: %s".formatted(routeItems.toString(), this.routeMask.pattern(), e.getMessage()), e);
         }
     }
 
@@ -75,7 +75,7 @@ public abstract class Route {
     }
 
     public String getName() {
-        return ((RouteItem)this.routeItems.get(0)).toString();
+        return this.routeItems.getFirst().toString();
     }
 
     public Pattern getRouteMask() {
@@ -87,7 +87,7 @@ public abstract class Route {
         String tab = "";
 
         for(int index = 0; index < routeItems.size(); ++index) {
-            RouteItem item = (RouteItem)routeItems.get(index);
+            RouteItem item = routeItems.get(index);
             if (index > 0) {
                 tab = this.delim;
             }
@@ -137,13 +137,9 @@ public abstract class Route {
     }
 
     public static ArrayList<RouteItem> parseMaskInRouteItems(Object[] sourceMask) {
-        ArrayList<RouteItem> res = new ArrayList();
-        Object[] var2 = sourceMask;
-        int var3 = sourceMask.length;
-
-        for(int var4 = 0; var4 < var3; ++var4) {
-            Object itemSource = var2[var4];
-            if (!(itemSource instanceof String) || !((String)itemSource).isEmpty()) {
+        ArrayList<RouteItem> res = new ArrayList<>();
+        for (Object itemSource : sourceMask) {
+            if (!(itemSource instanceof String) || !((String) itemSource).isEmpty()) {
                 RouteItem routeItem = new RouteItem(itemSource);
                 res.add(routeItem);
             }
@@ -154,9 +150,8 @@ public abstract class Route {
 
     protected static ActionExecutor getExecutor(Class<? extends ActionExecutor> clazz) {
         try {
-            return (ActionExecutor)clazz.newInstance();
-        } catch (Throwable var2) {
-            Throwable e = var2;
+            return (ActionExecutor)clazz.getDeclaredConstructor().newInstance();
+        } catch (Throwable e) {
             log.error("Error route instantiation:" + e);
             return null;
         }

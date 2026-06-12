@@ -1,5 +1,5 @@
 /*
- *  Copyright 2024-2025 NetCracker Technology Corporation
+ *  Copyright 2024-2026 NetCracker Technology Corporation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -20,55 +20,57 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Test;
-
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.qubership.atp.ram.enums.BvStatus;
 import org.qubership.atp.ram.enums.TestingStatuses;
 import org.qubership.atp.ram.models.logrecords.parts.ValidationTable;
 import org.qubership.atp.ram.models.logrecords.parts.ValidationTableLine;
+
 import net.sf.json.JSONObject;
 
 public class UtilsTest {
-    private static final String compareResult = "{\n"
-            + "    \"tcId\": \"5a117edc-fad7-423a-abe9-51d7084a396b\",\n"
-            + "    \"tcName\": \"OCS.Product.Smoke. Successful Data Customer creation for sanity\",\n"
-            + "    \"compareResult\": \"MODIFIED\",\n"
-            + "    \"trDate\": null,\n"
-            + "    \"trId\": \"1\",\n"
-            + "    \"resultLink\": \"http://localhost:8080/bvtool/#/validation?trid=1\",\n"
-            + "    \"steps\": [\n"
-            + "        {\n"
-            + "            \"objectId\": \"d971d7f9-e162-4b95-b72d-a8302651d529\",\n"
-            + "            \"stepName\": \"123\",\n"
-            + "            \"compareResult\": \"IDENTICAL\",\n"
-            + "            \"diffs\": [],\n"
-            + "            \"highlightedEr\": \"123\\n\",\n"
-            + "            \"highlightedAr\": \"123\\n\"\n"
-            + "        },\n"
-            + "        {\n"
-            + "            \"objectId\": \"33e92903-d400-45ee-be4a-e2b0bbc9f7c3\",\n"
-            + "            \"stepName\": \"CCA-T\",\n"
-            + "            \"compareResult\": \"MODIFIED\",\n"
-            + "            \"diffs\": [\n"
-            + "                {\n"
-            + "                    \"orderId\": 1,\n"
-            + "                    \"expected\": \"0-0\",\n"
-            + "                    \"actual\": \"0-0\",\n"
-            + "                    \"description\": \"ER row(s)## 0-0 are replaced with AR row(s)## 0-0\",\n"
-            + "                    \"result\": \"MODIFIED\"\n"
-            + "                }\n"
-            + "            ],\n"
-            + "            \"highlightedEr\": \"<span data-block-id=\\\"pc-highlight-block\\\" class=\\\"MODIFIED\\\">234\\n</span>\",\n"
-            + "            \"highlightedAr\": \"<span data-block-id=\\\"pc-highlight-block\\\" class=\\\"MODIFIED\\\">123\\n</span>\"\n"
-            + "        }]\n"
-            + "}";
+    private static final String compareResult = """
+            {
+                "tcId": "5a117edc-fad7-423a-abe9-51d7084a396b",
+                "tcName": "OCS.Product.Smoke. Successful Data Customer creation for sanity",
+                "compareResult": "MODIFIED",
+                "trDate": null,
+                "trId": "1",
+                "resultLink": "http://localhost:8080/bvtool/#/validation?trid=1",
+                "steps": [
+                    {
+                        "objectId": "d971d7f9-e162-4b95-b72d-a8302651d529",
+                        "stepName": "123",
+                        "compareResult": "IDENTICAL",
+                        "diffs": [],
+                        "highlightedEr": "123\\n",
+                        "highlightedAr": "123\\n"
+                    },
+                    {
+                        "objectId": "33e92903-d400-45ee-be4a-e2b0bbc9f7c3",
+                        "stepName": "CCA-T",
+                        "compareResult": "MODIFIED",
+                        "diffs": [
+                            {
+                                "orderId": 1,
+                                "expected": "0-0",
+                                "actual": "0-0",
+                                "description": "ER row(s)## 0-0 are replaced with AR row(s)## 0-0",
+                                "result": "MODIFIED"
+                            }
+                        ],
+                        "highlightedEr": "<span data-block-id=\\"pc-highlight-block\\" class=\\"MODIFIED\\">234\\n</span>",
+                        "highlightedAr": "<span data-block-id=\\"pc-highlight-block\\" class=\\"MODIFIED\\">123\\n</span>"
+                    }]
+            }\
+            """;
 
     @Test
     public void parseValidationTableFromJson_CompareTwoObject_ReturnValidValidationTable() throws IOException {
         ValidationTable expectedResult = createValidationTable();
         ValidationTable result = Utils.parseValidationTableFromJson(JSONObject.fromObject(compareResult));
-        Assert.assertEquals(expectedResult, result);
+        Assertions.assertEquals(expectedResult, result);
     }
 
     private ValidationTable createValidationTable() {

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2024-2025 NetCracker Technology Corporation
+ *  Copyright 2024-2026 NetCracker Technology Corporation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -16,14 +16,15 @@
 
 package org.qubership.atp.adapter.tools.tacomponents.context;
 
-import com.google.common.base.Preconditions;
 import org.qubership.atp.adapter.tools.tacomponents.context.threading.ScopeModel;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+
+import com.google.common.base.Preconditions;
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 
 abstract class ContextProvider implements ContextDataStorageProvider {
     @Nonnull
-    private ScopeModel scopeModel;
+    private final ScopeModel scopeModel;
 
     public ContextProvider(@Nonnull ScopeModel scopeModel) {
         Preconditions.checkNotNull(scopeModel, "Scope model cannot be null");
@@ -46,14 +47,11 @@ abstract class ContextProvider implements ContextDataStorageProvider {
 
     @Nonnull
     public ContextDataStorage getContextDataStorage() {
-        switch (this.getScopeModel()) {
-            case SINGLE:
-                return this.getForSingleScopeMode();
-            case MULTI:
-                return this.getForMultiScopeMode();
-            default:
-                return this.getForPrimitive();
-        }
+        return switch (this.getScopeModel()) {
+            case SINGLE -> this.getForSingleScopeMode();
+            case MULTI -> this.getForMultiScopeMode();
+            default -> this.getForPrimitive();
+        };
     }
 
     @Nullable
@@ -61,7 +59,6 @@ abstract class ContextProvider implements ContextDataStorageProvider {
         ThreadGroup threadGroup;
         for(threadGroup = Thread.currentThread().getThreadGroup(); !targetProviderClass.isAssignableFrom(threadGroup.getClass()) && threadGroup.getParent() != null; threadGroup = threadGroup.getParent()) {
         }
-
         return targetProviderClass.isAssignableFrom(threadGroup.getClass()) ? ((ContextDataStorageProvider)threadGroup).getContextDataStorage() : null;
     }
 }

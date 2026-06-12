@@ -1,5 +1,5 @@
 /*
- *  Copyright 2024-2025 NetCracker Technology Corporation
+ *  Copyright 2024-2026 NetCracker Technology Corporation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -16,9 +16,6 @@
 
 package org.qubership.atp.adapter.report;
 
-import org.qubership.atp.adapter.testcase.Config;
-import org.qubership.atp.adapter.utils.Utils;
-import java.io.Closeable;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -35,9 +32,12 @@ import java.util.Enumeration;
 import java.util.Properties;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.qubership.atp.adapter.testcase.Config;
+import org.qubership.atp.adapter.utils.Utils;
 
 public abstract class AbstractWebReportWriter implements ReportWriter {
     private static final Log LOG = LogFactory.getLog(AbstractWebReportWriter.class);
@@ -64,8 +64,8 @@ public abstract class AbstractWebReportWriter implements ReportWriter {
         try {
             String s = this.getResourcesLocationInJar();
             URLConnection connection = this.getClass().getClassLoader().getResource(s).openConnection();
-            if (connection instanceof JarURLConnection) {
-                JarFile archive = ((JarURLConnection)connection).getJarFile();
+            if (connection instanceof JarURLConnection lConnection) {
+                JarFile archive = lConnection.getJarFile();
                 Enumeration<? extends JarEntry> e = archive.entries();
 
                 label119:
@@ -79,7 +79,7 @@ public abstract class AbstractWebReportWriter implements ReportWriter {
                                     break label119;
                                 }
 
-                                entry = (JarEntry)e.nextElement();
+                                entry = e.nextElement();
                                 entryName = entry.getName();
                             } while(!entryName.startsWith(s));
                         } while(entryName.equals(s));
@@ -104,10 +104,10 @@ public abstract class AbstractWebReportWriter implements ReportWriter {
 
                                 int read;
                                 while((read = is.read(buffer)) != -1) {
-                                    ((OutputStream)os).write(buffer, 0, read);
+                                    os.write(buffer, 0, read);
                                 }
                             } finally {
-                                Utils.close(new Closeable[]{is, os});
+                                Utils.close(is, os);
                             }
                         }
                     }
@@ -115,16 +115,10 @@ public abstract class AbstractWebReportWriter implements ReportWriter {
             } else {
                 FileUtils.copyDirectory(new File(connection.getURL().toURI()), reportDir);
             }
-        } catch (IOException var21) {
-            IOException e = var21;
-            LOG.error("Unable to find report files", e);
-            return;
-        } catch (URISyntaxException var22) {
-            URISyntaxException e = var22;
+        } catch (IOException | URISyntaxException e) {
             LOG.error("Unable to find report files", e);
             return;
         }
-
         this.prepareIndexFile();
     }
 
@@ -132,7 +126,7 @@ public abstract class AbstractWebReportWriter implements ReportWriter {
 
     protected String getReportDirRoot(Properties p) {
         String reportRootDir = p == null ? Config.getString("report.dir.root") : p.getProperty("report.dir.root", Config.getString("report.dir.root"));
-        if (reportRootDir.length() == 0) {
+        if (reportRootDir.isEmpty()) {
             reportRootDir = "results";
         }
 
@@ -141,7 +135,7 @@ public abstract class AbstractWebReportWriter implements ReportWriter {
 
     protected String getReportDirName(Properties p) {
         String suffix = p == null ? "" : p.getProperty("suffix", "");
-        if (suffix.length() > 0) {
+        if (!suffix.isEmpty()) {
             suffix = "_" + suffix;
         }
 
@@ -160,12 +154,8 @@ public abstract class AbstractWebReportWriter implements ReportWriter {
             Class<Charset> c = Charset.class;
             Field defaultCharsetField = c.getDeclaredField("defaultCharset");
             defaultCharsetField.setAccessible(true);
-            defaultCharsetField.set((Object)null, Charset.forName(encoding));
-        } catch (NoSuchFieldException var3) {
-            NoSuchFieldException ex = var3;
-            LOG.warn("Can't set encoding", ex);
-        } catch (IllegalAccessException var4) {
-            IllegalAccessException ex = var4;
+            defaultCharsetField.set(null, Charset.forName(encoding));
+        } catch (NoSuchFieldException | IllegalAccessException ex) {
             LOG.warn("Can't set encoding", ex);
         }
 

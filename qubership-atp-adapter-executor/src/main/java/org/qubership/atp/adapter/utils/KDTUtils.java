@@ -1,5 +1,5 @@
 /*
- *  Copyright 2024-2025 NetCracker Technology Corporation
+ *  Copyright 2024-2026 NetCracker Technology Corporation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -16,6 +16,26 @@
 
 package org.qubership.atp.adapter.utils;
 
+import java.io.File;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.math.BigInteger;
+import java.nio.file.FileSystems;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.regex.Pattern;
+
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.qubership.atp.adapter.keyworddriven.basicformat.BasicFormatTestSuiteReader;
 import org.qubership.atp.adapter.keyworddriven.basicformat.StringValueSubstitution;
 import org.qubership.atp.adapter.keyworddriven.executable.Executable;
@@ -28,24 +48,6 @@ import org.qubership.atp.adapter.report.SourceProvider;
 import org.qubership.atp.adapter.report.WebReportWriter;
 import org.qubership.atp.adapter.testcase.Config;
 import org.qubership.atp.adapter.wd.shell.browser.ReportType;
-import java.io.File;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.math.BigInteger;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.regex.Pattern;
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang3.StringEscapeUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 
 public class KDTUtils {
     public static final String STORE_TEST_CASE_PARAMETERS_SHEET = "Stored Parameters";
@@ -57,7 +59,7 @@ public class KDTUtils {
     }
 
     public static String prepareFilePath(String file) {
-        String FILE_SEPARATOR = System.getProperty("file.separator");
+        String FILE_SEPARATOR = FileSystems.getDefault().getSeparator();
         if (!FILE_SEPARATOR.equals("\\")) {
             file = file.replaceAll("\\\\", FILE_SEPARATOR);
         }
@@ -96,14 +98,11 @@ public class KDTUtils {
         if (configMap.size() <= 0) {
             return false;
         } else {
-            Iterator var3 = configMap.entrySet().iterator();
-
-            while(var3.hasNext()) {
-                Map.Entry<String, String> entry = (Map.Entry)var3.next();
-                String key = ((String)entry.getKey()).replaceFirst(prefix + ".", "");
-                Config.setString(key, (String)entry.getValue());
+            for (Map.Entry<String, String> stringStringEntry : configMap.entrySet()) {
+                Map.Entry<String, String> entry = (Map.Entry) stringStringEntry;
+                String key = entry.getKey().replaceFirst(prefix + ".", "");
+                Config.setString(key, entry.getValue());
             }
-
             return true;
         }
     }
@@ -113,7 +112,7 @@ public class KDTUtils {
     }
 
     public static String getFileNameFromPath(String filePath) {
-        return filePath.substring(filePath.lastIndexOf(BasicFormatTestSuiteReader.FILE_SEPARATOR) + 1, filePath.length());
+        return filePath.substring(filePath.lastIndexOf(BasicFormatTestSuiteReader.FILE_SEPARATOR) + 1);
     }
 
     public static String getRepTitle() {
@@ -137,20 +136,19 @@ public class KDTUtils {
     }
 
     public static String getRepDesc(String additionalInfo) {
-        return getRepDesc() + (additionalInfo == null ? "" : "" + additionalInfo);
+        return getRepDesc() + (additionalInfo == null ? "" : additionalInfo);
     }
 
     public static String getRepDesc(Keyword e, String additionalInfo) {
-        return getRepDesc(e) + (additionalInfo == null ? "" : "" + additionalInfo);
+        return getRepDesc(e) + (additionalInfo == null ? "" : additionalInfo);
     }
 
     public static Properties getAllConfigContent() {
         try {
             Field config = Config.class.getDeclaredField("config");
             config.setAccessible(true);
-            return (Properties)config.get((Object)null);
-        } catch (NoSuchFieldException | IllegalAccessException | IllegalArgumentException | SecurityException var1) {
-            Exception e = var1;
+            return (Properties)config.get(null);
+        } catch (NoSuchFieldException | IllegalAccessException | IllegalArgumentException | SecurityException e) {
             log.error(KDTUtils.class.toString(), e);
             return null;
         }
@@ -162,28 +160,18 @@ public class KDTUtils {
 
     public static String htmlRow(boolean success, Object... cellValues) {
         StringBuilder buf = new StringBuilder("<tr>");
-        Object[] var3 = cellValues;
-        int var4 = cellValues.length;
-
-        for(int var5 = 0; var5 < var4; ++var5) {
-            Object value = var3[var5];
+        for (Object value : cellValues) {
             buf.append("<td").append(success ? ">" : " class='errorBackGround'>").append(value).append("</td>");
         }
-
         buf.append("</tr>");
         return buf.toString();
     }
 
     public static String htmlRow(HtmlClass clazz, Object... cellValues) {
         StringBuilder buf = (new StringBuilder("<tr class='")).append(clazz).append("'>");
-        Object[] var3 = cellValues;
-        int var4 = cellValues.length;
-
-        for(int var5 = 0; var5 < var4; ++var5) {
-            Object value = var3[var5];
+        for (Object value : cellValues) {
             buf.append("<td class='").append(clazz).append("'>").append(value).append("</td>");
         }
-
         buf.append("</tr>");
         return buf.toString();
     }
@@ -198,14 +186,9 @@ public class KDTUtils {
 
     public static String htmlTable(HtmlClass clazz, String... content) {
         StringBuilder buf = (new StringBuilder("<style type='text/css'>\r\ntable.colored {border: 0px; } table.colored th {background-color: #CCCCCC; } table.colored td {white-space: pre-wrap; } table.colored .errorBorder { border-color: coral;} table.colored .errorBackGround { background-color: #F78181;} table.colored .warnBorder { border-color: #FFFF00;} table.colored .warnBackGround { background-color: #FFFF00;} table.colored .successBorder { border-color: #81F781;} table.colored .successBackGround { background-color: #81F781;} table.colored .normal { border-width: 0px;} </style> ")).append("<table class='").append(clazz).append("'><tbody>");
-        String[] var3 = content;
-        int var4 = content.length;
-
-        for(int var5 = 0; var5 < var4; ++var5) {
-            String row = var3[var5];
+        for (String row : content) {
             buf.append(row);
         }
-
         buf.append("</tbody></table>");
         return buf.toString();
     }
@@ -233,8 +216,7 @@ public class KDTUtils {
                 String relativePath = getRelativePath(f.getAbsolutePath(),
                         (new File("../../../QubershipWebApp/")).getAbsolutePath(), File.separator);
                 return Config.getString("server.url") + File.separator + relativePath;
-            } catch (Throwable var3) {
-                Throwable e = var3;
+            } catch (Throwable e) {
                 log.error("Can't get relative link to file " + f.getAbsolutePath(), e);
                 return "";
             }
@@ -243,11 +225,11 @@ public class KDTUtils {
 
     public static String getHostname() {
         String hostname = System.getenv("HOSTNAME");
-        if (hostname != null && !hostname.trim().equals("")) {
+        if (hostname != null && !hostname.trim().isEmpty()) {
             return hostname;
         } else {
             hostname = System.getenv("COMPUTERNAME");
-            return hostname != null && !hostname.trim().equals("") ? hostname : "UNKNOWN-HOST";
+            return hostname != null && !hostname.trim().isEmpty() ? hostname : "UNKNOWN-HOST";
         }
     }
 
@@ -308,7 +290,7 @@ public class KDTUtils {
     public static String getHrefFromId(BigInteger id, String tab) {
         tab = tab.trim().replace(" ", "+");
         String link = id == null ? "#" : "/ncobject.jsp?id=" + id;
-        if (tab.length() != 0) {
+        if (!tab.isEmpty()) {
             link = link + "&tab=" + (tab.charAt(0) != '_' ? "_" : "") + tab;
         }
 
@@ -317,7 +299,7 @@ public class KDTUtils {
 
     public static String htmlLink(String href, String linkName) {
         String color = "#6666FF";
-        if (linkName == null || linkName.length() == 0) {
+        if (linkName == null || linkName.isEmpty()) {
             linkName = "N/A";
             color = "#CC3333";
         }
@@ -342,9 +324,9 @@ public class KDTUtils {
                 source.append("<H1></H1>");
 
                 for(Executable current = section; current != null; current = current.getParent()) {
-                    if (current.getNormalPriorityParams().size() > 0) {
-                        if (current instanceof Section) {
-                            source.append(htmlBold(((Section)current).getFullName()));
+                    if (!current.getNormalPriorityParams().isEmpty()) {
+                        if (current instanceof Section section1) {
+                            source.append(htmlBold(section1.getFullName()));
                         } else {
                             source.append(htmlBold(current.getName()));
                         }
@@ -371,8 +353,8 @@ public class KDTUtils {
         for(Iterator var2 = map.keySet().iterator(); var2.hasNext(); buf.append(htmlRow(key.toString(), value))) {
             key = var2.next();
             Object objValue = map.get(key);
-            if (objValue instanceof Map) {
-                value = mapToTable((Map)objValue);
+            if (objValue instanceof Map map1) {
+                value = mapToTable(map1);
             } else {
                 value = String.valueOf(objValue).replaceAll(" ", "&nbsp;");
             }
@@ -383,22 +365,13 @@ public class KDTUtils {
 
     public static String listToTable(List<String[]> list) {
         StringBuilder buf = new StringBuilder();
-        Iterator var2 = list.iterator();
-
-        while(var2.hasNext()) {
-            String[] row = (String[])var2.next();
+        for (String[] row : list) {
             buf.append("<tr>");
-            String[] var4 = row;
-            int var5 = row.length;
-
-            for(int var6 = 0; var6 < var5; ++var6) {
-                String cell = var4[var6];
-                buf.append(htmlCell(StringEscapeUtils.escapeHtml4(cell), KDTUtils.HtmlClass.normal));
+            for (String cell : row) {
+                buf.append(htmlCell(StringEscapeUtils.escapeHtml4(cell), HtmlClass.normal));
             }
-
             buf.append("</tr>");
         }
-
         return htmlTable(KDTUtils.HtmlClass.colored, buf.toString());
     }
 
@@ -408,8 +381,8 @@ public class KDTUtils {
 
     private static Map<String, Object> getFinalPropTableNormal(Executable section) {
         Map<String, Object> finalPropTable = section.getParent() == null ? new HashMap() : getFinalPropTableNormal(section.getParent());
-        ((Map)finalPropTable).putAll(section.getNormalPriorityParams());
-        return (Map)finalPropTable;
+        finalPropTable.putAll(section.getNormalPriorityParams());
+        return finalPropTable;
     }
 
     public static <T extends Section> void replaceParametersInDescription(T section) {
@@ -437,14 +410,10 @@ public class KDTUtils {
 
     public static SourceProvider getSourceProviderFromObject(Object object) {
         if (object != null) {
-            Method[] var1 = object.getClass().getDeclaredMethods();
-            int var2 = var1.length;
-
-            for(int var3 = 0; var3 < var2; ++var3) {
-                Method method = var1[var3];
+            for (Method method : object.getClass().getDeclaredMethods()) {
                 if (SourceProvider.class.isAssignableFrom(method.getReturnType())) {
                     try {
-                        return (SourceProvider)method.invoke(object);
+                        return (SourceProvider) method.invoke(object);
                     } catch (Throwable var6) {
                     }
                 }
@@ -457,10 +426,8 @@ public class KDTUtils {
     public static void loadConfigParams(Executable executable) {
         Properties p = getAllConfigContent();
         if (p != null) {
-            Iterator var2 = p.entrySet().iterator();
-
-            while(var2.hasNext()) {
-                Map.Entry<Object, Object> prop = (Map.Entry)var2.next();
+            for (Map.Entry<Object, Object> objectObjectEntry : p.entrySet()) {
+                Map.Entry<Object, Object> prop = (Map.Entry) objectObjectEntry;
                 String key = String.valueOf(prop.getKey());
                 String value = String.valueOf(prop.getValue());
                 executable.setParam(key, value);
@@ -478,7 +445,7 @@ public class KDTUtils {
     }
 
     public static class StringSource implements SourceProvider {
-        private String source;
+        private final String source;
 
         public StringSource(String source) {
             this.source = source;
@@ -555,14 +522,9 @@ public class KDTUtils {
 
         public HtmlTableBuilder addHeaderRow(boolean doNotEscape, Object... cellValues) {
             this.buf.append("<tr>");
-            Object[] var3 = cellValues;
-            int var4 = cellValues.length;
-
-            for(int var5 = 0; var5 < var4; ++var5) {
-                Object value = var3[var5];
+            for (Object value : cellValues) {
                 this.buf.append("<th>").append(this.escapeValue(value, doNotEscape)).append("</th>");
             }
-
             this.buf.append("</tr>");
             return this;
         }
@@ -587,14 +549,9 @@ public class KDTUtils {
             }
 
             this.buf.append("<tr class='").append(clazz).append("'>");
-            Object[] var4 = cellValues;
-            int var5 = cellValues.length;
-
-            for(int var6 = 0; var6 < var5; ++var6) {
-                Object value = var4[var6];
+            for (Object value : cellValues) {
                 this.buf.append("<td class='").append(clazz).append("'>").append(this.escapeValue(value, doNotEscape)).append("</td>");
             }
-
             this.buf.append("</tr>");
             return this;
         }

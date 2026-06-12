@@ -1,5 +1,5 @@
 /*
- *  Copyright 2024-2025 NetCracker Technology Corporation
+ *  Copyright 2024-2026 NetCracker Technology Corporation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -20,14 +20,12 @@ import java.io.File;
 import java.nio.charset.StandardCharsets;
 
 import org.apache.commons.io.FileUtils;
-import org.junit.Assert;
-import org.junit.Test;
-
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.qubership.atp.adapter.executor.executor.sourceproviders.CommonFileSourceProvider;
 import org.qubership.atp.adapter.executor.executor.sourceproviders.FileSource;
 import org.qubership.atp.adapter.executor.executor.sourceproviders.TestSnapshot;
 import org.qubership.atp.adapter.executor.executor.sourceproviders.TestSnapshotWithoutExtension;
-
 import org.qubership.atp.adapter.executor.executor.utils.AttachmentCreator;
 import org.qubership.atp.adapter.executor.executor.utils.MimeType;
 import org.qubership.atp.ram.models.logrecords.parts.FileMetadata;
@@ -43,10 +41,10 @@ public class AttachmentCreatorTest {
 
         org.qubership.atp.adapter.executor.executor.NttAttachment attachment = AttachmentCreator.create(new CommonFileSourceProvider(fileContent, fileName));
 
-        Assert.assertEquals(MimeType.HTML.toString(), attachment.getContentType());
-        Assert.assertEquals(fileName, attachment.getFileName());
-        Assert.assertEquals(fileContent, attachment.getFileSource().toString());
-        Assert.assertEquals(expectedFileMetadata, attachment.getFileMetadata());
+        Assertions.assertEquals(MimeType.HTML.toString(), attachment.getContentType());
+        Assertions.assertEquals(fileName, attachment.getFileName());
+        Assertions.assertEquals(fileContent, attachment.getFileSource().toString());
+        Assertions.assertEquals(expectedFileMetadata, attachment.getFileMetadata());
     }
 
     @Test
@@ -59,10 +57,10 @@ public class AttachmentCreatorTest {
 
         org.qubership.atp.adapter.executor.executor.NttAttachment attachment = AttachmentCreator.create(new FileSource(fileName));
 
-        Assert.assertEquals(MimeType.HTML.toString(), attachment.getContentType());
-        Assert.assertEquals(fileName, attachment.getFileName());
-        Assert.assertEquals(fileName, attachment.getFileSource().toString());
-        Assert.assertEquals(expectedFileMetadata, attachment.getFileMetadata());
+        Assertions.assertEquals(MimeType.HTML.toString(), attachment.getContentType());
+        Assertions.assertEquals(fileName, attachment.getFileName());
+        Assertions.assertEquals(fileName, attachment.getFileSource().toString());
+        Assertions.assertEquals(expectedFileMetadata, attachment.getFileMetadata());
     }
 
     @Test
@@ -74,10 +72,10 @@ public class AttachmentCreatorTest {
 
         org.qubership.atp.adapter.executor.executor.NttAttachment attachment = AttachmentCreator.create(new TestSnapshot(fileContent));
 
-        Assert.assertEquals(MimeType.HTML.toString(), attachment.getContentType());
-        Assert.assertEquals(fileNameWithExtension, attachment.getFileName());
-        Assert.assertTrue(attachment.getFileSource().getName().startsWith(fileName));
-        Assert.assertEquals(expectedFileMetadata, attachment.getFileMetadata());
+        Assertions.assertEquals(MimeType.HTML.toString(), attachment.getContentType());
+        Assertions.assertEquals(fileNameWithExtension, attachment.getFileName());
+        Assertions.assertTrue(attachment.getFileSource().getName().startsWith(fileName));
+        Assertions.assertEquals(expectedFileMetadata, attachment.getFileMetadata());
         attachment.getFileSource().delete();
     }
 
@@ -90,10 +88,10 @@ public class AttachmentCreatorTest {
 
         NttAttachment attachment = AttachmentCreator.create(new TestSnapshotWithoutExtension(fileContent));
 
-        Assert.assertEquals(MimeType.HTML.toString(), attachment.getContentType());
-        Assert.assertEquals(fileNameWithExtension, attachment.getFileName());
-        Assert.assertTrue(attachment.getFileSource().getName().startsWith(fileName));
-        Assert.assertEquals(expectedFileMetadata, attachment.getFileMetadata());
+        Assertions.assertEquals(MimeType.HTML.toString(), attachment.getContentType());
+        Assertions.assertEquals(fileNameWithExtension, attachment.getFileName());
+        Assertions.assertTrue(attachment.getFileSource().getName().startsWith(fileName));
+        Assertions.assertEquals(expectedFileMetadata, attachment.getFileMetadata());
         attachment.getFileSource().delete();
     }
 }

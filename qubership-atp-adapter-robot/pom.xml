@@ -3,7 +3,7 @@
     <parent>
         <groupId>org.qubership.atp.adapter.robot</groupId>
         <artifactId>qubership-atp-adapter-robot-parent-java</artifactId>
-        <version>4.5.73-SNAPSHOT</version>
+        <version>5.0.0-SNAPSHOT</version>
         <relativePath>../parent/parent-java/pom.xml</relativePath>
     </parent>
 
@@ -43,14 +43,14 @@
             <artifactId>slf4j-api</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>5.14.3</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>jul-to-slf4j</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>test</scope>
         </dependency>
     </dependencies>
 
@@ -228,7 +228,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-failsafe-plugin</artifactId>
-                        <version>2.20.1</version>
+                        <version>3.1.2</version>
                         <executions>
                             <!-- execute all integration (mostly UI tests) -->
                             <execution>

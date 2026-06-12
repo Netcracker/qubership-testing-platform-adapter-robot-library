@@ -1,5 +1,5 @@
 /*
- *  Copyright 2024-2025 NetCracker Technology Corporation
+ *  Copyright 2024-2026 NetCracker Technology Corporation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -16,10 +16,10 @@
 
 package org.qubership.atp.adapter.keyworddriven.basicformat;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.qubership.atp.adapter.keyworddriven.executable.Executable;
 import org.qubership.atp.adapter.keyworddriven.executable.Section;
 import org.qubership.atp.adapter.keyworddriven.executor.KeywordExecutor;
-import org.apache.commons.lang3.ArrayUtils;
 
 public abstract class Filter<T> {
     private Filter() {
@@ -28,23 +28,19 @@ public abstract class Filter<T> {
     public static <T> Filter or(final Filter<T>... filters) {
         return new Filter<T>() {
             public boolean match(T object) {
-                Filter[] var2 = filters;
-                int var3 = var2.length;
-
-                for(int var4 = 0; var4 < var3; ++var4) {
-                    Filter<T> filter = var2[var4];
+                for(int var4 = 0; var4 < filters.length; ++var4) {
+                    Filter<T> filter = ((Filter[]) filters)[var4];
                     if (filter.match(object)) {
                         return true;
                     }
                 }
-
                 return false;
             }
         };
     }
 
     public static <T extends Executable> Filter<T> executableByName(final String... names) {
-        return new Filter<T>() {
+        return new Filter<>() {
             public boolean match(T executable) {
                 return ArrayUtils.contains(names, executable.getName());
             }
@@ -52,7 +48,7 @@ public abstract class Filter<T> {
     }
 
     public static <T> Filter<T> noFilter() {
-        return new Filter<T>() {
+        return new Filter<>() {
             public boolean match(T o) {
                 return true;
             }
@@ -60,11 +56,11 @@ public abstract class Filter<T> {
     }
 
     public static <T extends Section> Filter<T> filterSectionByValidationLevel() {
-        return new Filter<T>() {
+        return new Filter<>() {
             public boolean match(T section) {
                 int level = section.getValidationLevel();
                 if (level > KeywordExecutor.validationLevel) {
-                    section.log().debug(String.format("Section '%s' was skipped because validation level of it is bigger than execution level (%d > %d)", section.getName(), level, KeywordExecutor.validationLevel));
+                    section.log().debug("Section '%s' was skipped because validation level of it is bigger than execution level (%d > %d)".formatted(section.getName(), level, KeywordExecutor.validationLevel));
                     return false;
                 } else {
                     return true;

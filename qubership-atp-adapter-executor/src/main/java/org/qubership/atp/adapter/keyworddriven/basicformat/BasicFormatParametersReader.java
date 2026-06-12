@@ -43,7 +43,7 @@ public class BasicFormatParametersReader extends ExcelParametersReader {
     public void loadParameters(Section section) throws InvalidFormatOfSourceException {
         if (!StringUtils.isEmpty(this.sheetName)) {
             if (!this.excelBook.hasSheet(this.sheetName)) {
-                throw new InvalidFormatOfSourceException(String.format("Sheet '%s' hasn't been found in the '%s' WB. Available sheets are: %s", this.sheetName, this.excelBook.getCurrentFile(), this.excelBook.getAllSheets()));
+                throw new InvalidFormatOfSourceException("Sheet '%s' hasn't been found in the '%s' WB. Available sheets are: %s".formatted(this.sheetName, this.excelBook.getCurrentFile(), this.excelBook.getAllSheets()));
             }
 
             try {

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2024-2025 NetCracker Technology Corporation
+ *  Copyright 2024-2026 NetCracker Technology Corporation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -16,6 +16,12 @@
 
 package org.qubership.atp.adapter.keyworddriven.executor;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.qubership.atp.adapter.keyworddriven.TestCaseException;
 import org.qubership.atp.adapter.keyworddriven.executable.BlockedExecutable;
 import org.qubership.atp.adapter.keyworddriven.executable.Executable;
@@ -24,15 +30,10 @@ import org.qubership.atp.adapter.report.Report;
 import org.qubership.atp.adapter.testcase.Config;
 import org.qubership.atp.adapter.utils.ExceptionUtils;
 import org.qubership.atp.adapter.utils.KDTUtils;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 public class SectionExecutor implements Executor {
     private static final Log log = LogFactory.getLog(SectionExecutor.class);
-    private List<ExecuteListener> executeListeners = new ArrayList();
+    private final List<ExecuteListener> executeListeners = new ArrayList<>();
 
     public SectionExecutor() {
     }
@@ -53,47 +54,35 @@ public class SectionExecutor implements Executor {
     }
 
     public void prepare(Executable executable) {
-        Iterator var2 = executable.getChildren().iterator();
-
-        while(var2.hasNext()) {
-            Executable child = (Executable)var2.next();
+        for (Executable child : executable.getChildren()) {
             child.prepare();
         }
-
     }
 
     public void addExecuteListener(ExecuteListener listener) {
         if (Config.getBoolean("kdt.check.listeners.are.already.registered", true) && this.executeListeners.contains(listener)) {
-            log.warn(String.format("Try to register already registered '%s' to '%s'", listener, this));
+            log.warn("Try to register already registered '%s' to '%s'".formatted(listener, this));
         } else {
             this.executeListeners.add(listener);
         }
     }
 
     public void executeBefore(Executable executable) {
-        Iterator var2 = this.executeListeners.iterator();
-
-        while(var2.hasNext()) {
-            ExecuteListener listener = (ExecuteListener)var2.next();
+        for (ExecuteListener listener : this.executeListeners) {
             listener.beforeExecute(executable);
         }
-
     }
 
     public void executeAfter(Executable executable) {
-        Iterator var2 = this.executeListeners.iterator();
-
-        while(var2.hasNext()) {
-            ExecuteListener listener = (ExecuteListener)var2.next();
+        for (ExecuteListener listener : this.executeListeners) {
             listener.afterExecute(executable);
         }
-
     }
 
     private boolean skip(Executable executable) {
         Section section = (Section)executable;
         if (section.getValidationLevel() > KeywordExecutor.validationLevel) {
-            section.log().debug(String.format("Section '%s' was skipped because validation level of it is bigger than execution level ( %s > %s )", section.getFullName(), section.getValidationLevel(), KeywordExecutor.validationLevel));
+            section.log().debug("Section '%s' was skipped because validation level of it is bigger than execution level ( %s > %s )".formatted(section.getFullName(), section.getValidationLevel(), KeywordExecutor.validationLevel));
             return true;
         } else {
             return false;
@@ -101,30 +90,25 @@ public class SectionExecutor implements Executor {
     }
 
     protected void executeChildren(Section section) throws Exception {
-        Iterator<Executable> childen = section.getChildren().iterator();
+        Iterator<Executable> children = section.getChildren().iterator();
         Executable current = null;
-
         try {
-            while(childen.hasNext()) {
-                current = (Executable)childen.next();
+            while(children.hasNext()) {
+                current = children.next();
                 current.execute();
             }
-        } catch (Exception var9) {
-            Exception e = var9;
+        } catch (Exception e) {
             if (!ExceptionUtils.isHandled(e)) {
                 TestCaseException handledException = ExceptionUtils.handle(e, "Error occurred during execution section: " + current + ".\n Error: " + e.getMessage());
                 Report.getReport().message(handledException);
                 throw handledException;
             }
-
             throw e;
         } finally {
-            while(childen.hasNext()) {
-                Report.getReport().message(new BlockedExecutable((Executable)childen.next()));
+            while(children.hasNext()) {
+                Report.getReport().message(new BlockedExecutable(children.next()));
             }
-
         }
-
     }
 }
 

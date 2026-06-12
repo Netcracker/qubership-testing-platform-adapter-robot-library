@@ -24,6 +24,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,19 +40,17 @@ import java.util.stream.Collectors;
 import javax.net.ssl.SSLContext;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpRequestInterceptor;
-import org.apache.http.client.fluent.Content;
-import org.apache.http.client.fluent.Request;
-import org.apache.http.config.Registry;
-import org.apache.http.config.RegistryBuilder;
-import org.apache.http.conn.socket.ConnectionSocketFactory;
-import org.apache.http.conn.socket.PlainConnectionSocketFactory;
-import org.apache.http.conn.ssl.NoopHostnameVerifier;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.entity.ContentType;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.conn.BasicHttpClientConnectionManager;
-import org.apache.http.ssl.SSLContexts;
+import org.apache.hc.client5.http.fluent.Content;
+import org.apache.hc.client5.http.fluent.Request;
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder;
+import org.apache.hc.client5.http.ssl.DefaultClientTlsStrategy;
+import org.apache.hc.client5.http.ssl.NoopHostnameVerifier;
+import org.apache.hc.client5.http.ssl.TlsSocketStrategy;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.HttpRequestInterceptor;
+import org.apache.hc.core5.ssl.SSLContexts;
 import org.qubership.atp.adapter.common.RamConstants;
 import org.qubership.atp.adapter.common.adapters.interceptors.MdcHttpRequestInterceptor;
 import org.qubership.atp.adapter.common.entities.Message;
@@ -133,8 +132,8 @@ public class RequestUtils {
             String url,
             Object request,
             Class<ResponseTypeT> responseType) throws IOException {
-        return request != null ? requestWithBody(url, request, responseType, Request::Post) :
-                requestWithoutBody(url, responseType, Request::Post);
+        return request != null ? requestWithBody(url, request, responseType, Request::post) :
+                requestWithoutBody(url, responseType, Request::post);
     }
 
     /**
@@ -152,8 +151,8 @@ public class RequestUtils {
             String url,
             Object request,
             Class<ResponseTypeT> responseType) throws IOException {
-        return request != null ? requestWithBody(url, request, responseType, Request::Put) :
-                requestWithoutBody(url, responseType, Request::Put);
+        return request != null ? requestWithBody(url, request, responseType, Request::put) :
+                requestWithoutBody(url, responseType, Request::put);
     }
 
     /**
@@ -171,8 +170,8 @@ public class RequestUtils {
             String url,
             Object request,
             Class<ResponseTypeT> responseType) throws IOException {
-        return request != null ? requestWithBody(url, request, responseType, Request::Patch) :
-                requestWithoutBody(url, responseType, Request::Patch);
+        return request != null ? requestWithBody(url, request, responseType, Request::patch) :
+                requestWithoutBody(url, responseType, Request::patch);
     }
 
     /**
@@ -190,7 +189,7 @@ public class RequestUtils {
             String url,
             InputStream requestStream,
             Class<ResponseTypeT> responseType) throws IOException {
-        return requestWithBodyStream(url, Objects.requireNonNull(requestStream), responseType, Request::Post);
+        return requestWithBodyStream(url, Objects.requireNonNull(requestStream), responseType, Request::post);
     }
 
     private static <ResponseTypeT> ResponseTypeT requestWithBody(
@@ -249,7 +248,7 @@ public class RequestUtils {
         String result = "";
         try {
             final Content postResult = getHttpExecutor()
-                    .execute(Request.Post(url)
+                    .execute(Request.post(url)
                             .bodyString(request, ContentType.APPLICATION_JSON)).returnContent();
             if (postResult.equals(Content.NO_CONTENT)) {
                 return null;
@@ -268,7 +267,7 @@ public class RequestUtils {
         try {
             return OBJECT_MAPPER.readValue(
                     getHttpExecutor()
-                            .execute(Request.Put(url))
+                            .execute(Request.put(url))
                             .returnContent()
                             .asString(), ObjectNode.class);
         } catch (IOException e) {
@@ -281,7 +280,7 @@ public class RequestUtils {
         try {
             OBJECT_MAPPER.readValue(
                     getHttpExecutor()
-                            .execute(Request.Put(url).bodyString(request, ContentType.APPLICATION_JSON))
+                            .execute(Request.put(url).bodyString(request, ContentType.APPLICATION_JSON))
                             .returnContent()
                             .asString(), ObjectNode.class);
         } catch (IOException e) {
@@ -293,7 +292,7 @@ public class RequestUtils {
         try {
             return OBJECT_MAPPER.readValue(
                     getHttpExecutor()
-                            .execute(Request.Get(url))
+                            .execute(Request.get(url))
                             .returnContent()
                             .asString(), ObjectNode.class);
         } catch (IOException e) {
@@ -331,11 +330,13 @@ public class RequestUtils {
         final Content postResult;
         try {
             postResult = getHttpExecutor()
-                    .execute(Request.Post(url + "/?fileName=" + fileName + "&contentType=" + contentType
+                    .execute(Request.post(url + "/?fileName=" + fileName + "&contentType=" + contentType
                                     + "&snapshotSource="
-                                    + URLEncoder.encode(StringUtils.defaultIfEmpty(snapshotSource, ""), "UTF-8")
+                                    + URLEncoder.encode(StringUtils.defaultIfEmpty(snapshotSource, ""),
+                                    StandardCharsets.UTF_8)
                                     + "&snapshotExternalSource="
-                                    + URLEncoder.encode(StringUtils.defaultIfEmpty(snapshotExternalSource, ""), "UTF-8")
+                                    + URLEncoder.encode(StringUtils.defaultIfEmpty(snapshotExternalSource, ""),
+                                    StandardCharsets.UTF_8)
                             ).bodyStream(stream, ContentType.APPLICATION_OCTET_STREAM)).returnContent();
             output = OBJECT_MAPPER.readValue(postResult.asString(), UploadScreenshotResponse.class);
             log.debug("Url: {}, RAM response: {} ", url, output);
@@ -358,31 +359,38 @@ public class RequestUtils {
      *
      * @return Executor
      */
-    public static org.apache.http.client.fluent.Executor getHttpExecutor() {
+    public static org.apache.hc.client5.http.fluent.Executor getHttpExecutor() {
         HttpClientBuilder httpClientBuilder = Optional.ofNullable(httpClientBuilderProvider)
                 .map(HttpClientBuilderProvider::getBuilder)
                 .orElseGet(HttpClientBuilder::create);
         try {
-            SSLContext sslContext = SSLContexts.custom().loadTrustMaterial(null, (cert, authType) -> true).build();
-            SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(sslContext,
-                    NoopHostnameVerifier.INSTANCE);
-            Registry<ConnectionSocketFactory> socketFactoryRegistry =
-                    RegistryBuilder.<ConnectionSocketFactory>create()
-                            .register(HTTPS, sslsf)
-                            .register(HTTP, new PlainConnectionSocketFactory())
+            // 1. Create SSLContext which trusts all certificates
+            SSLContext sslContext = SSLContexts.custom()
+                    .loadTrustMaterial(null, (cert, authType) -> true)
+                    .build();
+
+            // 2. Create TlsStrategy with this SSLContext and hostname verifying turned OFF.
+            TlsSocketStrategy tlsStrategy = new DefaultClientTlsStrategy(
+                    sslContext,
+                    NoopHostnameVerifier.INSTANCE
+            );
+
+            // 3. Create ConnectionManager
+            PoolingHttpClientConnectionManager connectionManager =
+                    PoolingHttpClientConnectionManagerBuilder.create()
+                            .setTlsSocketStrategy(tlsStrategy)
                             .build();
 
-            BasicHttpClientConnectionManager connectionManager =
-                    new BasicHttpClientConnectionManager(socketFactoryRegistry);
-            httpClientBuilder.setSSLSocketFactory(sslsf).setConnectionManager(connectionManager);
+            // 4. Set ConnectionManager in the builder
+            httpClientBuilder.setConnectionManager(connectionManager);
         } catch (GeneralSecurityException exception) {
             log.error("An error occurred while creating the SSLContext for http executor.", exception);
         }
-        httpClientBuilder.addInterceptorFirst(new MdcHttpRequestInterceptor(businessIds));
+        httpClientBuilder.addRequestInterceptorFirst(new MdcHttpRequestInterceptor(businessIds));
         for (HttpRequestInterceptor interceptor : interceptors) {
-            httpClientBuilder.addInterceptorLast(interceptor);
+            httpClientBuilder.addRequestInterceptorLast(interceptor);
         }
-        return org.apache.http.client.fluent.Executor.newInstance(httpClientBuilder.build());
+        return org.apache.hc.client5.http.fluent.Executor.newInstance(httpClientBuilder.build());
     }
 
     /**
@@ -394,7 +402,7 @@ public class RequestUtils {
      */
     @Deprecated
     public static void uploadOneFile(Message message, String atpRamUrl) {
-        Map attributes = message.getAttributes().get(0);
+        Map attributes = message.getAttributes().getFirst();
         UploadScreenshotResponse response = uploadFile(attributes, message.getUuid(), atpRamUrl);
 
         String contentType = (String) attributes.get(RamConstants.SCREENSHOT_TYPE_KEY);

@@ -53,7 +53,7 @@ public class ExcelSheet {
         this.excelBook = excelBook;
         this.currentSheetName = sheetName;
         if (!excelBook.hasSheet(sheetName)) {
-            throw new InvalidFormatOfSourceException(String.format("Sheet '%s' hasn't been found in the '%s' WB", sheetName, this.getExcelBookName()));
+            throw new InvalidFormatOfSourceException("Sheet '%s' hasn't been found in the '%s' WB".formatted(sheetName, this.getExcelBookName()));
         } else {
             this.setCurrentSheet(excelBook.getWorkbook().getSheet(sheetName));
             this.calculateHeaders(currentRowIndex, headerRowIdentifiers);
@@ -95,8 +95,8 @@ public class ExcelSheet {
                 }
             } else {
                 throw new InvalidFormatOfSourceException(
-                        String.format("Header row on '%s' sheet hasn't been defined. File name is '%s'.",
-                                this.getSheetName(), this.getExcelBookName()));
+                    "Header row on '%s' sheet hasn't been defined. File name is '%s'.".formatted(
+                        this.getSheetName(), this.getExcelBookName()));
             }
         }
     }
@@ -163,14 +163,14 @@ public class ExcelSheet {
     public ExcelCell getCellByHeaderName(int rowNumber, String headerName, int startIndex) {
         this.validateRowIndex(rowNumber, true);
         List<Integer> indexes = this.getHeaderIndexesByName(headerName, startIndex);
-        if (!indexes.isEmpty() && indexes.get(0) != -1) {
-            return this.getRow(rowNumber).getCell(indexes.get(0));
+        if (!indexes.isEmpty() && indexes.getFirst() != -1) {
+            return this.getRow(rowNumber).getCell(indexes.getFirst());
         } else {
-            String basicMessage = String.format("Error during operation with headers. Excel file name is '%s', excel sheet name is '%s'. Header row index = %s", this.getExcelBookName(), this.getSheetName(), this.headerRowIndex);
+            String basicMessage = "Error during operation with headers. Excel file name is '%s', excel sheet name is '%s'. Header row index = %s".formatted(this.getExcelBookName(), this.getSheetName(), this.headerRowIndex);
             if (this.getHeaderRowIndex() <= -1) {
-                throw new DataNotSetException(String.format("%s. Header row is not defined!", basicMessage));
+                throw new DataNotSetException("%s. Header row is not defined!".formatted(basicMessage));
             } else {
-                throw new DataNotSetException(String.format("%s. Header name '%s' doesn't exist in header row: '%s'", basicMessage, headerName, this.headers.values()));
+                throw new DataNotSetException("%s. Header name '%s' doesn't exist in header row: '%s'".formatted(basicMessage, headerName, this.headers.values()));
             }
         }
     }
@@ -203,8 +203,7 @@ public class ExcelSheet {
                 ExcelCell cell = (ExcelCell) o;
                 String cellValue = cell.getValue();
 
-                for (int i = 0; i < content.length; ++i) {
-                    String contentVal = content[i];
+                for (String contentVal : content) {
                     if (StringUtils.equalsIgnoreCase(cellValue, contentVal)) {
                         if (StringUtils.isNotEmpty(cellValue)) {
                             ++valuesCount;
@@ -284,7 +283,7 @@ public class ExcelSheet {
     }
 
     public Iterator<ExcelRow> iterator() {
-        return new Iterator<ExcelRow>() {
+        return new Iterator<>() {
             int index = 1;
             final int endIndex = ExcelSheet.this.getMaxRowNum();
 
@@ -354,7 +353,7 @@ public class ExcelSheet {
     }
 
     public boolean equals(Object object) {
-        return object instanceof ExcelSheet && this.toString().equals(((ExcelSheet) object).toString());
+        return object instanceof ExcelSheet es && this.toString().equals(es.toString());
     }
 
     public ExcelBook getExcelBook() {
@@ -391,24 +390,24 @@ public class ExcelSheet {
     }
 
     public void flushRows() throws IOException {
-        if (this.currentSheet instanceof SXSSFSheet) {
-            ((SXSSFSheet)this.currentSheet).flushRows();
+        if (this.currentSheet instanceof SXSSFSheet sheet) {
+            sheet.flushRows();
         } else {
             throw new UnsupportedOperationException("Could not release memory. This sheet is not SXSSFSheet's instance");
         }
     }
 
     public void trackColumnForAutoSizing(int columnNumber) {
-        if (this.currentSheet instanceof SXSSFSheet) {
-            ((SXSSFSheet)this.currentSheet).trackColumnForAutoSizing(columnNumber - 1);
+        if (this.currentSheet instanceof SXSSFSheet sheet) {
+            sheet.trackColumnForAutoSizing(columnNumber - 1);
         } else {
             throw new UnsupportedOperationException("This function available only for SXSSFSheet sheet");
         }
     }
 
     public void untrackColumnForAutoSizing(int columnNumber) {
-        if (this.currentSheet instanceof SXSSFSheet) {
-            ((SXSSFSheet)this.currentSheet).untrackColumnForAutoSizing(columnNumber - 1);
+        if (this.currentSheet instanceof SXSSFSheet sheet) {
+            sheet.untrackColumnForAutoSizing(columnNumber - 1);
         } else {
             throw new UnsupportedOperationException("This function available only for SXSSFSheet sheet");
         }

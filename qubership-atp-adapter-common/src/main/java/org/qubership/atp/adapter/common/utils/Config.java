@@ -21,7 +21,7 @@ import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.util.Properties;
 
 import org.apache.commons.io.filefilter.WildcardFileFilter;
@@ -49,7 +49,7 @@ public class Config {
     }
 
     private void loadConfigFiles() {
-        File dir = new File(Paths.get("").toAbsolutePath().toString());
+        File dir = new File(Path.of("").toAbsolutePath().toString());
         FileFilter fileFilter = new WildcardFileFilter("*.properties");
         configs = dir.listFiles(fileFilter);
     }

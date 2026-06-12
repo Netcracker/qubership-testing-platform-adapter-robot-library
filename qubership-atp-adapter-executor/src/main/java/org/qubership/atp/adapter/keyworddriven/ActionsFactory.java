@@ -34,7 +34,7 @@ public class ActionsFactory {
 
         if (!actions.containsKey(actionClass)) {
             try {
-                actions.put(actionClass, actionClass.newInstance());
+                actions.put(actionClass, actionClass.getDeclaredConstructor().newInstance());
             } catch (Throwable var3) {
                 Throwable e = var3;
                 throw new ActionCreatingException(e);

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2024-2025 NetCracker Technology Corporation
+ *  Copyright 2024-2026 NetCracker Technology Corporation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -19,9 +19,7 @@ package org.qubership.atp.adapter.executor.executor;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
-import static org.powermock.api.mockito.PowerMockito.mockStatic;
-import static org.powermock.api.mockito.PowerMockito.whenNew;
+import static org.mockito.Mockito.mockStatic;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -29,18 +27,20 @@ import java.util.Stack;
 import java.util.UUID;
 
 import org.apache.kafka.clients.producer.KafkaProducer;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.MockedConstruction;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.mockito.stubbing.Answer;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
-
 import org.qubership.atp.adapter.common.adapters.AtpKafkaRamAdapter;
 import org.qubership.atp.adapter.common.adapters.providers.RamAdapterProvider;
 import org.qubership.atp.adapter.common.context.AtpCompaund;
@@ -48,17 +48,16 @@ import org.qubership.atp.adapter.common.context.TestRunContext;
 import org.qubership.atp.adapter.common.context.TestRunContextHolder;
 import org.qubership.atp.adapter.common.entities.Message;
 import org.qubership.atp.adapter.common.kafka.client.KafkaConfigurator;
-import org.qubership.atp.adapter.common.kafka.pool.KafkaPoolManagementService;
-
+import org.qubership.atp.adapter.report.WebReportItem;
 import org.qubership.atp.ram.enums.TestingStatuses;
 import org.qubership.atp.ram.models.LogRecord;
-import org.qubership.atp.adapter.report.WebReportItem;
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest({KafkaPoolManagementService.class, AtpKafkaRamAdapter.class, RamAdapterProvider.class,
-        TestRunContextHolder.class})
-@PowerMockIgnore("javax.management.*")
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 public class AtpRamWriterHierarchyTest {
+    private MockedStatic<TestRunContextHolder> mockedTestRunContextHolder;
+    private MockedStatic<RamAdapterProvider> mockedRamAdapterProvider;
+
     @Spy
     private org.qubership.atp.adapter.executor.executor.AtpRamWriter writer = new AtpRamWriter();
     @Mock
@@ -66,7 +65,7 @@ public class AtpRamWriterHierarchyTest {
     @Mock
     private KafkaConfigurator kafkaConfigurator;
     private AtpKafkaRamAdapter adapter;
-    private Stack<LogRecord> expectedHierarchyLogRecords = new Stack<>();
+    private final Stack<LogRecord> expectedHierarchyLogRecords = new Stack<>();
 
     private static final UUID rootSectionId = UUID.randomUUID();
     private static final String rootSectionName = "Root Section";
@@ -87,23 +86,33 @@ public class AtpRamWriterHierarchyTest {
     private static final UUID rootLogRecordId = UUID.randomUUID();
     private static final String rootLogRecordName = "Root LogRecord";
 
-    private TestRunContext setUp(boolean stepIsLast) throws Exception {
-        TestRunContext testRunContext = Utils.createTestRunContext(false);
-        testRunContext.setCompoundAndUpdateCompoundStatuses(Utils.createAtpCompaund(stepIsLast));
-        whenNew(KafkaProducer.class).withAnyArguments().thenReturn(producer);
-        whenNew(KafkaConfigurator.class).withAnyArguments().thenReturn(kafkaConfigurator);
+    private TestRunContext setUp(boolean stepIsLast) {
+        try (MockedConstruction<KafkaConfigurator> mockKafkaConfigurator = Mockito.mockConstruction(KafkaConfigurator.class)) {
+            try (MockedConstruction<KafkaProducer> mockKafkaProducer = Mockito.mockConstruction(KafkaProducer.class)) {
+                TestRunContext testRunContext = Utils.createTestRunContext(false);
+                testRunContext.setCompoundAndUpdateCompoundStatuses(Utils.createAtpCompaund(stepIsLast));
 
-        adapter = Mockito.spy(AtpKafkaRamAdapter.class);
-        adapter.setContext(testRunContext);
+                adapter = Mockito.spy(AtpKafkaRamAdapter.class);
+                adapter.setContext(testRunContext);
+                mockedRamAdapterProvider.when(() -> RamAdapterProvider.getNewAdapter(anyString())).thenReturn(adapter);
+                mockedTestRunContextHolder.when(() -> TestRunContextHolder.getContext(anyString())).thenReturn(testRunContext);
 
-        mockStatic(RamAdapterProvider.class);
-        when(RamAdapterProvider.getNewAdapter(anyString())).thenReturn(adapter);
+                createExpectedHierarchyLogRecords();
+                return testRunContext;
+            }
+        }
+    }
 
-        mockStatic(TestRunContextHolder.class);
-        when(TestRunContextHolder.getContext(anyString())).thenReturn(testRunContext);
+    @BeforeEach
+    void setUpStaticMocks() {
+        mockedTestRunContextHolder = mockStatic(TestRunContextHolder.class);
+        mockedRamAdapterProvider = mockStatic(RamAdapterProvider.class);
+    }
 
-        createExpectedHierarchyLogRecords();
-        return testRunContext;
+    @AfterEach
+    void tearDownStaticMocks() {
+        mockedRamAdapterProvider.closeOnDemand();
+        mockedTestRunContextHolder.closeOnDemand();
     }
 
     /**
@@ -115,21 +124,21 @@ public class AtpRamWriterHierarchyTest {
     public void testHierarchyLogRecords_CheckCompoundStatus_CompoundStatusIsFailed() throws Exception {
         Stack<LogRecord> result = executeWithTwoSteps();
 
-        Assert.assertEquals(3, result.size());
+        Assertions.assertEquals(3, result.size());
 
         LogRecord compound = result.pop();
         boolean compoundIdEqualsExpectedId = compound.getUuid().equals(Utils.compaundId);
         boolean compoundStatusEqualsExpectedStatus =
                 compound.getTestingStatus().getName().equals(TestingStatuses.FAILED.getName());
-        Assert.assertTrue(String.format("Compound [%s] with status FAILED is expected last in the stack. AR: id [%s], "
-                        + "status [%s]", Utils.compaundId, compound.getUuid(), compound.getTestingStatus()),
-                compoundIdEqualsExpectedId && compoundStatusEqualsExpectedStatus);
+        Assertions.assertTrue(compoundIdEqualsExpectedId && compoundStatusEqualsExpectedStatus,
+                String.format("Compound [%s] with status FAILED is expected last in the stack. AR: id [%s], "
+                        + "status [%s]", Utils.compaundId, compound.getUuid(), compound.getTestingStatus()));
 
         LogRecord step = result.pop();
-        Assert.assertTrue(String.format("Step [%s] with parent [%s] and status FAILED expected after compound. AR: id "
+        Assertions.assertTrue(verifyLogRecord(Utils.stepId, Utils.compaundId, TestingStatuses.FAILED, step),
+                String.format("Step [%s] with parent [%s] and status FAILED expected after compound. AR: id "
                         + "[%s], "
-                        + "parentId [%s]", Utils.stepId, Utils.compaundId, step.getUuid(), step.getParentRecordId()),
-                verifyLogRecord(Utils.stepId, Utils.compaundId, TestingStatuses.FAILED, step));
+                        + "parentId [%s]", Utils.stepId, Utils.compaundId, step.getUuid(), step.getParentRecordId()));
     }
 
     /**
@@ -150,80 +159,80 @@ public class AtpRamWriterHierarchyTest {
             throws Exception {
         Stack<LogRecord> result = execute();
 
-        Assert.assertEquals(11, result.size());
+        Assertions.assertEquals(11, result.size());
         LogRecord compound = result.pop();
         boolean parentCompoundIsNull = Objects.isNull(compound.getParentRecordId());
         boolean compoundIdEqualsExpectedId = compound.getUuid().equals(Utils.compaundId);
         boolean compoundStatusEqualsExpectedStatus =
                 compound.getTestingStatus().getName().equals(TestingStatuses.FAILED.getName());
-        Assert.assertTrue(String.format("Compound [%s] with parent [%s] is expected last in the stack. AR: id [%s], "
-                        + "parentId [%s]", Utils.compaundId, null, compound.getUuid(), compound.getParentRecordId()),
-                parentCompoundIsNull && compoundIdEqualsExpectedId && compoundStatusEqualsExpectedStatus);
+        Assertions.assertTrue(parentCompoundIsNull && compoundIdEqualsExpectedId && compoundStatusEqualsExpectedStatus,
+                String.format("Compound [%s] with parent [%s] is expected last in the stack. AR: id [%s], "
+                        + "parentId [%s]", Utils.compaundId, null, compound.getUuid(), compound.getParentRecordId()));
 
         LogRecord step = result.pop();
-        Assert.assertTrue(String.format("Step [%s] with parent [%s] expected after compound. AR: id [%s], "
-                        + "parentId [%s]", Utils.stepId, Utils.compaundId, step.getUuid(), step.getParentRecordId()),
-                verifyLogRecord(Utils.stepId, Utils.compaundId, TestingStatuses.FAILED, step));
+        Assertions.assertTrue(verifyLogRecord(Utils.stepId, Utils.compaundId, TestingStatuses.FAILED, step),
+                String.format("Step [%s] with parent [%s] expected after compound. AR: id [%s], "
+                        + "parentId [%s]", Utils.stepId, Utils.compaundId, step.getUuid(), step.getParentRecordId()));
 
         LogRecord rootSection = result.pop();
-        Assert.assertTrue(String.format("Root section [%s] with parent [%s] expected after Step. AR: id [%s], "
+        Assertions.assertTrue(verifyLogRecord(rootSectionId, Utils.stepId, TestingStatuses.FAILED,
+                rootSection), String.format("Root section [%s] with parent [%s] expected after Step. AR: id [%s], "
                         + "parentId [%s]", rootSectionId, Utils.stepId, rootSection.getUuid(),
-                rootSection.getParentRecordId()), verifyLogRecord(rootSectionId, Utils.stepId, TestingStatuses.FAILED,
-                rootSection));
+                rootSection.getParentRecordId()));
 
         LogRecord rootLogRecord = result.pop();
-        Assert.assertTrue(String.format("Root Log Record [%s] with parent [%s] expected last in the Root Section. "
+        Assertions.assertTrue(verifyLogRecord(rootLogRecordId, rootSectionId,
+                TestingStatuses.PASSED, rootLogRecord), String.format("Root Log Record [%s] with parent [%s] expected last in the Root Section. "
                         + "AR: id [%s], parentId [%s]", rootLogRecordId, rootSectionId, rootLogRecord.getUuid(),
-                rootLogRecord.getParentRecordId()), verifyLogRecord(rootLogRecordId, rootSectionId,
-                TestingStatuses.PASSED, rootLogRecord));
+                rootLogRecord.getParentRecordId()));
 
         LogRecord section2 = result.pop();
-        Assert.assertTrue(String.format("Section2 [%s] with parent [%s] expected in the Root Section. AR: id [%s], "
-                        + "parentId [%s]", section2Id, rootSectionId, section2.getUuid(), section2.getParentRecordId()),
-                verifyLogRecord(section2Id, rootSectionId, TestingStatuses.FAILED, section2));
+        Assertions.assertTrue(verifyLogRecord(section2Id, rootSectionId, TestingStatuses.FAILED, section2),
+                String.format("Section2 [%s] with parent [%s] expected in the Root Section. AR: id [%s], "
+                        + "parentId [%s]", section2Id, rootSectionId, section2.getUuid(), section2.getParentRecordId()));
 
         LogRecord section21 = result.pop();
-        Assert.assertTrue(String.format("Section21 [%s] with parent [%s] expected in the Section2. "
+        Assertions.assertTrue(verifyLogRecord(section21Id, section2Id, TestingStatuses.FAILED,
+                section21), String.format("Section21 [%s] with parent [%s] expected in the Section2. "
                         + "AR: id [%s], parentId [%s]", section21Id, section2Id, section21.getUuid(),
-                section21.getParentRecordId()), verifyLogRecord(section21Id, section2Id, TestingStatuses.FAILED,
-                section21));
+                section21.getParentRecordId()));
 
         LogRecord logRecord212 = result.pop();
-        Assert.assertTrue(String.format("Log Record 212 [%s] with parent [%s] expected last in the Section21. "
+        Assertions.assertTrue(verifyLogRecord(logRecord212Id, section21Id,
+                TestingStatuses.FAILED, logRecord212), String.format("Log Record 212 [%s] with parent [%s] expected last in the Section21. "
                         + "AR: id [%s], parentId [%s]", logRecord212Id, section21Id, logRecord212.getUuid(),
-                logRecord212.getParentRecordId()), verifyLogRecord(logRecord212Id, section21Id,
-                TestingStatuses.FAILED, logRecord212));
+                logRecord212.getParentRecordId()));
 
         LogRecord logRecord211 = result.pop();
-        Assert.assertTrue(String.format("Log Record 211 [%s] with parent [%s] expected in the Section21. "
+        Assertions.assertTrue(verifyLogRecord(logRecord211Id, section21Id,
+                TestingStatuses.PASSED, logRecord211), String.format("Log Record 211 [%s] with parent [%s] expected in the Section21. "
                         + "AR: id [%s], parentId [%s]", logRecord211Id, section21Id, logRecord211.getUuid(),
-                logRecord211.getParentRecordId()), verifyLogRecord(logRecord211Id, section21Id,
-                TestingStatuses.PASSED, logRecord211));
+                logRecord211.getParentRecordId()));
 
         LogRecord section1 = result.pop();
-        Assert.assertTrue(String.format("Section1 [%s] with parent [%s] expected first in the Root Section. "
+        Assertions.assertTrue(verifyLogRecord(section1Id, rootSectionId, TestingStatuses.PASSED,
+                section1), String.format("Section1 [%s] with parent [%s] expected first in the Root Section. "
                         + "AR: id [%s], parentId [%s]", section1Id, rootSectionId, section1.getUuid(),
-                section1.getParentRecordId()), verifyLogRecord(section1Id, rootSectionId, TestingStatuses.PASSED,
-                section1));
+                section1.getParentRecordId()));
 
         LogRecord logRecord12 = result.pop();
-        Assert.assertTrue(String.format("Log Record 12 [%s] with parent [%s] expected last in the Section1. "
+        Assertions.assertTrue(verifyLogRecord(logRecord12Id, section1Id,
+                TestingStatuses.PASSED, logRecord12), String.format("Log Record 12 [%s] with parent [%s] expected last in the Section1. "
                         + "AR: id [%s], parentId [%s]", logRecord12Id, section1Id, logRecord12.getUuid(),
-                logRecord12.getParentRecordId()), verifyLogRecord(logRecord12Id, section1Id,
-                TestingStatuses.PASSED, logRecord12));
+                logRecord12.getParentRecordId()));
 
         LogRecord logRecord11 = result.pop();
-        Assert.assertTrue(String.format("Log Record 11 [%s] with parent [%s] expected in the Section1. "
+        Assertions.assertTrue(verifyLogRecord(logRecord11Id, section1Id, TestingStatuses.PASSED,
+                logRecord11), String.format("Log Record 11 [%s] with parent [%s] expected in the Section1. "
                         + "AR: id [%s], parentId [%s]", logRecord11Id, section1Id, logRecord11.getUuid(),
-                logRecord11.getParentRecordId()), verifyLogRecord(logRecord11Id, section1Id, TestingStatuses.PASSED,
-                logRecord11));
+                logRecord11.getParentRecordId()));
     }
 
     private Stack<LogRecord> execute() throws Exception {
         TestRunContext testRunContext = setUp(true);
         Stack<LogRecord> result = new Stack<>();
         createAnswers(result, testRunContext);
-        PowerMockito.doReturn(testRunContext).when(adapter).startAtpRun(any(), any());
+        Mockito.doReturn(testRunContext).when(adapter).startAtpRun(any(), any());
         writer.openLog(testRunContext.getTestRunId());
 
         openSection(rootSectionName, "", rootSectionId.toString());
@@ -251,7 +260,7 @@ public class AtpRamWriterHierarchyTest {
         Stack<LogRecord> result = new Stack<>();
         createAnswers(result, testRunContext);
 
-        PowerMockito.doReturn(testRunContext).when(adapter).startAtpRun(any(), any());
+        Mockito.doReturn(testRunContext).when(adapter).startAtpRun(any(), any());
         writer.openLog(testRunContext.getTestRunId());
 
         message(logRecord11Name, "message", logRecord11Id.toString(), TestingStatuses.FAILED);
@@ -296,8 +305,8 @@ public class AtpRamWriterHierarchyTest {
             result.push(logRecord);
             return writer.getAdapter().getContext();
         };
-        PowerMockito.doAnswer(answer).when(adapter).sendLogRecord(any(LogRecord.class));
-        PowerMockito.doAnswer(answerFotUpdateStatus).when(adapter).updateTestingStatus(anyString(), anyString());
+        Mockito.doAnswer(answer).when(adapter).sendLogRecord(any(LogRecord.class));
+        Mockito.doAnswer(answerFotUpdateStatus).when(adapter).updateTestingStatus(anyString(), anyString());
     }
 
     private boolean verifyLogRecord(UUID expectedId, UUID expectedParentId,

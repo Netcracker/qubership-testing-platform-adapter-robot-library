@@ -1,5 +1,5 @@
 /*
- *  Copyright 2024-2025 NetCracker Technology Corporation
+ *  Copyright 2024-2026 NetCracker Technology Corporation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -16,15 +16,15 @@
 
 package org.qubership.atp.adapter.common.utils;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class ActionParametersTrimmerTest {
 
     private ActionParametersTrimmer actionParametersTrimmer;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         actionParametersTrimmer = new ActionParametersTrimmer(12);
     }
@@ -43,7 +43,7 @@ public class ActionParametersTrimmerTest {
         String expected =
                 "Store value \"big value...\" and \"big value...\" and \"big value...\"and (\"small value\", \"big value...\")";
         String result = actionParametersTrimmer.trimActionParametersByLimit(step);
-        Assert.assertEquals(expected, result);
+        Assertions.assertEquals(expected, result);
     }
 
     @Test
@@ -51,6 +51,6 @@ public class ActionParametersTrimmerTest {
         String step = "Store value \"MRC with \\\\\\\"Installation\\\\\\\"\"";
         String result = actionParametersTrimmer.trimActionParametersByLimit(step);
         String expected = "Store value \"MRC with ...\"";
-        Assert.assertEquals(expected, result);
+        Assertions.assertEquals(expected, result);
     }
 }

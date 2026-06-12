@@ -17,13 +17,15 @@
 package org.qubership.atp.adapter.common.adapters;
 
 import static java.util.Arrays.asList;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -48,10 +50,10 @@ import java.util.UUID;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.qubership.atp.adapter.common.RamConstants;
@@ -102,7 +104,7 @@ public class AbstractAdapterTest {
             new ContextVariable("test", "beforeValue", "afterValue"));
     private RequestUtils requestUtils;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         abstractAdapter = Mockito.mock(AbstractAdapter.class, Mockito.CALLS_REAL_METHODS);
         TestRunContext context = new TestRunContext();
@@ -128,8 +130,7 @@ public class AbstractAdapterTest {
                 .postRequest(
                         argThat(url -> url.contains(CREATE_ER_PATH)),
                         argThat(er -> {
-                            if (er instanceof ExecutionRequest) {
-                                ExecutionRequest erToCreate = (ExecutionRequest) er;
+                            if (er instanceof ExecutionRequest erToCreate) {
                                 return erToCreate.getName().equals(createdRequest.getName()) &&
                                         erToCreate.getTestPlanId().equals(createdRequest.getTestPlanId()) &&
                                         erToCreate.getProjectId().equals(createdRequest.getProjectId()) &&
@@ -152,25 +153,26 @@ public class AbstractAdapterTest {
                 createdRequest.getProjectId(),
                 createdRequest.getTestPlanId(),
                 createdRequest.getExecutionStatus());
-        assertEquals("ER id should be filled in context",
-                createdRequest.getUuid().toString(), resultContext.getExecutionRequestId());
-        assertEquals("Project id should be filled in context",
-                createdRequest.getProjectId().toString(), resultContext.getProjectId());
-        assertEquals("Test plan id should be filled in context",
-                createdRequest.getTestPlanId().toString(), resultContext.getTestPlanId());
+        assertEquals(createdRequest.getUuid().toString(),
+                resultContext.getExecutionRequestId(), "ER id should be filled in context");
+        assertEquals(createdRequest.getProjectId().toString(),
+                resultContext.getProjectId(), "Project id should be filled in context");
+        assertEquals(createdRequest.getTestPlanId().toString(),
+                resultContext.getTestPlanId(), "Test plan id should be filled in context");
     }
 
-    @Test(expected = FailedToCreateRamEntity.class)
-    public void startExecutionRequest_FailedToCreateEntityIsThrownInCaseOfBadResponse() throws FailedToCreateRamEntity,
-            IOException {
+    @Test
+    public void startExecutionRequest_FailedToCreateEntityIsThrownInCaseOfBadResponse() {
+      assertThrows(FailedToCreateRamEntity.class, () -> {
         ExecutionRequest createdRequest = createExecutionRequest();
         when(requestUtils.postRequest(any(String.class), any(ExecutionRequest.class), any()))
-                .thenThrow(new IOException("Ram error"));
+            .thenThrow(new IOException("Ram error"));
         abstractAdapter.startExecutionRequest(
-                createdRequest.getName(),
-                createdRequest.getProjectId(),
-                createdRequest.getTestPlanId(),
-                createdRequest.getExecutionStatus());
+            createdRequest.getName(),
+            createdRequest.getProjectId(),
+            createdRequest.getTestPlanId(),
+            createdRequest.getExecutionStatus());
+      });
     }
 
     @Test
@@ -186,7 +188,7 @@ public class AbstractAdapterTest {
                         any());
     }
 
-    @Test()
+    @Test
     public void updateTestRun_DetailsReportIsSentInCaseOfPatchError() throws IOException,
             FailedToCreateRamEntity {
         TestRun testRunPatch = new TestRun();
@@ -201,7 +203,7 @@ public class AbstractAdapterTest {
                 .reportDetails(any(String.class), eq(TestingStatuses.FAILED));
     }
 
-    @Test()
+    @Test
     public void finishAllTestRuns_ifDelayedProperEndpointIsInvoked() throws IOException,
             FailedToCreateRamEntity {
         List<UUID> uuids = asList(UUID.randomUUID(), UUID.randomUUID());
@@ -221,7 +223,7 @@ public class AbstractAdapterTest {
         );
     }
 
-    @Test()
+    @Test
     public void finishAllTestRuns_ifNotDelayedProperEndpointIsInvoked() throws IOException,
             FailedToCreateRamEntity {
         List<UUID> uuids = asList(UUID.randomUUID(), UUID.randomUUID());
@@ -230,14 +232,14 @@ public class AbstractAdapterTest {
         abstractAdapter.finishAllTestRuns(uuids, false);
         for (UUID uuid : uuids) {
             verify(requestUtils, times(1)).putRequest(
-                    argThat(url -> url.contains(String.format(FINISH_TR_PATH_TEMPLATE, uuid))),
+                    argThat(url -> url.contains(FINISH_TR_PATH_TEMPLATE.formatted(uuid))),
                     eq(null),
                     any()
             );
         }
     }
 
-    @Test()
+    @Test
     public void finishAllTestRuns_DetailsReportIsSentInCaseOfFinishError() throws IOException,
             FailedToCreateRamEntity {
         List<UUID> uuids = asList(UUID.randomUUID(), UUID.randomUUID());
@@ -252,7 +254,7 @@ public class AbstractAdapterTest {
                 .reportDetails(any(String.class), eq(TestingStatuses.FAILED));
     }
 
-    @Test()
+    @Test
     public void reportDetails_reportDetailsEndpointIsInvokedProperly() throws IOException,
             FailedToCreateRamEntity {
         when(requestUtils.postRequest(any(String.class), any(), any()))
@@ -264,10 +266,9 @@ public class AbstractAdapterTest {
         abstractAdapter.reportDetails(DETAILS_MESSAGE, TestingStatuses.FAILED);
         verify(requestUtils, times(1))
                 .postRequest(
-                        argThat(url -> url.contains(String.format(API_ER_DETAILS_TEMPLATE, erId))),
+                        argThat(url -> url.contains(API_ER_DETAILS_TEMPLATE.formatted(erId))),
                         argThat(details -> {
-                            if (details instanceof ExecutionRequestDetails) {
-                                ExecutionRequestDetails requestDetails = (ExecutionRequestDetails) details;
+                            if (details instanceof ExecutionRequestDetails requestDetails) {
                                 return requestDetails.getMessage().equals(DETAILS_MESSAGE) &&
                                         requestDetails.getStatus().equals(TestingStatuses.FAILED) &&
                                         requestDetails.getExecutionRequestId().equals(erId) &&
@@ -279,7 +280,7 @@ public class AbstractAdapterTest {
     }
 
     @Test
-    @Ignore
+    @Disabled
     public void stopAtpRun_WithEmptyFields_CreateRequestWithoutErrors() throws IOException {
         String trId = abstractAdapter.getContext().getTestRunId();
         ObjectNode expectedRequest = OBJECT_MAPPER.createObjectNode();
@@ -292,16 +293,17 @@ public class AbstractAdapterTest {
         verify(requestUtils, times(1)).postRequest(any(), eq(expectedRequest.toString()), any());
     }
 
-    @Test(expected = FailedToCreateRamEntity.class)
-    public void reportDetails_FailedToCreateRamEntityIsThrownInCaseOfRamResponseError() throws IOException,
-            FailedToCreateRamEntity {
+    @Test
+    public void reportDetails_FailedToCreateRamEntityIsThrownInCaseOfRamResponseError() {
+      assertThrows(FailedToCreateRamEntity.class, () -> {
         when(requestUtils.postRequest(any(String.class), any(), any()))
-                .thenThrow(new IOException("RAM error"));
+            .thenThrow(new IOException("RAM error"));
         UUID erId = UUID.randomUUID();
         UUID projectId = UUID.randomUUID();
         abstractAdapter.getContext().setExecutionRequestId(erId.toString());
         abstractAdapter.getContext().setProjectId(projectId.toString());
         abstractAdapter.reportDetails(DETAILS_MESSAGE, TestingStatuses.FAILED);
+      });
     }
 
     @Test
@@ -375,8 +377,8 @@ public class AbstractAdapterTest {
         when(requestUtils.postRequestStream(any(String.class), any(), any()))
                 .thenReturn(expectedResponse);
         UploadScreenshotResponse actualResponse = abstractAdapter.uploadFile(attributes, message);
-        assertEquals("UploadScreenshotResponse should be returned from RAM",
-                expectedResponse, actualResponse);
+        assertEquals(expectedResponse,
+                actualResponse, "UploadScreenshotResponse should be returned from RAM");
     }
 
     private Map<String, Object> createAttributes(InputStream streamToUpload) {
@@ -400,14 +402,14 @@ public class AbstractAdapterTest {
     public void createLogRecord_SetEmptyTypeAction_GenerateValidLogRecord() {
         Message message = ModelMocks.generateMessage(StringUtils.EMPTY);
         LogRecord logRecord = abstractAdapter.createLogRecord(message, false, false);
-        Assert.assertEquals("Type action is default value (TECHNICAL)", TypeAction.TECHNICAL, logRecord.getType());
+        Assertions.assertEquals(TypeAction.TECHNICAL, logRecord.getType(), "Type action is default value (TECHNICAL)");
     }
 
     @Test
     public void createLogRecord_SetNotEmptyTypeAction_GenerateValidLogRecord() {
         Message message = ModelMocks.generateMessage(TypeAction.BV.toString());
         LogRecord logRecord = abstractAdapter.createLogRecord(message, false, false);
-        Assert.assertEquals("Type action is BV", TypeAction.BV, logRecord.getType());
+        Assertions.assertEquals(TypeAction.BV, logRecord.getType(), "Type action is BV");
     }
 
     @Test
@@ -415,7 +417,7 @@ public class AbstractAdapterTest {
         Message message = ModelMocks.generateMessage(TypeAction.BV.toString());
         message.setUuid("null");
         LogRecord logRecord = abstractAdapter.createLogRecord(message, false, false);
-        assertTrue("ID of LogRecord should be filled", Objects.nonNull(logRecord.getUuid()));
+        assertTrue(Objects.nonNull(logRecord.getUuid()), "ID of LogRecord should be filled");
     }
 
     @Test
@@ -424,14 +426,14 @@ public class AbstractAdapterTest {
         long createdDateStamp = new Random().nextLong();
         message.setCreatedDateStamp(createdDateStamp);
         LogRecord logRecord = abstractAdapter.createLogRecord(message, false, false);
-        Assert.assertEquals("Created Date is set", createdDateStamp, logRecord.getCreatedDateStamp());
+        Assertions.assertEquals(createdDateStamp, logRecord.getCreatedDateStamp(), "Created Date is set");
     }
 
     @Test
     public void createBvLogRecordTest() {
         Message message = ModelMocks.generateMessage(TypeAction.BV.toString());
         LogRecord logRecord = abstractAdapter.createLogRecord(message, false, false);
-        assertTrue(logRecord instanceof BvLogRecord);
+        assertInstanceOf(BvLogRecord.class, logRecord);
     }
 
     @Test
@@ -439,56 +441,56 @@ public class AbstractAdapterTest {
         Message message = ModelMocks.generateMessage(TypeAction.MIA.toString());
         message.setIsGroup(true);
         LogRecord logRecord = abstractAdapter.createLogRecord(message, false, false);
-        assertTrue(logRecord instanceof MiaLogRecord);
+        assertInstanceOf(MiaLogRecord.class, logRecord);
     }
 
     @Test
     public void createUiLogRecordTest() {
         Message message = ModelMocks.generateMessage(TypeAction.UI.toString());
         LogRecord logRecord = abstractAdapter.createLogRecord(message, false, false);
-        assertTrue(logRecord instanceof UiLogRecord);
+        assertInstanceOf(UiLogRecord.class, logRecord);
     }
 
     @Test
     public void createItfLogRecordTest() {
         Message message = ModelMocks.generateMessage(TypeAction.ITF.toString());
         LogRecord logRecord = abstractAdapter.createLogRecord(message, true, false);
-        assertTrue(logRecord instanceof ItfLogRecord);
+        assertInstanceOf(ItfLogRecord.class, logRecord);
     }
 
     @Test
     public void createRestLogRecordTest() {
         Message message = ModelMocks.generateMessage(TypeAction.REST.toString());
         LogRecord logRecord = abstractAdapter.createLogRecord(message, false, false);
-        assertTrue(logRecord instanceof RestLogRecord);
+        assertInstanceOf(RestLogRecord.class, logRecord);
     }
 
     @Test
     public void createSqlLogRecordTest() {
         Message message = ModelMocks.generateMessage(TypeAction.SQL.toString());
         LogRecord logRecord = abstractAdapter.createLogRecord(message, false, false);
-        assertTrue(logRecord instanceof SqlLogRecord);
+        assertInstanceOf(SqlLogRecord.class, logRecord);
     }
 
     @Test
     public void createSshLogRecordTest() {
         Message message = ModelMocks.generateMessage(TypeAction.SSH.toString());
         LogRecord logRecord = abstractAdapter.createLogRecord(message, false, false);
-        assertTrue(logRecord instanceof SshLogRecord);
+        assertInstanceOf(SshLogRecord.class, logRecord);
     }
 
     @Test
     public void createCompoundLogRecordTest() {
         Message message = ModelMocks.generateMessage(TypeAction.COMPOUND.toString());
         LogRecord logRecord = abstractAdapter.createLogRecord(message, true, false);
-        assertTrue(logRecord instanceof CompoundLogRecord);
+        assertInstanceOf(CompoundLogRecord.class, logRecord);
     }
 
     @Test
     public void createTechnicalLogRecordTest() {
         Message message = ModelMocks.generateMessage(TypeAction.TECHNICAL.toString());
         LogRecord logRecord = abstractAdapter.createLogRecord(message, false, false);
-        assertTrue(logRecord instanceof TechnicalLogRecord);
+        assertInstanceOf(TechnicalLogRecord.class, logRecord);
 
     }
 
@@ -496,23 +498,23 @@ public class AbstractAdapterTest {
     public void createLogRecord_SetParentSectionIdAsNull_GenerateLogRecordWithEmptyParentId() {
         Message message = ModelMocks.generateMessage(TypeAction.BV.toString());
         LogRecord logRecord = abstractAdapter.createLogRecord(message, true, false);
-        assertTrue("ID of parent LogRecord should be empty", Objects.isNull(logRecord.getParentRecordId()));
+        assertTrue(Objects.isNull(logRecord.getParentRecordId()), "ID of parent LogRecord should be empty");
     }
 
     @Test
     public void createLogRecord_maskMessageAndTitle_generateEncryptedMessage() {
         Message message = ModelMocks.generateEncryptedMessage(TypeAction.BV.toString());
         LogRecord logRecord = abstractAdapter.createLogRecord(message, true, false);
-        assertEquals("Log record title should be masked",
-                MASKED_MESSAGE, logRecord.getName());
-        assertEquals("Log record message should be masked", MASKED_MESSAGE, logRecord.getMessage());
+        assertEquals(MASKED_MESSAGE,
+                logRecord.getName(), "Log record title should be masked");
+        assertEquals(MASKED_MESSAGE, logRecord.getMessage(), "Log record message should be masked");
     }
 
     @Test
     public void createLogRecord_SetMessageFieldInMessage_GenerateLogRecordWithFilledMessage() {
         Message message = ModelMocks.generateMessage(TypeAction.BV.toString());
         LogRecord logRecord = abstractAdapter.createLogRecord(message, false, false);
-        Assert.assertEquals("Message of LogRecord should be filled", message.getMessage(), logRecord.getMessage());
+        Assertions.assertEquals(message.getMessage(), logRecord.getMessage(), "Message of LogRecord should be filled");
     }
 
     @Test
@@ -521,8 +523,8 @@ public class AbstractAdapterTest {
         String expectedStatus = TestingStatuses.FAILED.toString();
         message.setTestingStatus(expectedStatus.toUpperCase());
         LogRecord logRecord = abstractAdapter.createLogRecord(message, true, false);
-        Assert.assertEquals("Log record should keep status through conversion", expectedStatus,
-                logRecord.getTestingStatus().toString());
+        Assertions.assertEquals(expectedStatus, logRecord.getTestingStatus().toString(),
+                "Log record should keep status through conversion");
     }
 
     @Test
@@ -531,8 +533,8 @@ public class AbstractAdapterTest {
         String expectedStatus = TestingStatuses.NOT_STARTED.toString();
         message.setTestingStatus(expectedStatus);
         LogRecord logRecord = abstractAdapter.createLogRecord(message, true, false);
-        Assert.assertEquals("Log record should keep status through conversion", expectedStatus,
-                logRecord.getTestingStatus().toString());
+        Assertions.assertEquals(expectedStatus, logRecord.getTestingStatus().toString(),
+                "Log record should keep status through conversion");
     }
 
     @Test
@@ -540,8 +542,8 @@ public class AbstractAdapterTest {
         Message message = ModelMocks.generateMessage(StringUtils.EMPTY);
         message.setStepContextVariables(contextVariables);
         LogRecord logRecord = abstractAdapter.createLogRecord(message, true, false);
-        Assert.assertEquals("Log record should keep step context variables through conversion", contextVariables,
-                logRecord.getStepContextVariables());
+        Assertions.assertEquals(contextVariables, logRecord.getStepContextVariables(),
+                "Log record should keep step context variables through conversion");
     }
 
     @Test
@@ -555,15 +557,15 @@ public class AbstractAdapterTest {
         LogRecord logRecord = abstractAdapter.createLogRecord(message, true, false);
         List<CustomLink> resCustomLinks = logRecord.getCustomLinks();
         assertNotNull(resCustomLinks);
-        Assert.assertEquals(2, resCustomLinks.size());
-        CustomLink customLink = resCustomLinks.get(0);
-        Assert.assertEquals("name1", customLink.getName());
-        Assert.assertEquals("http://url1", customLink.getUrl());
-        Assert.assertEquals(OpenMode.NEW_TAB, customLink.getOpenMode());
+        Assertions.assertEquals(2, resCustomLinks.size());
+        CustomLink customLink = resCustomLinks.getFirst();
+        Assertions.assertEquals("name1", customLink.getName());
+        Assertions.assertEquals("http://url1", customLink.getUrl());
+        Assertions.assertEquals(OpenMode.NEW_TAB, customLink.getOpenMode());
         customLink = resCustomLinks.get(1);
-        Assert.assertEquals("name2", customLink.getName());
-        Assert.assertEquals("http://url2", customLink.getUrl());
-        Assert.assertEquals(OpenMode.CURRENT_TAB, customLink.getOpenMode());
+        Assertions.assertEquals("name2", customLink.getName());
+        Assertions.assertEquals("http://url2", customLink.getUrl());
+        Assertions.assertEquals(OpenMode.CURRENT_TAB, customLink.getOpenMode());
     }
 
     @Test
@@ -571,8 +573,8 @@ public class AbstractAdapterTest {
         LogRecord logRecord = new LogRecord();
         logRecord.setStartDate(new Timestamp(System.currentTimeMillis() - 1));
         abstractAdapter.updateLogRecordDurationAndEndDate(logRecord);
-        Assert.assertNotNull("End date of log record should be filled", logRecord.getEndDate());
-        Assert.assertTrue("Duration of log record should be > 0", logRecord.getDuration() > 0);
+        Assertions.assertNotNull(logRecord.getEndDate(), "End date of log record should be filled");
+        Assertions.assertTrue(logRecord.getDuration() > 0, "Duration of log record should be > 0");
     }
 
     @Test
@@ -584,8 +586,8 @@ public class AbstractAdapterTest {
 
         AtpCompaund result = context.getAtpCompaund();
 
-        Assert.assertEquals(newCompound.getTestingStatuses(), result.getTestingStatuses());
-        Assert.assertEquals(newCompound.getParentSection().getTestingStatuses(),
+        Assertions.assertEquals(newCompound.getTestingStatuses(), result.getTestingStatuses());
+        Assertions.assertEquals(newCompound.getParentSection().getTestingStatuses(),
                 result.getParentSection().getTestingStatuses());
     }
 
@@ -598,8 +600,8 @@ public class AbstractAdapterTest {
 
         AtpCompaund result = context.getAtpCompaund();
 
-        Assert.assertEquals(compoundFromContext.getTestingStatuses(), result.getTestingStatuses());
-        Assert.assertEquals(compoundFromContext.getParentSection().getTestingStatuses(),
+        Assertions.assertEquals(compoundFromContext.getTestingStatuses(), result.getTestingStatuses());
+        Assertions.assertEquals(compoundFromContext.getParentSection().getTestingStatuses(),
                 result.getParentSection().getTestingStatuses());
     }
 
@@ -630,8 +632,8 @@ public class AbstractAdapterTest {
         ExecutionStatuses expectedStatus = ExecutionStatuses.NOT_STARTED;
         message.setTestingStatus(TestingStatuses.NOT_STARTED.toString());
         LogRecord logRecord = abstractAdapter.createLogRecord(message, true, false);
-        Assert.assertEquals("Log record should keep status through conversion", expectedStatus,
-                logRecord.getExecutionStatus());
+        Assertions.assertEquals(expectedStatus, logRecord.getExecutionStatus(),
+                "Log record should keep status through conversion");
     }
 
     @Test
@@ -640,8 +642,8 @@ public class AbstractAdapterTest {
         ExecutionStatuses expectedStatus = ExecutionStatuses.FINISHED;
         message.setTestingStatus(TestingStatuses.NOT_STARTED.toString());
         LogRecord logRecord = abstractAdapter.createLogRecord(message, false, false);
-        Assert.assertEquals("Log record should keep status through conversion", expectedStatus,
-                logRecord.getExecutionStatus());
+        Assertions.assertEquals(expectedStatus, logRecord.getExecutionStatus(),
+                "Log record should keep status through conversion");
     }
 
     @Test
@@ -650,8 +652,8 @@ public class AbstractAdapterTest {
         ExecutionStatuses expectedStatus = ExecutionStatuses.IN_PROGRESS;
         message.setTestingStatus(TestingStatuses.UNKNOWN.toString());
         LogRecord logRecord = abstractAdapter.createLogRecord(message, true, false);
-        Assert.assertEquals("Log record should keep status through conversion", expectedStatus,
-                logRecord.getExecutionStatus());
+        Assertions.assertEquals(expectedStatus, logRecord.getExecutionStatus(),
+                "Log record should keep status through conversion");
     }
 
     @Test
@@ -708,9 +710,9 @@ public class AbstractAdapterTest {
         String result = abstractAdapter.getUploadFileUrl(attribute, message);
 
         // Assert
-        assertFalse("Result String with URL contains space ' ' character but should be encoded.",
-                result.contains(" "));
-        assertTrue("Result String with URL doesnt contain correct fileName param",
-                result.contains("fileName=screenshotNameKey+withSpaceCharacter&"));
+        assertFalse(result.contains(" "),
+                "Result String with URL contains space ' ' character but should be encoded.");
+        assertTrue(result.contains("fileName=screenshotNameKey+withSpaceCharacter&"),
+                "Result String with URL doesnt contain correct fileName param");
     }
 }

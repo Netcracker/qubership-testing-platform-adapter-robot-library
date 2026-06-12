@@ -1,5 +1,5 @@
 /*
- *  Copyright 2024-2025 NetCracker Technology Corporation
+ *  Copyright 2024-2026 NetCracker Technology Corporation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -27,10 +27,10 @@ public class GeneralReportWriterAdapter extends GenericsReportAdapter<GeneralRep
 
     public void writeItem(GeneralReportWriter writer, Object item) {
         try {
-            if (item instanceof WebReportItem.Message) {
-                writer.report((WebReportItem.Message)item, Thread.currentThread());
-            } else if (item instanceof WebReportItem.OpenLog) {
-                writer.newScenario((WebReportItem.OpenLog)item, Thread.currentThread());
+            if (item instanceof WebReportItem.Message message) {
+                writer.report(message, Thread.currentThread());
+            } else if (item instanceof WebReportItem.OpenLog log) {
+                writer.newScenario(log, Thread.currentThread());
             }
         } finally {
             writer.reportScenarioDetails();

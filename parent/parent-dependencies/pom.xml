@@ -4,32 +4,28 @@
 
     <groupId>org.qubership.atp.adapter.robot</groupId>
     <artifactId>qubership-atp-adapter-robot-parent-dependencies</artifactId>
-    <version>4.5.73-SNAPSHOT</version>
+    <version>5.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>parent-dependencies</name>
 
     <properties>
         <java.version>21</java.version>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
-        <slf4j.version>1.7.25</slf4j.version>
-        <logback.version>1.2.13</logback.version>
-        <junit.version>4.13.2</junit.version>
-        <hikariCP.version>2.6.2</hikariCP.version>
-        <querydsl.version>4.1.4</querydsl.version>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
+        <slf4j.version>2.0.17</slf4j.version>
+        <logback.version>1.5.32</logback.version>
         <h2.version>1.4.195</h2.version>
-        <postgesql.version>42.1.1</postgesql.version>
-        <liquibase.version>3.5.3</liquibase.version>
-        <guice.version>4.1.0</guice.version>
-        <jackson.annotations.version>2.8.4</jackson.annotations.version>
-        <org.apache.httpcomponents>4.5.13</org.apache.httpcomponents>
-        <kafka.clients>3.1.2</kafka.clients>
+        <guice.version>5.1.0</guice.version>
+        <jackson.version>2.18.6</jackson.version>
+        <org.apache.httpcomponents>4.5.14</org.apache.httpcomponents>
+        <kafka.clients>3.9.2</kafka.clients>
 
-        <spotbugs-maven-plugin.version>4.7.3.0</spotbugs-maven-plugin.version>
-        <maven-pmd-plugin.version>3.8</maven-pmd-plugin.version>
-        <lombok.version>1.18.30</lombok.version>
-        <mapstruct.version>1.5.5.Final</mapstruct.version>
-        <crypt.version>0.0.20</crypt.version>
+        <lombok.version>1.18.46</lombok.version>
+        <mapstruct.version>1.6.3</mapstruct.version>
+        <httpclient5.version>5.4.4</httpclient5.version>
+        <httpcore5.version>5.3.4</httpcore5.version>
+
+        <crypt.version>1.0.0</crypt.version>
         <ram.model.version>2.2.204</ram.model.version>
     </properties>
 
@@ -184,6 +180,12 @@
                 <groupId>org.qubership.atp</groupId>
                 <artifactId>atp-crypt</artifactId>
                 <version>${crypt.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>junit</groupId>
+                        <artifactId>junit</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>
@@ -198,7 +200,12 @@
             <dependency>
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-classic</artifactId>
-                <version>1.2.3</version>
+                <version>${logback.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-core</artifactId>
+                <version>${logback.version}</version>
             </dependency>
 
             <dependency>
@@ -207,19 +214,11 @@
                 <version>${kafka.clients}</version>
             </dependency>
             <dependency>
-                <groupId>com.fasterxml.jackson.core</groupId>
-                <artifactId>jackson-annotations</artifactId>
-                <version>2.12.7</version>
-            </dependency>
-            <dependency>
-                <groupId>com.fasterxml.jackson.core</groupId>
-                <artifactId>jackson-core</artifactId>
-                <version>2.12.7</version>
-            </dependency>
-            <dependency>
-                <groupId>com.fasterxml.jackson.core</groupId>
-                <artifactId>jackson-databind</artifactId>
-                <version>2.12.7.1</version>
+                <groupId>com.fasterxml.jackson</groupId>
+                <artifactId>jackson-bom</artifactId>
+                <version>${jackson.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
 
             <dependency>
@@ -239,15 +238,9 @@
                 <version>${slf4j.version}</version>
             </dependency>
             <dependency>
-                <groupId>junit</groupId>
-                <artifactId>junit</artifactId>
-                <version>${junit.version}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
-                <version>22.0</version>
+                <version>32.0.1-jre</version>
             </dependency>
 
             <dependency>
@@ -291,17 +284,86 @@
                         <groupId>commons-lang</groupId>
                         <artifactId>commons-lang</artifactId>
                     </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.commons</groupId>
+                        <artifactId>commons-lang3</artifactId>
+                    </exclusion>
                 </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.qubership.atp.ram</groupId>
                 <artifactId>qubership-atp-ram-model</artifactId>
                 <version>${ram.model.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>io.netty</groupId>
+                        <artifactId>netty-handler</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>io.undertow</groupId>
+                        <artifactId>undertow-core</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.springframework.security</groupId>
+                        <artifactId>spring-security-web</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.springframework.security</groupId>
+                        <artifactId>spring-security-core</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.qubership.atp.auth</groupId>
+                        <artifactId>atp-auth-spring-boot-starter</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.springframework.data</groupId>
+                        <artifactId>spring-data-mongodb</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot-starter-web</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>javax.validation</groupId>
+                        <artifactId>validation-api</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>commons-lang</groupId>
+                <artifactId>commons-lang</artifactId>
+                <version>2.6</version>
             </dependency>
             <dependency>
                 <groupId>org.qubership.atp.adapter.robot</groupId>
                 <artifactId>qubership-atp-adapter-robot</artifactId>
                 <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>jakarta.annotation</groupId>
+                <artifactId>jakarta.annotation-api</artifactId>
+                <version>2.1.1</version>
+                <scope>compile</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents.client5</groupId>
+                <artifactId>httpclient5</artifactId>
+                <version>${httpclient5.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents.client5</groupId>
+                <artifactId>httpclient5-fluent</artifactId>
+                <version>${httpclient5.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents.core5</groupId>
+                <artifactId>httpcore5</artifactId>
+                <version>${httpcore5.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents.core5</groupId>
+                <artifactId>httpcore5-h2</artifactId>
+                <version>${httpcore5.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

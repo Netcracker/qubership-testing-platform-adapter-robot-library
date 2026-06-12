@@ -140,7 +140,7 @@ public class GeneralReportWriter implements ReportWriter {
         StringBuilder returnBuild = new StringBuilder();
 
         while(true) {
-            int ch = ((Reader)reader).read();
+            int ch = reader.read();
             if (ch == -1) {
                 return returnBuild.toString();
             }
@@ -180,8 +180,8 @@ public class GeneralReportWriter implements ReportWriter {
     public synchronized void report(WebReportItem.Message message, Thread thread) {
         synchronized(this.scenarios) {
             if (!this.scenarios.isEmpty()) {
-                List<ScenarioInfo> scenarioList = (List)this.scenarios.get(thread);
-                scenarioList.get(scenarioList.size() - 1).setLevel(message.getLevel().toInt());
+                List<ScenarioInfo> scenarioList = this.scenarios.get(thread);
+                scenarioList.getLast().setLevel(message.getLevel().toInt());
                 Throwable throwable = message.getThrowable();
                 String cause;
                 if (throwable == null) {
@@ -194,8 +194,8 @@ public class GeneralReportWriter implements ReportWriter {
                     cause = "<pre>" + Utils.getStackTrace(throwable) + "</pre>";
                 }
 
-                scenarioList.get(scenarioList.size() - 1).setCause(cause);
-                scenarioList.get(scenarioList.size() - 1).setEndTime(System.currentTimeMillis());
+                scenarioList.getLast().setCause(cause);
+                scenarioList.getLast().setEndTime(System.currentTimeMillis());
             } else {
                 this.newScenario(new WebReportItem.OpenLog(message.getTitle(), message.getMessage()), thread);
                 this.report(message, thread);
@@ -206,16 +206,16 @@ public class GeneralReportWriter implements ReportWriter {
 
     public synchronized void newScenario(WebReportItem.OpenLog message, Thread thread) {
         synchronized(this.scenarios) {
-            List<ScenarioInfo> scenarioList = (List)this.scenarios.get(thread);
+            List<ScenarioInfo> scenarioList = this.scenarios.get(thread);
             if (scenarioList == null) {
-                scenarioList = new ArrayList();
+                scenarioList = new ArrayList<>();
                 this.scenarios.put(thread, scenarioList);
             } else {
                 ((ScenarioInfo)((List)scenarioList).get(scenarioList.size() - 1)).setEndTime(System.currentTimeMillis());
             }
 
             ScenarioInfo soinfo = new ScenarioInfo(message.getLogName(), message.getDescription());
-            ((List)scenarioList).add(soinfo);
+            scenarioList.add(soinfo);
             this.scenariosOrdered.add(soinfo);
         }
     }
@@ -255,7 +255,7 @@ public class GeneralReportWriter implements ReportWriter {
         StringBuilder headerPart = new StringBuilder();
         long execTime = (System.currentTimeMillis() - this.startTime) / 1000L;
         headerPart.append("<b>Report Time: </b>").append("date=\"").append(dateFormat.format(new Date())).append("\" t=\"").append(timeFormat.format(new Date())).append("\"").append("<br/>");
-        headerPart.append("<b>Duration: </b>").append(String.format("%02d hours %02d minutes", execTime / 3600L, execTime % 3600L / 60L)).append("<br/>");
+        headerPart.append("<b>Duration: </b>").append("%02d hours %02d minutes".formatted(execTime / 3600L, execTime % 3600L / 60L)).append("<br/>");
         if (Integer.parseInt(getEnvValue(Config.getString(SERVER_ALIAS_KEY) + ".threads", "1")) > 1) {
             headerPart.append("<b>Threads: </b>").append(getEnvValue(Config.getString(SERVER_ALIAS_KEY) + ".threads", "1")).append("<br/>");
         }
@@ -305,15 +305,19 @@ public class GeneralReportWriter implements ReportWriter {
         for(Iterator i$ = this.scenariosOrdered.iterator(); i$.hasNext(); sb.append("</testcase>")) {
             ScenarioInfo si = (ScenarioInfo)i$.next();
             ++testCount;
-            sb.append(String.format("<testcase classname=\"%s\" name=\"%s\">",
-                    StringEscapeUtils.escapeXml("Test Scope"),
-                    StringEscapeUtils.escapeXml(si.name)));
+            sb.append("<testcase classname=\"%s\" name=\"%s\">".formatted(
+                StringEscapeUtils.escapeXml("Test Scope"),
+                StringEscapeUtils.escapeXml(si.name)));
             if (si.level == 40000) {
                 if ("true".equals(Config.getString("report.junit.ci.url"))) {
-                    sb.append("<failure type=\"\"  message=\"" + Config.getString("report.detailed.path")
-                            + this.getFolderByScenarioName(si.getName()) + "/report.html\"/>");
+                    sb.append("<failure type=\"\"  message=\"")
+                            .append(Config.getString("report.detailed.path"))
+                            .append(this.getFolderByScenarioName(si.getName()))
+                            .append("/report.html\"/>");
                 } else {
-                    sb.append("<failure type=\"\">" + StringEscapeUtils.escapeXml(si.getCause()) + "</failure>");
+                    sb.append("<failure type=\"\">")
+                            .append(StringEscapeUtils.escapeXml(si.getCause()))
+                            .append("</failure>");
                 }
             }
         }
@@ -323,10 +327,7 @@ public class GeneralReportWriter implements ReportWriter {
 
     public String getFolderByScenarioName(String name) {
         String[] arr$ = getWebReportDir().list();
-        int len$ = arr$.length;
-
-        for(int i$ = 0; i$ < len$; ++i$) {
-            String folder = arr$[i$];
+        for (String folder : arr$) {
             if (folder.contains(name)) {
                 return folder;
             }
@@ -449,7 +450,7 @@ public class GeneralReportWriter implements ReportWriter {
 
         public String getExecutionTime() {
             long s = (this.end - this.start) / 1000L;
-            return String.format("%02d:%02d:%02d", s / 3600L, s % 3600L / 60L, s % 60L);
+            return "%02d:%02d:%02d".formatted(s / 3600L, s % 3600L / 60L, s % 60L);
         }
     }
 }

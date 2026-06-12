@@ -1,5 +1,5 @@
 /*
- *  Copyright 2024-2025 NetCracker Technology Corporation
+ *  Copyright 2024-2026 NetCracker Technology Corporation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -17,12 +17,13 @@
 package org.qubership.atp.adapter.tools.tacomponents.context;
 
 import java.util.Map;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 
 public final class Context {
-    private static ContextType defaultContextType;
-    private static ContextType globalContextType;
+    private static final ContextType defaultContextType;
+    private static final ContextType globalContextType;
 
     public Context() {
     }
@@ -91,4 +92,3 @@ public final class Context {
         globalContextType = ContextType.GLOBAL;
     }
 }
-

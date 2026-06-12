@@ -1,5 +1,5 @@
 /*
- *  Copyright 2024-2025 NetCracker Technology Corporation
+ *  Copyright 2024-2026 NetCracker Technology Corporation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -16,6 +16,11 @@
 
 package org.qubership.atp.adapter.keyworddriven.executor;
 
+import java.lang.reflect.InvocationTargetException;
+import java.util.Iterator;
+import java.util.LinkedList;
+
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.qubership.atp.adapter.keyworddriven.TestCaseException;
 import org.qubership.atp.adapter.keyworddriven.basicformat.ValidationLevel;
 import org.qubership.atp.adapter.keyworddriven.dataitem.Processor;
@@ -29,13 +34,9 @@ import org.qubership.atp.adapter.keyworddriven.routing.Route;
 import org.qubership.atp.adapter.report.Report;
 import org.qubership.atp.adapter.testcase.Config;
 import org.qubership.atp.adapter.utils.KDTUtils;
-import java.lang.reflect.InvocationTargetException;
-import java.util.Iterator;
-import java.util.LinkedList;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 
 public class KeywordExecutor extends SectionExecutor {
-    private static final ThreadLocal<Keyword> currentKeyword = new ThreadLocal();
+    private static final ThreadLocal<Keyword> currentKeyword = new ThreadLocal<>();
     public static final boolean VALIDATE_SCENARIO = Boolean.parseBoolean(Config.getString("kdt.validate.scenarios"));
     public static final int SEVERITY_LEVEL = Integer.parseInt(Config.getString("kdt.severity.level", "0"));
     public static int validationLevel = ValidationLevel.parseValidationLevel(Config.getString("kdt.validation.level"));
@@ -49,7 +50,7 @@ public class KeywordExecutor extends SectionExecutor {
         if (route == null) {
             Report.getReport().warn("No routes found for keyword: " + keyword);
             if (VALIDATE_SCENARIO && !this.skip(keyword)) {
-                KDTUtils.criticalMessAndExit(String.format("No routes found for keyword %s\nExecution is interrupted", keyword));
+                KDTUtils.criticalMessAndExit("No routes found for keyword %s\nExecution is interrupted".formatted(keyword));
             }
 
         } else {
@@ -76,7 +77,7 @@ public class KeywordExecutor extends SectionExecutor {
         Keyword keyword = (Keyword)executable;
         boolean skip = keyword.getValidationLevel() > validationLevel;
         if (skip && keyword.log().isDebugEnabled()) {
-            keyword.log().info(String.format("Keyword '%s' was skipped because validation level of it is bigger than execution level ( %s > %s )", keyword, keyword.getValidationLevel(), validationLevel));
+            keyword.log().info("Keyword '%s' was skipped because validation level of it is bigger than execution level ( %s > %s )".formatted(keyword, keyword.getValidationLevel(), validationLevel));
         }
 
         return skip;
@@ -91,18 +92,16 @@ public class KeywordExecutor extends SectionExecutor {
         } else {
             try {
                 keyword.getRoute().getActionExecutor().execute(keyword);
-            } catch (InvocationTargetException var3) {
-                InvocationTargetException e = var3;
+            } catch (InvocationTargetException e) {
                 this.throwTCE(keyword, e.getTargetException());
             } catch (Exception e) {
-                Report.getReport().error((String)null, "Error during keyword execution: " + keyword + ":" + e.getMessage(), new KDTUtils.StringSource(ExceptionUtils.getStackTrace(e)));
+                Report.getReport().error(null, "Error during keyword execution: " + keyword + ":" + e.getMessage(), new KDTUtils.StringSource(ExceptionUtils.getStackTrace(e)));
                 this.throwTCE(keyword, e);
             }
 
-            if (keyword.getChildren().size() > 0) {
+            if (!keyword.getChildren().isEmpty()) {
                 super.execute(keyword);
             }
-
         }
     }
 
@@ -110,15 +109,11 @@ public class KeywordExecutor extends SectionExecutor {
         LinkedList<DataItem> dataItems = keyword.getDataItems();
 
         for(int i = 0; i < dataItems.size(); ++i) {
-            DataItem item = (DataItem)dataItems.get(i);
-            Iterator var5 = ProcessorStorage.getStorage().getProcessors().iterator();
-
-            while(var5.hasNext()) {
-                Processor dataItemProcessor = (Processor)var5.next();
+            DataItem item = dataItems.get(i);
+            for (Processor dataItemProcessor : ProcessorStorage.getStorage().getProcessors()) {
                 dataItems.set(i, dataItemProcessor.process(item));
             }
         }
-
     }
 
     protected void throwTCE(Keyword keyword, Throwable e) throws TestCaseException {
@@ -133,21 +128,17 @@ public class KeywordExecutor extends SectionExecutor {
     }
 
     protected static void replaceParametersInKeyword(Keyword keyword) {
-        Iterator var1 = keyword.getDataItems().iterator();
-
-        while(var1.hasNext()) {
-            DataItem item = (DataItem)var1.next();
+        for (DataItem item : keyword.getDataItems()) {
             String value = KDTUtils.replaceParametersInString(keyword, item.getData());
             item.setData(value);
         }
-
     }
 
     protected static void routeNotFound(Keyword keyword) {
         String KEYWORD_WAS_SKIPPED_DESC = "Keyword was skipped because no matches found for it. Keyword : '%s'.\n<br/>Possible routes:<br/>\n";
         String KEYWORD_WAS_SKIPPED_TITLE = "Keyword '%s' was skipped";
-        String title = String.format("Keyword '%s' was skipped", keyword.getName());
-        String description = String.format("Keyword was skipped because no matches found for it. Keyword : '%s'.\n<br/>Possible routes:<br/>\n", keyword.getDataItems());
+        String title = "Keyword '%s' was skipped".formatted(keyword.getName());
+        String description = "Keyword was skipped because no matches found for it. Keyword : '%s'.\n<br/>Possible routes:<br/>\n".formatted(keyword.getDataItems());
 
         Route route;
         for(Iterator var5 = KeywordRouteTable.getRoutesByName(keyword.getName()).iterator(); var5.hasNext(); description = description + route.getRouteItems() + "\n<br/>") {
@@ -162,7 +153,7 @@ public class KeywordExecutor extends SectionExecutor {
     }
 
     public static Keyword getKeyword() {
-        return (Keyword)currentKeyword.get();
+        return currentKeyword.get();
     }
 
     public static void removeInstance() {

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2024-2025 NetCracker Technology Corporation
+ *  Copyright 2024-2026 NetCracker Technology Corporation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -26,8 +26,8 @@ public class ContextUtils {
         Object value = Context.getValue(key);
         if (value == null) {
             return defaultValue;
-        } else if (value instanceof Integer) {
-            return (Integer)value;
+        } else if (value instanceof Integer integer) {
+            return integer;
         } else {
             try {
                 return Integer.parseInt(value.toString());
@@ -42,7 +42,7 @@ public class ContextUtils {
         if (value == null) {
             return defaultValue;
         } else {
-            return value instanceof Boolean ? (Boolean)value : Boolean.parseBoolean(value.toString());
+            return value instanceof Boolean b ? b : Boolean.parseBoolean(value.toString());
         }
     }
 }

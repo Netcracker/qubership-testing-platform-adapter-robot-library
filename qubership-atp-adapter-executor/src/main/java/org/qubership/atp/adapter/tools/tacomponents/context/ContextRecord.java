@@ -1,5 +1,5 @@
 /*
- *  Copyright 2024-2025 NetCracker Technology Corporation
+ *  Copyright 2024-2026 NetCracker Technology Corporation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -16,15 +16,17 @@
 
 package org.qubership.atp.adapter.tools.tacomponents.context;
 
-import com.google.common.base.Preconditions;
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+
+import com.google.common.base.Preconditions;
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 
 public final class ContextRecord<T> implements Serializable {
+    @Serial
     private static final long serialVersionUID = -1049577909010590824L;
     @Nonnull
     private String key;
@@ -82,14 +84,12 @@ public final class ContextRecord<T> implements Serializable {
 
     @Nonnull
     public static <T> Map<String, T> convertRecordsToValues(@Nonnull Map<String, ContextRecord<T>> originalMap) {
-        Map<String, T> resultMap = new HashMap();
-        Iterator var2 = originalMap.entrySet().iterator();
+        Map<String, T> resultMap = new HashMap<>();
 
-        while(var2.hasNext()) {
-            Map.Entry<String, ContextRecord<T>> originalEntry = (Map.Entry)var2.next();
-            resultMap.put(originalEntry.getKey(), (T)((ContextRecord)originalEntry.getValue()).getValue());
+        for (Map.Entry<String, ContextRecord<T>> stringContextRecordEntry : originalMap.entrySet()) {
+            resultMap.put(stringContextRecordEntry.getKey(),
+                    (T) ((ContextRecord) stringContextRecordEntry.getValue()).getValue());
         }
-
         return resultMap;
     }
 }
