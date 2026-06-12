@@ -31,7 +31,7 @@
         <httpclient5.version>5.4.4</httpclient5.version>
         <httpcore5.version>5.3.4</httpcore5.version>
 
-        <crypt.version>1.0.1-SNAPSHOT</crypt.version>
+        <crypt.version>1.0.0</crypt.version>
         <ram.model.version>2.2.204</ram.model.version>
     </properties>
 
@@ -300,6 +300,45 @@
                 <groupId>org.qubership.atp.ram</groupId>
                 <artifactId>qubership-atp-ram-model</artifactId>
                 <version>${ram.model.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>io.netty</groupId>
+                        <artifactId>netty-handler</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>io.undertow</groupId>
+                        <artifactId>undertow-core</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.springframework.security</groupId>
+                        <artifactId>spring-security-web</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.springframework.security</groupId>
+                        <artifactId>spring-security-core</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.qubership.atp.auth</groupId>
+                        <artifactId>atp-auth-spring-boot-starter</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.springframework.data</groupId>
+                        <artifactId>spring-data-mongodb</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot-starter-web</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>javax.validation</groupId>
+                        <artifactId>validation-api</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>commons-lang</groupId>
+                <artifactId>commons-lang</artifactId>
+                <version>2.6</version>
             </dependency>
             <dependency>
                 <groupId>org.qubership.atp.adapter.robot</groupId>

@@ -17,6 +17,7 @@
 package org.qubership.atp.adapter.keyworddriven.basicformat;
 
 import java.io.File;
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -118,7 +119,11 @@ public class BasicFormatTestCaseReader implements TestCaseReader {
 
     private void setLogger(FileTestCase testCase) {
         String logFileName = "logs/%s-%s.log".formatted(testCase.getName(), dateFormat.format(new Date()));
-        FileAppender appender = new FileAppender(appenderLayout, logFileName, false);
+        try {
+            FileAppender appender = new FileAppender(appenderLayout, logFileName, false);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
         Logger logger = Logger.getLogger(testCase.getName());
 //        logger.addAppender(appender);
