@@ -188,7 +188,7 @@ public class BasicFormatTestCaseReader implements TestCaseReader {
 
     private void loadSubSection(Executable parent, int rowNum, int headerIndex, ExcelSheet subSheet, int endRow) throws InvalidFormatOfSourceException {
         if (this.sectionHeaderIndexes.size() > headerIndex + 1) {
-            String previos = "";
+            String previous = "";
             boolean isChildrenFound = false;
 
             for(int currentRowNum = rowNum; currentRowNum < endRow; ++currentRowNum) {
@@ -202,8 +202,8 @@ public class BasicFormatTestCaseReader implements TestCaseReader {
                     isChildrenFound = true;
                     boolean hasChildren = this.hasSubSections(nextHeaderIndex, currentRowNum);
                     boolean hasRunnables = this.hasRunnable(nextHeaderIndex, currentRowNum);
-                    if (!previos.equals(name)) {
-                        previos = name;
+                    if (!previous.equals(name)) {
+                        previous = name;
                     } else if (hasChildren) {
                         continue;
                     }
