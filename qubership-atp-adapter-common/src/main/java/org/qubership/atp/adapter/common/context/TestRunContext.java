@@ -68,7 +68,7 @@ public class TestRunContext implements Cloneable, Serializable {
     private Timestamp startDate;
     private AtpCompaund atpCompaund;
     private String logRecordUuid;
-    private LogRecordsStack sections;
+    private transient LogRecordsStack sections;
     private String currentSectionId;
     private HashSet<String> urlToBrowserOrLogs;
     private String environmentId;
