@@ -9,4 +9,8 @@ updates:
     directories:
       - "/.github/workflows"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+    groups:
+      workflow-hub-updates:
+        patterns:
+          - "netcracker/qubership-workflow-hub/*"
