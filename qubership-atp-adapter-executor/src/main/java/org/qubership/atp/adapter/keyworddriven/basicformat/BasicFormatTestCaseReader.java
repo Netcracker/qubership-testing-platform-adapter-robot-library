@@ -17,7 +17,6 @@
 package org.qubership.atp.adapter.keyworddriven.basicformat;
 
 import java.io.File;
-import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -121,7 +120,7 @@ public class BasicFormatTestCaseReader implements TestCaseReader {
         String logFileName = "logs/%s-%s.log".formatted(testCase.getName(), dateFormat.format(new Date()));
         try {
             FileAppender appender = new FileAppender(appenderLayout, logFileName, false);
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
 
@@ -208,7 +207,7 @@ public class BasicFormatTestCaseReader implements TestCaseReader {
                         continue;
                     }
 
-                    if ((subSheet.getCellByHeaderName(subSheet.getCurrentRow().getRowNum(), RUN_COLUMN_NAME, (Integer)this.sectionHeaderIndexes.get(nextHeaderIndex)).getValue().equalsIgnoreCase(YES) || hasChildren) && hasRunnables) {
+                    if ((subSheet.getCellByHeaderName(subSheet.getCurrentRow().getRowNum(), RUN_COLUMN_NAME, this.sectionHeaderIndexes.get(nextHeaderIndex)).getValue().equalsIgnoreCase(YES) || hasChildren) && hasRunnables) {
                         subSheet.getRow(currentRowNum);
                         SectionImpl section = new SectionImpl(name, parent);
                         this.loadParameters(section, subSheet);

@@ -482,7 +482,7 @@ public class AtpKafkaRamAdapter extends AbstractAdapter {
                                 .setProblemContextReportId(problemContextMetricReportId)
                                 .setMicroservicesReportId(microservicesReportId).build())
                         .build()), ProducerType.PROTOBUF);
-        log.debug("Update and ssm metric reports [{}, {}] for section [{}]", problemContextMetricReportId,
+        log.debug("Update SSM metric reports [{}, {}] for section [{}]", problemContextMetricReportId,
                 microservicesReportId, logRecordId);
         return context;
     }

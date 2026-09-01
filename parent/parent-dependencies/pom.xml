@@ -22,11 +22,11 @@
 
         <lombok.version>1.18.46</lombok.version>
         <mapstruct.version>1.6.3</mapstruct.version>
-        <httpclient5.version>5.4.4</httpclient5.version>
-        <httpcore5.version>5.3.4</httpcore5.version>
+        <httpclient5.version>5.5.2</httpclient5.version>
+        <httpcore5.version>5.3.6</httpcore5.version>
 
         <crypt.version>1.0.0</crypt.version>
-        <ram.model.version>2.2.204</ram.model.version>
+        <ram.model.version>3.0.1</ram.model.version>
     </properties>
 
     <description>Qubership Testing Platform Adapter Robot library</description>
@@ -48,7 +48,7 @@
     <scm>
         <connection>scm:git:https//github.com/Netcracker/qubership-testing-platform-adapter-robot-library.git</connection>
         <developerConnection>scm:git:https://github.com/Netcracker/qubership-testing-platform-adapter-robot-library.git</developerConnection>
-        <url>scm:git:https://github.com/Netcracker/qubership-testing-platform-adapter-robot-library/tree/main</url>
+        <url>scm:git:https://github.com/Netcracker/qubership-testing-platform-adapter-robot-library.git</url>
         <tag>HEAD</tag>
     </scm>
 
@@ -94,7 +94,7 @@
         <profile>
             <id>central</id>
             <activation>
-                <activeByDefault>true</activeByDefault>
+                <activeByDefault>false</activeByDefault>
             </activation>
             <build>
                 <plugins>
@@ -162,7 +162,7 @@
         <profile>
             <id>github</id>
             <activation>
-                <activeByDefault>false</activeByDefault>
+                <activeByDefault>true</activeByDefault>
             </activation>
             <distributionManagement>
                 <repository>
