@@ -1,0 +1,10 @@
+{
+  "threshold": 20,
+  "ignore": [
+    "**/.github/**",
+    "**/.qubership/**",
+    "**/*/*.sh",
+    "**/*/*.yaml",
+    "**/*/*.xml"
+  ]
+}
