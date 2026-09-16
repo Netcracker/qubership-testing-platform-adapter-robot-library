@@ -72,7 +72,9 @@ jobs:
           ref: ${{ github.ref }}
           module: ${{ github.event.repository.name }}
           maven-args: ${{ inputs.mvn-args }}
-          profile: ${{ inputs.profile }}
+          # pom.xml activates source/javadoc generation only in a dedicated github-release
+          # profile, kept separate from the always-on "github" snapshot-deploy profile.
+          profile: ${{ inputs.profile == 'github' && 'github-release' || inputs.profile }}
           server-id: ${{ inputs.profile }}
           token: ${{ secrets.GITHUB_TOKEN }}
           maven-user: ${{ inputs.profile == 'github' && github.actor || secrets.MAVEN_USER }}
@@ -103,7 +105,9 @@ jobs:
           ref: ${{ github.ref }}
           module: ${{ github.event.repository.name }}
           maven-args: ${{ inputs.mvn-args }}
-          profile: ${{ inputs.profile }}
+          # pom.xml activates source/javadoc generation only in a dedicated github-release
+          # profile, kept separate from the always-on "github" snapshot-deploy profile.
+          profile: ${{ inputs.profile == 'github' && 'github-release' || inputs.profile }}
           server-id: ${{ inputs.profile }}
           token: ${{ steps.app-token.outputs.token }} # It can be ${{ secrets.GITHUB_TOKEN }} if default branch isn't protected
           maven-user: ${{ inputs.profile == 'github' && github.actor || secrets.MAVEN_USER }}
