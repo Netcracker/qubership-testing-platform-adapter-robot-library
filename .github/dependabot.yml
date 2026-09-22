@@ -9,7 +9,9 @@ updates:
     directories:
       - "/.github/workflows"
     schedule:
-      interval: "weekly"
+      interval: "cron"
+      cronjob: "0 9 */14 * *"
+      timezone: "Europe/Moscow"
     groups:
       workflow-hub-updates:
         patterns:
