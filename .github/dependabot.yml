@@ -10,8 +10,8 @@ updates:
       - "/.github/workflows"
     schedule:
       interval: "cron"
-      cronjob: "0 9 */14 * *"
-      timezone: "Europe/Moscow"
+      cronjob: "0 6 5,20 * *"
+      timezone: "UTC"
     groups:
       workflow-hub-updates:
         patterns:

@@ -1,6 +1,8 @@
 {
-  "threshold": 20,
+  "threshold": 10,
+  "mode": "weak",
   "ignore": [
+    "**/target/**",
     "**/.github/**",
     "**/.qubership/**",
     "**/*/*.sh",
